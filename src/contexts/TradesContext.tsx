@@ -35,9 +35,9 @@ export const TradesProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-export const useTradesContext = () => {
+export const useTradesContext = (): TradesContextType => {
   const context = useContext(TradesContext);
-  if (!context) {
+  if (context === undefined) {
     throw new Error('useTradesContext must be used within TradesProvider');
   }
   return context;
