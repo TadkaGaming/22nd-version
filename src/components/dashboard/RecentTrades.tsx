@@ -1,9 +1,10 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTradesContext } from '@/contexts/TradesContext';
-import { calculateTradeMetrics } from '@/types/trade';
+import { useTradeModal } from '@/contexts/TradeModalContext';
+import { Trade, calculateTradeMetrics } from '@/types/trade';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
@@ -11,8 +12,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 
 export const RecentTrades = () => {
   const { trades } = useTradesContext();
+  const { openModal } = useTradeModal();
   const navigate = useNavigate();
-  const scrollRef = useRef<HTMLDivElement>(null);
   const [showViewMore, setShowViewMore] = useState(false);
 
   // Get closed trades sorted by close date (most recent first)
@@ -43,7 +44,7 @@ export const RecentTrades = () => {
     setShowViewMore(isAtBottom && hasMoreTrades);
   };
 
-  const TradeItem = ({ trade, index }: { trade: typeof trades[0]; index: number }) => {
+  const TradeItem = ({ trade, index }: { trade: Trade; index: number }) => {
     const metrics = calculateTradeMetrics(trade);
     const isOpen = metrics.positionStatus === 'OPEN';
 
@@ -53,7 +54,8 @@ export const RecentTrades = () => {
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 0.05 * index }}
-        className="flex items-center justify-between p-3 rounded-xl bg-secondary/30 hover:bg-secondary/50 transition-colors"
+        onClick={() => openModal(trade)}
+        className="flex items-center justify-between p-3 rounded-xl bg-secondary/30 hover:bg-secondary/50 transition-colors cursor-pointer"
       >
         <div className="flex items-center gap-3">
           <div className={cn(
