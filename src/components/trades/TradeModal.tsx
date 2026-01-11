@@ -40,6 +40,7 @@ export const TradeModal = () => {
   const [instrument, setInstrument] = useState<'Equity' | 'Futures' | 'Options' | 'Crypto'>('Equity');
   const [entries, setEntries] = useState<TradeEntry[]>([defaultEntry()]);
   const [tradeRisk, setTradeRisk] = useState(0);
+  const [tradeTarget, setTradeTarget] = useState(0);
   const [accountName, setAccountName] = useState('');
   const [strategyId, setStrategyId] = useState<string>('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
@@ -52,6 +53,7 @@ export const TradeModal = () => {
       setInstrument(editingTrade.instrument);
       setEntries(editingTrade.entries.length > 0 ? editingTrade.entries : [defaultEntry()]);
       setTradeRisk(editingTrade.tradeRisk);
+      setTradeTarget(editingTrade.tradeTarget || 0);
       setAccountName(editingTrade.accountName);
       setStrategyId(editingTrade.strategyId || '');
       setSelectedTags(editingTrade.tags);
@@ -66,6 +68,7 @@ export const TradeModal = () => {
     setInstrument('Equity');
     setEntries([defaultEntry()]);
     setTradeRisk(0);
+    setTradeTarget(0);
     setAccountName('');
     setStrategyId('');
     setSelectedTags([]);
@@ -113,13 +116,14 @@ export const TradeModal = () => {
       instrument,
       entries,
       tradeRisk,
+      tradeTarget,
       accountName,
       strategyId: strategyId || undefined,
       tags: selectedTags,
       notes,
     };
     return calculateTradeMetrics(formData);
-  }, [symbol, instrument, entries, tradeRisk, accountName, strategyId, selectedTags, notes]);
+  }, [symbol, instrument, entries, tradeRisk, tradeTarget, accountName, strategyId, selectedTags, notes]);
 
   // Auto-calculated side from entries
   const calculatedSide = metrics.positionSide || 'LONG';
@@ -133,6 +137,7 @@ export const TradeModal = () => {
       instrument,
       entries,
       tradeRisk,
+      tradeTarget,
       accountName: accountName.trim(),
       strategyId: strategyId || undefined,
       tags: selectedTags,
@@ -292,7 +297,7 @@ export const TradeModal = () => {
                 </div>
               </div>
 
-              {/* Risk & Account - Side by Side */}
+              {/* Risk & Target - Side by Side */}
               <div className="grid grid-cols-2 gap-2">
                 <div>
                   <Label className="text-xs mb-1 block">Risk</Label>
@@ -308,35 +313,50 @@ export const TradeModal = () => {
                   </div>
                 </div>
                 <div>
-                  <Label className="text-xs mb-1 block">Account</Label>
-                  {accounts.length === 0 ? (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        closeModal();
-                        navigate('/settings');
-                      }}
-                      className="w-full h-8 text-xs"
-                    >
-                      <Wallet className="w-3 h-3 mr-1.5" />
-                      Add Account
-                    </Button>
-                  ) : (
-                    <Select value={accountName || "none"} onValueChange={(val) => setAccountName(val === "none" ? "" : val)}>
-                      <SelectTrigger className="h-8 text-sm bg-input border-border">
-                        <SelectValue placeholder="Select..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="none">None</SelectItem>
-                        {accounts.map((a) => (
-                          <SelectItem key={a.id} value={a.name}>{a.name}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
+                  <Label className="text-xs mb-1 block">Target</Label>
+                  <div className="relative">
+                    <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">₹</span>
+                    <Input
+                      type="number"
+                      placeholder="2,000"
+                      value={tradeTarget || ''}
+                      onChange={(e) => setTradeTarget(parseFloat(e.target.value) || 0)}
+                      className="pl-6 h-8 text-sm bg-input border-border"
+                    />
+                  </div>
                 </div>
+              </div>
+
+              {/* Account */}
+              <div>
+                <Label className="text-xs mb-1 block">Account</Label>
+                {accounts.length === 0 ? (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      closeModal();
+                      navigate('/settings');
+                    }}
+                    className="w-full h-8 text-xs"
+                  >
+                    <Wallet className="w-3 h-3 mr-1.5" />
+                    Add Account
+                  </Button>
+                ) : (
+                  <Select value={accountName || "none"} onValueChange={(val) => setAccountName(val === "none" ? "" : val)}>
+                    <SelectTrigger className="h-8 text-sm bg-input border-border">
+                      <SelectValue placeholder="Select..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">None</SelectItem>
+                      {accounts.map((a) => (
+                        <SelectItem key={a.id} value={a.name}>{a.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
               </div>
 
               {/* Strategy */}
@@ -419,8 +439,43 @@ export const TradeModal = () => {
             </div>
           </div>
 
-          {/* Right Panel - Trade Entries */}
+          {/* Right Panel - Trade Entries & Metrics */}
           <div className="flex-1 p-5 overflow-y-auto flex flex-col min-w-0">
+            {/* MAE/MFE Metrics Section */}
+            <div className="glass-card rounded-xl p-3 mb-4">
+              <h3 className="text-xs font-medium text-muted-foreground mb-2">Position Metrics</h3>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <div className="flex justify-between items-center">
+                    <span className="text-[10px] text-muted-foreground">Position MAE</span>
+                    <span className={`font-mono text-xs ${metrics.positionMAE < 0 ? 'text-loss' : 'text-muted-foreground'}`}>
+                      ₹{metrics.positionMAE.toFixed(2)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-[10px] text-muted-foreground">Potential MAE</span>
+                    <span className={`font-mono text-xs ${metrics.potentialMAE < 0 ? 'text-loss' : 'text-muted-foreground'}`}>
+                      ₹{metrics.potentialMAE.toFixed(2)}
+                    </span>
+                  </div>
+                </div>
+                <div className="space-y-1.5">
+                  <div className="flex justify-between items-center">
+                    <span className="text-[10px] text-muted-foreground">Position MFE</span>
+                    <span className={`font-mono text-xs ${metrics.positionMFE > 0 ? 'text-profit' : 'text-muted-foreground'}`}>
+                      ₹{metrics.positionMFE.toFixed(2)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-[10px] text-muted-foreground">Potential MFE</span>
+                    <span className={`font-mono text-xs ${metrics.potentialMFE > 0 ? 'text-profit' : 'text-muted-foreground'}`}>
+                      ₹{metrics.potentialMFE.toFixed(2)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
               <TabsList className="w-fit mb-4">
                 <TabsTrigger value="trades">Trades</TabsTrigger>
