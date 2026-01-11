@@ -10,7 +10,6 @@ export const AvgWinLossRatio = ({ avgWin, avgLoss }: AvgWinLossRatioProps) => {
   const ratio = absLoss > 0 ? avgWin / absLoss : avgWin > 0 ? Infinity : 0;
   const total = avgWin + absLoss;
   
-  // Calculate percentages for the bar
   const winPercent = total > 0 ? (avgWin / total) * 100 : 50;
   const lossPercent = total > 0 ? (absLoss / total) * 100 : 50;
 
@@ -24,45 +23,41 @@ export const AvgWinLossRatio = ({ avgWin, avgLoss }: AvgWinLossRatioProps) => {
   };
 
   return (
-    <div className="flex flex-col items-center w-full">
-      <p className="text-xs text-muted-foreground mb-2">Avg Win/Loss</p>
-      
-      {/* Ratio Value */}
-      <motion.p
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
-        className="text-xl font-bold font-mono mb-3"
-      >
-        {formatRatio(ratio)}
-      </motion.p>
+    <div className="flex flex-col w-full gap-1">
+      <div className="flex items-center justify-between">
+        <span className="text-xs text-muted-foreground">Avg Win/Loss</span>
+        <motion.span
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="text-2xl font-bold font-mono"
+        >
+          {formatRatio(ratio)}
+        </motion.span>
+      </div>
 
-      {/* Bar Chart */}
-      <div className="w-full space-y-1.5">
-        <div className="flex h-2.5 rounded-full overflow-hidden bg-secondary">
-          <motion.div
-            initial={{ width: 0 }}
-            animate={{ width: `${winPercent}%` }}
-            transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
-            className="bg-profit h-full"
-          />
-          <motion.div
-            initial={{ width: 0 }}
-            animate={{ width: `${lossPercent}%` }}
-            transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
-            className="bg-loss h-full"
-          />
-        </div>
+      <div className="flex h-2 rounded-full overflow-hidden bg-secondary">
+        <motion.div
+          initial={{ width: 0 }}
+          animate={{ width: `${winPercent}%` }}
+          transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
+          className="bg-profit h-full"
+        />
+        <motion.div
+          initial={{ width: 0 }}
+          animate={{ width: `${lossPercent}%` }}
+          transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
+          className="bg-loss h-full"
+        />
+      </div>
 
-        {/* Labels */}
-        <div className="flex justify-between text-[10px]">
-          <span className="profit-text font-mono font-medium">
-            {formatCurrency(avgWin)}
-          </span>
-          <span className="loss-text font-mono font-medium">
-            -{formatCurrency(absLoss)}
-          </span>
-        </div>
+      <div className="flex justify-between text-[10px]">
+        <span className="profit-text font-mono font-medium">
+          {formatCurrency(avgWin)}
+        </span>
+        <span className="loss-text font-mono font-medium">
+          -{formatCurrency(absLoss)}
+        </span>
       </div>
     </div>
   );
