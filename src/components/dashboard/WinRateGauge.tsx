@@ -89,7 +89,7 @@ export const WinRateGauge = ({ value, label, winners = 0, losers = 0, breakeven 
         </div>
         
         {/* Numbers below gauge - aligned with chart edges */}
-        <div className="flex items-center justify-between w-full mt-1 text-xs font-medium" style={{ maxWidth: size }}>
+        <div className="flex items-center justify-between w-full mt-1 text-xs font-medium" style={{ maxWidth: 110 }}>
           <Tooltip>
             <TooltipTrigger asChild>
               <span className="profit-text cursor-help bg-profit/15 px-2 py-0.5 rounded-full">{winners}</span>
