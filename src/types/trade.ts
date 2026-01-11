@@ -14,6 +14,7 @@ export interface Trade {
   instrument: 'Equity' | 'Futures' | 'Options' | 'Crypto';
   entries: TradeEntry[];
   tradeRisk: number;
+  tradeTarget: number;
   accountName: string;
   strategyId?: string;
   tags: string[];
@@ -41,6 +42,11 @@ export interface TradeCalculations {
   positionSide: 'LONG' | 'SHORT' | null;
   positionStatus: 'OPEN' | 'CLOSED';
   openQuantity: number;
+  // MAE/MFE metrics
+  positionMAE: number;
+  positionMFE: number;
+  potentialMAE: number;
+  potentialMFE: number;
 }
 
 export type TradeFormData = Omit<Trade, 'id' | 'createdAt' | 'updatedAt'>;
@@ -129,6 +135,34 @@ export function calculateTradeMetrics(trade: Trade | TradeFormData): TradeCalcul
   const investedAmount = side === 'LONG' ? totalBuyCost : totalSellValue;
   const returnPercent = investedAmount > 0 ? (netPnl / investedAmount) * 100 : 0;
   
+  // MAE/MFE calculations
+  // Position MAE: Maximum loss experienced during the trade (worst drawdown from entry)
+  // Position MFE: Maximum profit experienced during the trade (best gain from entry)
+  // For now, we calculate based on entry price vs individual trade prices
+  let positionMAE = 0;
+  let positionMFE = 0;
+  
+  if (closedQty > 0 && avgEntryPrice > 0) {
+    for (const entry of sortedEntries) {
+      if (entry.price > 0) {
+        let excursion = 0;
+        if (side === 'LONG') {
+          excursion = (entry.price - avgEntryPrice) * closedQty;
+        } else {
+          excursion = (avgEntryPrice - entry.price) * closedQty;
+        }
+        if (excursion < positionMAE) positionMAE = excursion;
+        if (excursion > positionMFE) positionMFE = excursion;
+      }
+    }
+  }
+  
+  // Potential MAE/MFE based on risk/target
+  const tradeRiskValue = trade.tradeRisk || 0;
+  const tradeTargetValue = ('tradeTarget' in trade ? (trade as any).tradeTarget : 0) || 0;
+  const potentialMAE = -Math.abs(tradeRiskValue);
+  const potentialMFE = Math.abs(tradeTargetValue);
+  
   return {
     grossPnl,
     netPnl,
@@ -146,5 +180,9 @@ export function calculateTradeMetrics(trade: Trade | TradeFormData): TradeCalcul
     positionSide,
     positionStatus,
     openQuantity,
+    positionMAE,
+    positionMFE,
+    potentialMAE,
+    potentialMFE,
   };
 }
