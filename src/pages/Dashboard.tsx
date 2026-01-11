@@ -1,4 +1,3 @@
-import { DollarSign } from 'lucide-react';
 import { RecentTrades } from '@/components/dashboard/RecentTrades';
 import { WinRateGauge } from '@/components/dashboard/WinRateGauge';
 import { ProfitFactorRing } from '@/components/dashboard/ProfitFactorRing';
@@ -27,26 +26,23 @@ const Dashboard = () => {
         </div>
       </motion.div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-3">
         {/* Net P&L with Total Trades */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0 }}
-          className="glass-card rounded-2xl p-4 relative overflow-hidden"
+          className="glass-card rounded-xl px-4 py-3"
         >
-          <div className="absolute top-0 right-0 w-24 h-24 opacity-5 transform translate-x-6 -translate-y-6">
-            <DollarSign className="w-full h-full" />
+          <div className="flex items-center gap-1.5 mb-1">
+            <span className="text-xs text-muted-foreground">Net P&L</span>
+            <span className="text-[10px] text-muted-foreground bg-secondary px-1.5 py-0.5 rounded">
+              {stats.totalTrades}
+            </span>
           </div>
-          <div className="relative z-10">
-            <p className="stat-label mb-1 text-xs">Net P&L</p>
-            <p className={`text-xl font-bold font-mono ${stats.netPnl >= 0 ? 'profit-text' : 'loss-text'}`}>
-              {formatCurrency(stats.netPnl)}
-            </p>
-            <p className="text-[10px] text-muted-foreground mt-1">
-              Total Trades: {stats.totalTrades}
-            </p>
-          </div>
+          <p className={`text-2xl font-bold font-mono ${stats.netPnl >= 0 ? 'profit-text' : 'loss-text'}`}>
+            {formatCurrency(stats.netPnl)}
+          </p>
         </motion.div>
 
         {/* Trade Win Rate */}
@@ -54,28 +50,13 @@ const Dashboard = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.1 }}
-          className="glass-card rounded-2xl p-4 flex items-center justify-center"
+          className="glass-card rounded-xl px-4 py-3"
         >
           <WinRateGauge 
             value={stats.tradeWinRate} 
-            label="Trade Win Rate"
+            label="Trade Win %"
             winners={stats.winningTrades}
             losers={stats.losingTrades}
-            size={100}
-          />
-        </motion.div>
-
-        {/* Day Win Rate */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.2 }}
-          className="glass-card rounded-2xl p-4 flex items-center justify-center"
-        >
-          <WinRateGauge 
-            value={stats.dayWinRate} 
-            label="Day Win Rate"
-            size={100}
           />
         </motion.div>
 
@@ -83,14 +64,26 @@ const Dashboard = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.3 }}
-          className="glass-card rounded-2xl p-4 flex items-center justify-center"
+          transition={{ duration: 0.4, delay: 0.2 }}
+          className="glass-card rounded-xl px-4 py-3"
         >
           <ProfitFactorRing 
             profitFactor={stats.profitFactor}
             totalProfits={stats.totalProfits}
             totalLosses={stats.totalLosses}
-            size={100}
+          />
+        </motion.div>
+
+        {/* Day Win Rate */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.3 }}
+          className="glass-card rounded-xl px-4 py-3"
+        >
+          <WinRateGauge 
+            value={stats.dayWinRate} 
+            label="Day Win %"
           />
         </motion.div>
 
@@ -99,7 +92,7 @@ const Dashboard = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.4 }}
-          className="glass-card rounded-2xl p-4 flex items-center justify-center"
+          className="glass-card rounded-xl px-4 py-3"
         >
           <AvgWinLossRatio 
             avgWin={stats.avgWin}
