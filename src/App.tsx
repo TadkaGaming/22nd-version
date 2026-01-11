@@ -28,9 +28,9 @@ const App = () => (
           <TradesProvider>
             <AccountsProvider>
               <TradeModalProvider>
-                <Toaster />
-                <Sonner />
                 <BrowserRouter>
+                  <Toaster />
+                  <Sonner />
                   <AppLayout>
                     <Routes>
                       <Route path="/" element={<Dashboard />} />
