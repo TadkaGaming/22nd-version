@@ -74,7 +74,20 @@ export const TradeModal = () => {
   };
 
   const addEntry = () => {
-    setEntries([...entries, defaultEntry()]);
+    // Check first entry type and default new entry to opposite
+    const firstEntry = entries[0];
+    const newEntryType: 'BUY' | 'SELL' = firstEntry?.type === 'BUY' ? 'SELL' : 'BUY';
+    
+    const newEntry: TradeEntry = {
+      id: crypto.randomUUID(),
+      type: newEntryType,
+      datetime: new Date().toISOString().slice(0, 16),
+      quantity: 0,
+      price: 0,
+      charges: 0,
+    };
+    
+    setEntries([...entries, newEntry]);
   };
 
   const removeEntry = (id: string) => {
