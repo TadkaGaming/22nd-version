@@ -18,6 +18,9 @@ const Settings = () => {
     addConfluence, removeConfluence,
     addPattern, removePattern,
     addPreparation, removePreparation,
+    addEntryComment, removeEntryComment,
+    addTradeManagement, removeTradeManagement,
+    addExitComment, removeExitComment,
   } = useCustomStats();
   
   const [newTag, setNewTag] = useState('');
@@ -39,6 +42,9 @@ const Settings = () => {
   const [newConfluence, setNewConfluence] = useState('');
   const [newPattern, setNewPattern] = useState('');
   const [newPreparation, setNewPreparation] = useState('');
+  const [newEntryComment, setNewEntryComment] = useState('');
+  const [newTradeManagement, setNewTradeManagement] = useState('');
+  const [newExitComment, setNewExitComment] = useState('');
 
   const accountsWithStats = getAllAccountsWithStats();
   const handleAddTag = () => {
@@ -134,6 +140,27 @@ const Settings = () => {
     if (newPreparation.trim()) {
       addPreparation(newPreparation.trim());
       setNewPreparation('');
+    }
+  };
+
+  const handleAddEntryComment = () => {
+    if (newEntryComment.trim()) {
+      addEntryComment(newEntryComment.trim());
+      setNewEntryComment('');
+    }
+  };
+
+  const handleAddTradeManagement = () => {
+    if (newTradeManagement.trim()) {
+      addTradeManagement(newTradeManagement.trim());
+      setNewTradeManagement('');
+    }
+  };
+
+  const handleAddExitComment = () => {
+    if (newExitComment.trim()) {
+      addExitComment(newExitComment.trim());
+      setNewExitComment('');
     }
   };
 
@@ -532,6 +559,117 @@ const Settings = () => {
                     <span className="text-sm">{item}</span>
                     <button
                       onClick={() => removePreparation(item)}
+                      className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 hover:text-destructive"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Entry Comments */}
+          <div className="space-y-3">
+            <h3 className="text-sm font-medium text-foreground">Entry Comments</h3>
+            <div className="flex gap-3">
+              <Input
+                placeholder="Add new entry comment..."
+                value={newEntryComment}
+                onChange={(e) => setNewEntryComment(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleAddEntryComment()}
+                className="bg-input border-border flex-1"
+              />
+              <Button onClick={handleAddEntryComment} disabled={!newEntryComment.trim()} size="sm">
+                <Plus className="w-4 h-4" />
+              </Button>
+            </div>
+            {customStatsOptions.entryComments.length === 0 ? (
+              <p className="text-sm text-muted-foreground">No entry comment options added yet</p>
+            ) : (
+              <div className="flex flex-wrap gap-2">
+                {customStatsOptions.entryComments.map((item) => (
+                  <div
+                    key={item}
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-muted/50 rounded-lg border border-border group"
+                  >
+                    <span className="text-sm">{item}</span>
+                    <button
+                      onClick={() => removeEntryComment(item)}
+                      className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 hover:text-destructive"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Trade Management */}
+          <div className="space-y-3">
+            <h3 className="text-sm font-medium text-foreground">Trade Management</h3>
+            <div className="flex gap-3">
+              <Input
+                placeholder="Add new trade management..."
+                value={newTradeManagement}
+                onChange={(e) => setNewTradeManagement(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleAddTradeManagement()}
+                className="bg-input border-border flex-1"
+              />
+              <Button onClick={handleAddTradeManagement} disabled={!newTradeManagement.trim()} size="sm">
+                <Plus className="w-4 h-4" />
+              </Button>
+            </div>
+            {customStatsOptions.tradeManagements.length === 0 ? (
+              <p className="text-sm text-muted-foreground">No trade management options added yet</p>
+            ) : (
+              <div className="flex flex-wrap gap-2">
+                {customStatsOptions.tradeManagements.map((item) => (
+                  <div
+                    key={item}
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-muted/50 rounded-lg border border-border group"
+                  >
+                    <span className="text-sm">{item}</span>
+                    <button
+                      onClick={() => removeTradeManagement(item)}
+                      className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 hover:text-destructive"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Exit Comments */}
+          <div className="space-y-3">
+            <h3 className="text-sm font-medium text-foreground">Exit Comments</h3>
+            <div className="flex gap-3">
+              <Input
+                placeholder="Add new exit comment..."
+                value={newExitComment}
+                onChange={(e) => setNewExitComment(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleAddExitComment()}
+                className="bg-input border-border flex-1"
+              />
+              <Button onClick={handleAddExitComment} disabled={!newExitComment.trim()} size="sm">
+                <Plus className="w-4 h-4" />
+              </Button>
+            </div>
+            {customStatsOptions.exitComments.length === 0 ? (
+              <p className="text-sm text-muted-foreground">No exit comment options added yet</p>
+            ) : (
+              <div className="flex flex-wrap gap-2">
+                {customStatsOptions.exitComments.map((item) => (
+                  <div
+                    key={item}
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-muted/50 rounded-lg border border-border group"
+                  >
+                    <span className="text-sm">{item}</span>
+                    <button
+                      onClick={() => removeExitComment(item)}
                       className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 hover:text-destructive"
                     >
                       <Trash2 className="w-3 h-3" />

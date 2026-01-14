@@ -841,50 +841,41 @@ export const TradeModal = () => {
           {activeTab === 'advanced' && (
             <div className="space-y-6">
               {/* Trade Comments Section */}
-              <div className="space-y-4">
-                <div className="space-y-1.5">
-                  <Label className="text-xs text-muted-foreground">Entry Comments</Label>
-                  <Select value={entryComment || "none"} onValueChange={(val) => setEntryComment(val === "none" ? "" : val)}>
-                    <SelectTrigger className="h-10 bg-input border-border">
-                      <SelectValue placeholder="Select..." />
-                    </SelectTrigger>
-                    <SelectContent className="bg-popover border-border z-50">
-                      <SelectItem value="none">Select...</SelectItem>
-                      {customStatsOptions.entryComments.map((opt) => (
-                        <SelectItem key={opt} value={opt}>{opt}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+              <div className="space-y-3">
+                <h4 className="text-sm font-medium text-foreground">Trade Comments</h4>
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="space-y-1.5">
+                    <Label className="text-xs text-muted-foreground">Entry Comments</Label>
+                    <TypeableCombobox
+                      value={entryComment}
+                      onChange={setEntryComment}
+                      options={customStatsOptions.entryComments}
+                      onAddNew={addEntryComment}
+                      placeholder="Select..."
+                    />
+                  </div>
 
-                <div className="space-y-1.5">
-                  <Label className="text-xs text-muted-foreground">Trade Management</Label>
-                  <Select value={tradeManagement || "none"} onValueChange={(val) => setTradeManagement(val === "none" ? "" : val)}>
-                    <SelectTrigger className="h-10 bg-input border-border">
-                      <SelectValue placeholder="Select..." />
-                    </SelectTrigger>
-                    <SelectContent className="bg-popover border-border z-50">
-                      <SelectItem value="none">Select...</SelectItem>
-                      {customStatsOptions.tradeManagements.map((opt) => (
-                        <SelectItem key={opt} value={opt}>{opt}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-xs text-muted-foreground">Trade Management</Label>
+                    <TypeableCombobox
+                      value={tradeManagement}
+                      onChange={setTradeManagement}
+                      options={customStatsOptions.tradeManagements}
+                      onAddNew={addTradeManagement}
+                      placeholder="Select..."
+                    />
+                  </div>
 
-                <div className="space-y-1.5">
-                  <Label className="text-xs text-muted-foreground">Exit Comments</Label>
-                  <Select value={exitComment || "none"} onValueChange={(val) => setExitComment(val === "none" ? "" : val)}>
-                    <SelectTrigger className="h-10 bg-input border-border">
-                      <SelectValue placeholder="Select..." />
-                    </SelectTrigger>
-                    <SelectContent className="bg-popover border-border z-50">
-                      <SelectItem value="none">Select...</SelectItem>
-                      {customStatsOptions.exitComments.map((opt) => (
-                        <SelectItem key={opt} value={opt}>{opt}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <div className="space-y-1.5">
+                    <Label className="text-xs text-muted-foreground">Exit Comments</Label>
+                    <TypeableCombobox
+                      value={exitComment}
+                      onChange={setExitComment}
+                      options={customStatsOptions.exitComments}
+                      onAddNew={addExitComment}
+                      placeholder="Select..."
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -973,7 +964,7 @@ export const TradeModal = () => {
                   </div>
 
                   {/* Break Even Toggle */}
-                  <div className="border border-border rounded-lg overflow-hidden">
+                  <div className="grid grid-cols-2 gap-0 border border-border rounded-lg overflow-hidden">
                     <button
                       type="button"
                       onClick={() => setBreakEven(breakEven === true ? null : true)}
@@ -985,6 +976,18 @@ export const TradeModal = () => {
                       )}
                     >
                       Yes
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setBreakEven(breakEven === false ? null : false)}
+                      className={cn(
+                        "h-10 px-6 text-sm font-medium transition-colors border-l border-border",
+                        breakEven === false
+                          ? "bg-foreground text-background"
+                          : "bg-background text-foreground hover:bg-muted/50"
+                      )}
+                    >
+                      No
                     </button>
                   </div>
                 </div>
