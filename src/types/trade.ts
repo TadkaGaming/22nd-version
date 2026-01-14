@@ -83,18 +83,29 @@ export function calculateTradeMetrics(trade: Trade | TradeFormData): TradeCalcul
     ? (firstEntry.type === 'BUY' ? 'LONG' : 'SHORT')
     : null;
   
-  // Calculate running position
-  let netPosition = 0; // positive = long, negative = short
-  for (const entry of sortedEntries) {
-    if (entry.type === 'BUY') {
-      netPosition += entry.quantity;
-    } else {
-      netPosition -= entry.quantity;
-    }
-  }
+  // Calculate open quantity - prefer scaleEntries/scaleExits if they exist
+  let openQuantity = 0;
+  let positionStatus: 'OPEN' | 'CLOSED' = 'CLOSED';
   
-  const openQuantity = Math.abs(netPosition);
-  const positionStatus: 'OPEN' | 'CLOSED' = netPosition === 0 ? 'CLOSED' : 'OPEN';
+  if (trade.scaleEntries && trade.scaleEntries.length > 0) {
+    // Use scale entries/exits for position tracking
+    const totalScaleEntryQty = trade.scaleEntries.reduce((sum, e) => sum + e.quantity, 0);
+    const totalScaleExitQty = (trade.scaleExits || []).reduce((sum, e) => sum + e.quantity, 0);
+    openQuantity = Math.max(0, totalScaleEntryQty - totalScaleExitQty);
+    positionStatus = openQuantity > 0 ? 'OPEN' : 'CLOSED';
+  } else {
+    // Fallback to entries array for position tracking
+    let netPosition = 0; // positive = long, negative = short
+    for (const entry of sortedEntries) {
+      if (entry.type === 'BUY') {
+        netPosition += entry.quantity;
+      } else {
+        netPosition -= entry.quantity;
+      }
+    }
+    openQuantity = Math.abs(netPosition);
+    positionStatus = netPosition === 0 ? 'CLOSED' : 'OPEN';
+  }
   
   // Separate buy and sell entries
   const buyEntries = entries.filter(e => e.type === 'BUY');
