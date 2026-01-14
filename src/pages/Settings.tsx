@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Trash2, Edit2, Check, X, Tag, Wallet, TrendingUp, TrendingDown, ArrowLeftRight, BarChart3 } from 'lucide-react';
+import { Plus, Trash2, Edit2, Check, X, Tag, Wallet, TrendingUp, TrendingDown, ArrowLeftRight, BarChart3, MessageSquareText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useTagsContext } from '@/contexts/TagsContext';
@@ -568,7 +568,22 @@ const Settings = () => {
               </div>
             )}
           </div>
+        </div>
+      </div>
 
+      {/* Trade Advance Comments Section */}
+      <div className="glass-card rounded-2xl p-6">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
+            <MessageSquareText className="w-5 h-5 text-primary" />
+          </div>
+          <div>
+            <h2 className="text-xl font-semibold">Trade Advance Comments</h2>
+            <p className="text-sm text-muted-foreground">Manage dropdown options for trade comments</p>
+          </div>
+        </div>
+
+        <div className="space-y-6">
           {/* Entry Comments */}
           <div className="space-y-3">
             <h3 className="text-sm font-medium text-foreground">Entry Comments</h3>
