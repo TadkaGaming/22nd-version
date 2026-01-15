@@ -22,6 +22,11 @@ import NotFound from "./pages/NotFound";
 import Drawdown from "./pages/chartroom/Drawdown";
 import ExitAnalysis from "./pages/chartroom/ExitAnalysis";
 import HoldingTime from "./pages/chartroom/HoldingTime";
+import PerformanceByInstrument from "./pages/chartroom/PerformanceByInstrument";
+import PerformanceBySetup from "./pages/chartroom/PerformanceBySetup";
+import PerformanceByTime from "./pages/chartroom/PerformanceByTime";
+import PerformanceRatio from "./pages/chartroom/PerformanceRatio";
+import RiskDistribution from "./pages/chartroom/RiskDistribution";
 
 const queryClient = new QueryClient();
 
@@ -49,6 +54,11 @@ const App = () => (
                           <Route path="/chart-room/drawdown" element={<Drawdown />} />
                           <Route path="/chart-room/exit-analysis" element={<ExitAnalysis />} />
                           <Route path="/chart-room/holding-time" element={<HoldingTime />} />
+                          <Route path="/chart-room/performance-by-instrument" element={<PerformanceByInstrument />} />
+                          <Route path="/chart-room/performance-by-setup" element={<PerformanceBySetup />} />
+                          <Route path="/chart-room/performance-by-time" element={<PerformanceByTime />} />
+                          <Route path="/chart-room/performance-ratio" element={<PerformanceRatio />} />
+                          <Route path="/chart-room/risk-distribution" element={<RiskDistribution />} />
                           <Route path="/settings" element={<Settings />} />
                           <Route path="*" element={<NotFound />} />
                         </Routes>

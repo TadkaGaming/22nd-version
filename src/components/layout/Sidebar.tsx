@@ -18,6 +18,11 @@ const chartRoomItems = [
   { label: 'Drawdown', path: '/chart-room/drawdown' },
   { label: 'Exit Analysis', path: '/chart-room/exit-analysis' },
   { label: 'Holding Time', path: '/chart-room/holding-time' },
+  { label: 'Performance by Instrument', path: '/chart-room/performance-by-instrument' },
+  { label: 'Performance by Setup', path: '/chart-room/performance-by-setup' },
+  { label: 'Performance by Time', path: '/chart-room/performance-by-time' },
+  { label: 'Performance Ratio', path: '/chart-room/performance-ratio' },
+  { label: 'Risk Distribution', path: '/chart-room/risk-distribution' },
 ];
 
 export const Sidebar = () => {
