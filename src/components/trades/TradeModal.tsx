@@ -105,6 +105,7 @@ export const TradeModal = () => {
   const [exitComment, setExitComment] = useState('');
   const [farthestPriceInProfit, setFarthestPriceInProfit] = useState<string>('');
   const [farthestPriceInLoss, setFarthestPriceInLoss] = useState<string>('');
+  const [priceReachedFirst, setPriceReachedFirst] = useState<'takeProfit' | 'stopLoss' | ''>('');
   const [breakEven, setBreakEven] = useState<boolean | null>(null);
   
   // Custom Stats fields
@@ -244,6 +245,7 @@ export const TradeModal = () => {
       setExitComment(editingTrade.exitComment || '');
       setFarthestPriceInProfit(editingTrade.farthestPriceInProfit !== undefined ? editingTrade.farthestPriceInProfit.toString() : '');
       setFarthestPriceInLoss(editingTrade.farthestPriceInLoss !== undefined ? editingTrade.farthestPriceInLoss.toString() : '');
+      setPriceReachedFirst(editingTrade.priceReachedFirst || '');
       setBreakEven(editingTrade.breakEven ?? null);
       
       // Load Custom Stats
@@ -307,6 +309,7 @@ export const TradeModal = () => {
     setExitComment('');
     setFarthestPriceInProfit('');
     setFarthestPriceInLoss('');
+    setPriceReachedFirst('');
     setBreakEven(null);
     // Reset Custom Stats
     setTimeframe('');
@@ -401,58 +404,6 @@ export const TradeModal = () => {
     
     return `${days}D ${hours}H ${mins}M`;
   }, [entryDate, exitDate]);
-
-  // Derived "Which level did price reach first?" based on price data
-  const priceReachedFirst = useMemo((): 'takeProfit' | 'stopLoss' | '' => {
-    const entry = parseFloat(entryPrice);
-    const sl = parseFloat(stopLoss);
-    const tp = parseFloat(takeProfit);
-    const farthestProfit = parseFloat(farthestPriceInProfit);
-    const farthestLoss = parseFloat(farthestPriceInLoss);
-    
-    // Validate all required inputs are present
-    if (isNaN(entry) || isNaN(sl) || isNaN(tp) || isNaN(farthestProfit) || isNaN(farthestLoss)) {
-      return '';
-    }
-    
-    if (direction === 'LONG') {
-      const tpTouched = farthestProfit >= tp;
-      const slTouched = farthestLoss <= sl;
-      
-      // TP first if: farthestProfit >= TP AND farthestLoss > SL (didn't touch SL)
-      if (tpTouched && farthestLoss > sl) {
-        return 'takeProfit';
-      }
-      // SL first if: farthestLoss <= SL AND farthestProfit < TP (didn't touch TP)
-      if (slTouched && farthestProfit < tp) {
-        return 'stopLoss';
-      }
-      // Both levels touched - default to Stop Loss
-      if (tpTouched && slTouched) {
-        return 'stopLoss';
-      }
-    } else {
-      // SHORT trade
-      const tpTouched = farthestProfit <= tp;
-      const slTouched = farthestLoss >= sl;
-      
-      // TP first if: farthestProfit <= TP AND farthestLoss < SL (didn't touch SL)
-      if (tpTouched && farthestLoss < sl) {
-        return 'takeProfit';
-      }
-      // SL first if: farthestLoss >= SL AND farthestProfit > TP (didn't touch TP)
-      if (slTouched && farthestProfit > tp) {
-        return 'stopLoss';
-      }
-      // Both levels touched - default to Stop Loss
-      if (tpTouched && slTouched) {
-        return 'stopLoss';
-      }
-    }
-    
-    // Neither level touched
-    return '';
-  }, [direction, entryPrice, stopLoss, takeProfit, farthestPriceInProfit, farthestPriceInLoss]);
 
   // Validation - minimum required fields
   const canSave = symbol.trim() && entryDate && (parseFloat(entryPrice) >= 0) && (parseFloat(quantity) > 0);
@@ -1120,37 +1071,37 @@ export const TradeModal = () => {
                 {/* Price Reached First */}
                 <div className="space-y-1.5">
                   <div className="flex items-center gap-1">
-                    <Label className="text-xs text-muted-foreground">Which level reached first?</Label>
+                    <Label className="text-xs text-muted-foreground">Which level did the price reach first?</Label>
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <Info className="w-3.5 h-3.5 text-muted-foreground cursor-help" />
                       </TooltipTrigger>
                       <TooltipContent>
-                        <p className="text-xs">Auto-derived from farthest prices. Shows which level (TP or SL) was reached first.</p>
+                        <p className="text-xs">Did the price hit your take profit or stop loss first?</p>
                       </TooltipContent>
                     </Tooltip>
                   </div>
                   <div className="grid grid-cols-2 gap-0 border border-border rounded-lg overflow-hidden">
                     <button
                       type="button"
-                      disabled
+                      onClick={() => setPriceReachedFirst(priceReachedFirst === 'takeProfit' ? '' : 'takeProfit')}
                       className={cn(
-                        "h-10 px-4 text-sm font-medium transition-colors cursor-not-allowed",
+                        "h-10 px-4 text-sm font-medium transition-colors",
                         priceReachedFirst === 'takeProfit'
-                          ? "bg-green-500 text-white ring-2 ring-green-500/50 ring-inset"
-                          : "bg-muted/30 text-muted-foreground"
+                          ? "bg-foreground text-background"
+                          : "bg-background text-foreground hover:bg-muted/50"
                       )}
                     >
                       Take Profit
                     </button>
                     <button
                       type="button"
-                      disabled
+                      onClick={() => setPriceReachedFirst(priceReachedFirst === 'stopLoss' ? '' : 'stopLoss')}
                       className={cn(
-                        "h-10 px-4 text-sm font-medium transition-colors border-l border-border cursor-not-allowed",
+                        "h-10 px-4 text-sm font-medium transition-colors border-l border-border",
                         priceReachedFirst === 'stopLoss'
-                          ? "bg-red-500 text-white ring-2 ring-red-500/50 ring-inset"
-                          : "bg-muted/30 text-muted-foreground"
+                          ? "bg-foreground text-background"
+                          : "bg-background text-foreground hover:bg-muted/50"
                       )}
                     >
                       Stop Loss
