@@ -31,7 +31,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 
-type DisplayType = 'dollar' | 'percent' | 'winrate';
+type DisplayType = 'dollar' | 'percent' | 'winrate' | 'tradecount';
 type DateSettingType = 'entry' | 'exit';
 type PeriodType = 'weekday' | 'month' | 'week' | 'hour' | '2hour' | '1hour' | '30min' | '15min' | '10min' | '5min';
 
@@ -299,6 +299,9 @@ const PerformanceByTime = () => {
           case 'winrate':
             displayValue = winrate;
             break;
+          case 'tradecount':
+            displayValue = data.tradeCount;
+            break;
           case 'dollar':
           default:
             displayValue = data.totalPnl;
@@ -401,6 +404,9 @@ const PerformanceByTime = () => {
     if (type === 'winrate') {
       return `${value.toFixed(2)}%`;
     }
+    if (type === 'tradecount') {
+      return `${Math.round(value)}`;
+    }
     const absValue = Math.abs(value);
     if (absValue >= 1000) {
       return `${value >= 0 ? '+' : '-'}${currencyConfig.symbol}${(absValue / 1000).toFixed(1)}k`;
@@ -462,6 +468,7 @@ const PerformanceByTime = () => {
                   <SelectItem value="dollar">Return ($)</SelectItem>
                   <SelectItem value="percent">Return (%)</SelectItem>
                   <SelectItem value="winrate">Winrate (%)</SelectItem>
+                  <SelectItem value="tradecount">Trade Count</SelectItem>
                 </SelectContent>
               </Select>
 
@@ -546,6 +553,9 @@ const PerformanceByTime = () => {
                       if (displayType === 'dollar') {
                         return `${currencyConfig.symbol}${value.toFixed(0)}`;
                       }
+                      if (displayType === 'tradecount') {
+                        return `${Math.round(value)}`;
+                      }
                       return `${value.toFixed(1)}%`;
                     }}
                     width={60}
@@ -568,9 +578,15 @@ const PerformanceByTime = () => {
                         <div className="bg-card border border-border rounded-lg p-3 shadow-lg">
                           <p className="text-foreground font-medium mb-2">{data.label}</p>
                           <div className="space-y-1 text-sm">
-                            <p className={data.totalPnl >= 0 ? 'text-green-500' : 'text-red-500'}>
-                              {formatValue(data.totalPnl, 'dollar')}
-                            </p>
+                            {displayType === 'tradecount' ? (
+                              <p className="text-foreground font-semibold">
+                                Trade Count: {data.tradeCount}
+                              </p>
+                            ) : (
+                              <p className={data.totalPnl >= 0 ? 'text-green-500' : 'text-red-500'}>
+                                {formatValue(data.totalPnl, 'dollar')}
+                              </p>
+                            )}
                             <p className="text-muted-foreground">
                               Number of trades: {data.tradeCount}
                             </p>
@@ -598,9 +614,11 @@ const PerformanceByTime = () => {
                       <Cell 
                         key={`cell-${index}`}
                         fill={
-                          displayType === 'winrate'
-                            ? entry.displayValue >= 50 ? 'hsl(142, 71%, 45%)' : 'hsl(0, 84%, 60%)'
-                            : entry.displayValue >= 0 ? 'hsl(142, 71%, 45%)' : 'hsl(0, 84%, 60%)'
+                          displayType === 'tradecount'
+                            ? 'hsl(var(--primary))'
+                            : displayType === 'winrate'
+                              ? entry.displayValue >= 50 ? 'hsl(142, 71%, 45%)' : 'hsl(0, 84%, 60%)'
+                              : entry.displayValue >= 0 ? 'hsl(142, 71%, 45%)' : 'hsl(0, 84%, 60%)'
                         }
                       />
                     ))}
