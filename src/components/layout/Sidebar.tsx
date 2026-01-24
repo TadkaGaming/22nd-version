@@ -7,9 +7,12 @@ import { useTradeModal } from '@/contexts/TradeModalContext';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
+import { Calendar } from 'lucide-react';
+
 const navItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
   { icon: ListOrdered, label: 'Trades', path: '/trades' },
+  { icon: Calendar, label: 'Day View', path: '/day-view' },
   { icon: Target, label: 'Setups', path: '/strategies' },
   { icon: FileText, label: 'Reports', path: '/reports' },
 ];
