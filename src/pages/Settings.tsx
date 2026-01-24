@@ -9,6 +9,7 @@ import { useGlobalFilters, CurrencyCode, CURRENCIES } from '@/contexts/GlobalFil
 import { cn } from '@/lib/utils';
 import DepositWithdrawModal from '@/components/settings/DepositWithdrawModal';
 import { CategoriesManagement } from '@/components/settings/CategoriesManagement';
+import { TagsManagement } from '@/components/settings/TagsManagement';
 import { importMT5Trades } from '@/lib/mt5Import';
 import { toast } from 'sonner';
 import {
@@ -406,14 +407,10 @@ const Settings = () => {
             </div>
           )}
 
-          {/* Tags Sub-tab (Placeholder) */}
+          {/* Tags Sub-tab */}
           {activeTagsSubTab === 'tags' && (
             <div className="glass-card rounded-2xl p-6">
-              <div className="text-center py-16 text-muted-foreground">
-                <Tag className="w-12 h-12 mx-auto mb-4 opacity-30" />
-                <p className="font-medium">Tags management coming soon</p>
-                <p className="text-sm">Create and manage tags that can be assigned to your trades</p>
-              </div>
+              <TagsManagement />
             </div>
           )}
         </div>
