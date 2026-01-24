@@ -1,18 +1,31 @@
 import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
+import { useCategoriesContext } from './CategoriesContext';
+
+export interface Tag {
+  id: string;
+  name: string;
+  categoryId: string;
+  description: string;
+}
 
 interface TagsContextType {
-  tags: string[];
-  addTag: (tag: string) => void;
-  removeTag: (tag: string) => void;
-  updateTag: (oldTag: string, newTag: string) => void;
+  tags: Tag[];
+  addTag: (name: string, categoryId: string, description: string) => void;
+  removeTag: (id: string) => void;
+  updateTag: (id: string, name: string, categoryId: string, description: string) => void;
+  removeTagsByCategory: (categoryId: string) => void;
+  getTagUsageCount: (tagId: string, trades: { tags: string[] }[]) => number;
 }
 
 const TagsContext = createContext<TagsContextType | undefined>(undefined);
 
-const TAGS_STORAGE_KEY = 'trading-journal-tags';
+const TAGS_STORAGE_KEY = 'trading-journal-tags-v2';
+
+const generateId = () => `tag_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
 export const TagsProvider = ({ children }: { children: ReactNode }) => {
-  const [tags, setTags] = useState<string[]>([]);
+  const [tags, setTags] = useState<Tag[]>([]);
+  const { onCategoryRemove } = useCategoriesContext();
 
   useEffect(() => {
     const stored = localStorage.getItem(TAGS_STORAGE_KEY);
@@ -21,31 +34,66 @@ export const TagsProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
-  const saveTags = useCallback((newTags: string[]) => {
+  const saveTags = useCallback((newTags: Tag[]) => {
     localStorage.setItem(TAGS_STORAGE_KEY, JSON.stringify(newTags));
     setTags(newTags);
   }, []);
 
-  const addTag = useCallback((tag: string) => {
-    const trimmed = tag.trim();
-    if (trimmed && !tags.includes(trimmed)) {
-      saveTags([...tags, trimmed]);
+  const removeTagsByCategory = useCallback((categoryId: string) => {
+    setTags(currentTags => {
+      const newTags = currentTags.filter(t => t.categoryId !== categoryId);
+      localStorage.setItem(TAGS_STORAGE_KEY, JSON.stringify(newTags));
+      return newTags;
+    });
+  }, []);
+
+  // Subscribe to category removal events
+  useEffect(() => {
+    const unsubscribe = onCategoryRemove((categoryId) => {
+      removeTagsByCategory(categoryId);
+    });
+    return unsubscribe;
+  }, [onCategoryRemove, removeTagsByCategory]);
+
+  const addTag = useCallback((name: string, categoryId: string, description: string) => {
+    const trimmed = name.trim();
+    if (trimmed && categoryId) {
+      const newTag: Tag = {
+        id: generateId(),
+        name: trimmed,
+        categoryId,
+        description: description.trim(),
+      };
+      saveTags([...tags, newTag]);
     }
   }, [tags, saveTags]);
 
-  const removeTag = useCallback((tag: string) => {
-    saveTags(tags.filter(t => t !== tag));
+  const removeTag = useCallback((id: string) => {
+    saveTags(tags.filter(t => t.id !== id));
   }, [tags, saveTags]);
 
-  const updateTag = useCallback((oldTag: string, newTag: string) => {
-    const trimmed = newTag.trim();
-    if (trimmed && !tags.includes(trimmed)) {
-      saveTags(tags.map(t => t === oldTag ? trimmed : t));
+  const updateTag = useCallback((id: string, name: string, categoryId: string, description: string) => {
+    const trimmed = name.trim();
+    if (trimmed && categoryId) {
+      saveTags(tags.map(t => 
+        t.id === id ? { ...t, name: trimmed, categoryId, description: description.trim() } : t
+      ));
     }
   }, [tags, saveTags]);
+
+  const getTagUsageCount = useCallback((tagId: string, trades: { tags: string[] }[]) => {
+    return trades.filter(trade => trade.tags?.includes(tagId)).length;
+  }, []);
 
   return (
-    <TagsContext.Provider value={{ tags, addTag, removeTag, updateTag }}>
+    <TagsContext.Provider value={{ 
+      tags, 
+      addTag, 
+      removeTag, 
+      updateTag, 
+      removeTagsByCategory,
+      getTagUsageCount 
+    }}>
       {children}
     </TagsContext.Provider>
   );

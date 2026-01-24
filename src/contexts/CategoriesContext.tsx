@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode, useCallback, useRef } from 'react';
 
 export interface Category {
   id: string;
@@ -11,6 +11,7 @@ interface CategoriesContextType {
   addCategory: (name: string, color: string) => void;
   removeCategory: (id: string) => void;
   updateCategory: (id: string, name: string, color: string) => void;
+  onCategoryRemove: (callback: (categoryId: string) => void) => () => void;
 }
 
 const CategoriesContext = createContext<CategoriesContextType | undefined>(undefined);
@@ -21,6 +22,7 @@ const generateId = () => `cat_${Date.now()}_${Math.random().toString(36).substr(
 
 export const CategoriesProvider = ({ children }: { children: ReactNode }) => {
   const [categories, setCategories] = useState<Category[]>([]);
+  const removeCallbacksRef = useRef<Set<(categoryId: string) => void>>(new Set());
 
   useEffect(() => {
     const stored = localStorage.getItem(CATEGORIES_STORAGE_KEY);
@@ -47,6 +49,8 @@ export const CategoriesProvider = ({ children }: { children: ReactNode }) => {
   }, [categories, saveCategories]);
 
   const removeCategory = useCallback((id: string) => {
+    // Notify subscribers before removing
+    removeCallbacksRef.current.forEach(callback => callback(id));
     saveCategories(categories.filter(c => c.id !== id));
   }, [categories, saveCategories]);
 
@@ -59,8 +63,15 @@ export const CategoriesProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [categories, saveCategories]);
 
+  const onCategoryRemove = useCallback((callback: (categoryId: string) => void) => {
+    removeCallbacksRef.current.add(callback);
+    return () => {
+      removeCallbacksRef.current.delete(callback);
+    };
+  }, []);
+
   return (
-    <CategoriesContext.Provider value={{ categories, addCategory, removeCategory, updateCategory }}>
+    <CategoriesContext.Provider value={{ categories, addCategory, removeCategory, updateCategory, onCategoryRemove }}>
       {children}
     </CategoriesContext.Provider>
   );

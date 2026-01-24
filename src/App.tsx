@@ -37,8 +37,8 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <TagsProvider>
-        <CategoriesProvider>
+      <CategoriesProvider>
+        <TagsProvider>
           <StrategiesProvider>
             <TradesProvider>
               <AccountsProvider>
@@ -77,8 +77,8 @@ const App = () => (
               </AccountsProvider>
             </TradesProvider>
           </StrategiesProvider>
-        </CategoriesProvider>
-      </TagsProvider>
+        </TagsProvider>
+      </CategoriesProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );
