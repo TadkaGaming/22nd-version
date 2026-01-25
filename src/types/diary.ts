@@ -1,0 +1,53 @@
+export type DiaryFolderType = 'all' | 'trade' | 'day' | 'custom';
+
+export interface DiaryFolder {
+  id: string;
+  name: string;
+  type: DiaryFolderType;
+  isDefault: boolean;
+  createdAt: string;
+}
+
+export interface DiaryNote {
+  id: string;
+  title: string;
+  content: string; // HTML content from rich text editor
+  folderId: string | null; // null means it's in "All Notes" only
+  linkedTradeId: string | null; // Link to a specific trade
+  linkedDate: string | null; // Link to a specific day (YYYY-MM-DD format)
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface DiaryNoteFormData {
+  title: string;
+  content: string;
+  folderId?: string | null;
+  linkedTradeId?: string | null;
+  linkedDate?: string | null;
+}
+
+// Default folders that cannot be deleted
+export const DEFAULT_FOLDERS: DiaryFolder[] = [
+  {
+    id: 'all-notes',
+    name: 'All Notes',
+    type: 'all',
+    isDefault: true,
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: 'trade-notes',
+    name: 'Trade Notes',
+    type: 'trade',
+    isDefault: true,
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: 'day-notes',
+    name: 'Day Notes',
+    type: 'day',
+    isDefault: true,
+    createdAt: new Date().toISOString(),
+  },
+];

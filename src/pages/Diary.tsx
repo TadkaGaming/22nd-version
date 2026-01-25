@@ -1,17 +1,37 @@
-import { BookOpen } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { DiaryFolderSidebar } from '@/components/diary/DiaryFolderSidebar';
+import { DiaryNotesList } from '@/components/diary/DiaryNotesList';
+import { DiaryNoteEditor } from '@/components/diary/DiaryNoteEditor';
 
 const Diary = () => {
   return (
-    <div className="space-y-6">
-      <div className="glass-card rounded-2xl p-12 flex flex-col items-center justify-center min-h-[400px]">
-        <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center mb-6">
-          <BookOpen className="w-10 h-10 text-primary" />
+    <div className="h-[calc(100vh-8rem)]">
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="mb-4"
+      >
+        <h1 className="text-3xl font-bold tracking-tight">Diary</h1>
+        <p className="text-muted-foreground mt-1">Record your thoughts, emotions, and lessons learned</p>
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="glass-card rounded-2xl overflow-hidden h-[calc(100%-4rem)]"
+      >
+        <div className="grid grid-cols-[220px_280px_1fr] h-full">
+          {/* Left Column - Folder Navigation */}
+          <DiaryFolderSidebar />
+          
+          {/* Middle Column - Notes List */}
+          <DiaryNotesList />
+          
+          {/* Right Column - Note Editor */}
+          <DiaryNoteEditor />
         </div>
-        <h3 className="text-2xl font-semibold mb-3">Diary</h3>
-        <p className="text-muted-foreground text-center max-w-md">
-          Your trading diary will be displayed here. Record your thoughts, emotions, and lessons learned.
-        </p>
-      </div>
+      </motion.div>
     </div>
   );
 };
