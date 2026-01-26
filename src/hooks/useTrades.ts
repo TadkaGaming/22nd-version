@@ -39,32 +39,24 @@ export const useTrades = () => {
           
           // Migration 3: Backfill savedReturnPercent for trades that don't have it
           // This uses the calculated returnPercent from metrics as a fallback
-          // IMPORTANT: Only backfill for non-MT5 trades (those without manualGrossPnl)
-          // MT5 trades should have savedReturnPercent set at import time
+          // IMPORTANT: MT5 trades use accountBalanceSnapshot, non-MT5 use standard calculation
           if (updated.savedReturnPercent === undefined || updated.savedReturnPercent === null) {
-            // Skip backfill for trades with manualGrossPnl (likely MT5 imports) 
-            // that already have an incorrect or missing savedReturnPercent
-            // These need to be recalculated properly using the MT5 formula
             if (updated.manualGrossPnl !== undefined) {
-              // MT5 trade: calculate Return % using net P/L and invested amount
+              // MT5 trade: calculate Return % using account balance snapshot
+              // Return % = (Net P&L / Account Balance at Trade Time) * 100
               const entries = updated.entries || [];
-              const buyEntries = entries.filter((e: any) => e.type === 'BUY');
-              const sellEntries = entries.filter((e: any) => e.type === 'SELL');
-              const totalBuyQty = buyEntries.reduce((sum: number, e: any) => sum + e.quantity, 0);
-              const totalSellQty = sellEntries.reduce((sum: number, e: any) => sum + e.quantity, 0);
-              const totalBuyCost = buyEntries.reduce((sum: number, e: any) => sum + (e.quantity * e.price), 0);
-              const totalSellValue = sellEntries.reduce((sum: number, e: any) => sum + (e.quantity * e.price), 0);
-              const totalCharges = entries.reduce((sum: number, e: any) => sum + e.charges, 0);
-              
-              const side = updated.side || 'LONG';
-              const investedAmount = side === 'LONG' ? totalBuyCost : totalSellValue;
+              const totalCharges = entries.reduce((sum: number, e: any) => sum + (e.charges || 0), 0);
               const netPnl = updated.manualGrossPnl - totalCharges;
               
-              if (investedAmount > 0) {
+              // Use accountBalanceSnapshot if available, otherwise skip (cannot calculate accurately)
+              if (updated.accountBalanceSnapshot && updated.accountBalanceSnapshot > 0) {
                 updated = {
                   ...updated,
-                  savedReturnPercent: (netPnl / investedAmount) * 100,
+                  savedReturnPercent: (netPnl / updated.accountBalanceSnapshot) * 100,
                 };
+              } else {
+                // Legacy MT5 trade without account balance - log warning and skip
+                console.warn(`MT5 trade ${updated.id || 'unknown'} missing accountBalanceSnapshot - cannot calculate Return %`);
               }
             } else {
               // Non-MT5 trade: use standard calculation
