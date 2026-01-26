@@ -8,12 +8,20 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 import { Calendar, BookOpen } from 'lucide-react';
+import { Separator } from '@/components/ui/separator';
 
-const navItems = [
-  { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
+// Section 1: Dashboard (standalone)
+const dashboardItem = { icon: LayoutDashboard, label: 'Dashboard', path: '/' };
+
+// Section 2: Trading Views
+const tradingViewItems = [
   { icon: ListOrdered, label: 'Trades', path: '/trades' },
   { icon: Calendar, label: 'Day View', path: '/day-view' },
   { icon: BookOpen, label: 'Diary', path: '/diary' },
+];
+
+// Section 3: Analysis & Planning
+const analysisItems = [
   { icon: Target, label: 'Setups', path: '/strategies' },
   { icon: FileText, label: 'Reports', path: '/reports' },
 ];
@@ -106,8 +114,100 @@ export const Sidebar = () => {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 space-y-1">
-        {navItems.map((item) => {
+      <nav className="flex-1 px-3 space-y-1 overflow-y-auto">
+        {/* Section 1: Dashboard */}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <NavLink to={dashboardItem.path} className="block">
+              <motion.div
+                className={cn(
+                  "flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200",
+                  isCollapsed ? "justify-center" : "",
+                  location.pathname === dashboardItem.path
+                    ? "bg-primary text-primary-foreground shadow-lg"
+                    : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                )}
+                whileHover={{ x: location.pathname === dashboardItem.path || isCollapsed ? 0 : 4 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <dashboardItem.icon className="w-5 h-5 flex-shrink-0" />
+                <AnimatePresence>
+                  {!isCollapsed && (
+                    <motion.span
+                      initial={{ opacity: 0, width: 0 }}
+                      animate={{ opacity: 1, width: 'auto' }}
+                      exit={{ opacity: 0, width: 0 }}
+                      className="font-medium overflow-hidden whitespace-nowrap"
+                    >
+                      {dashboardItem.label}
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            </NavLink>
+          </TooltipTrigger>
+          {isCollapsed && (
+            <TooltipContent side="right">
+              <p>{dashboardItem.label}</p>
+            </TooltipContent>
+          )}
+        </Tooltip>
+
+        {/* Divider after Dashboard */}
+        <div className="py-2">
+          <Separator className="bg-sidebar-border/50" />
+        </div>
+
+        {/* Section 2: Trading Views */}
+        {tradingViewItems.map((item) => {
+          const isActive = location.pathname === item.path;
+          return (
+            <Tooltip key={item.path}>
+              <TooltipTrigger asChild>
+                <NavLink to={item.path} className="block">
+                  <motion.div
+                    className={cn(
+                      "flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200",
+                      isCollapsed ? "justify-center" : "",
+                      isActive
+                        ? "bg-primary text-primary-foreground shadow-lg"
+                        : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                    )}
+                    whileHover={{ x: isActive || isCollapsed ? 0 : 4 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <item.icon className="w-5 h-5 flex-shrink-0" />
+                    <AnimatePresence>
+                      {!isCollapsed && (
+                        <motion.span
+                          initial={{ opacity: 0, width: 0 }}
+                          animate={{ opacity: 1, width: 'auto' }}
+                          exit={{ opacity: 0, width: 0 }}
+                          className="font-medium overflow-hidden whitespace-nowrap"
+                        >
+                          {item.label}
+                        </motion.span>
+                      )}
+                    </AnimatePresence>
+                  </motion.div>
+                </NavLink>
+              </TooltipTrigger>
+              {isCollapsed && (
+                <TooltipContent side="right">
+                  <p>{item.label}</p>
+                </TooltipContent>
+              )}
+            </Tooltip>
+          );
+        })}
+
+        {/* Divider after Trading Views */}
+        <div className="py-2">
+          <Separator className="bg-sidebar-border/50" />
+        </div>
+
+        {/* Section 3: Analysis & Planning */}
+        {analysisItems.map((item) => {
           const isActive = location.pathname === item.path || 
             (item.path === '/reports' && location.pathname.startsWith('/reports'));
           return (
@@ -220,8 +320,15 @@ export const Sidebar = () => {
             </CollapsibleContent>
           </Collapsible>
         )}
+      </nav>
+
+      {/* Bottom Section - Settings (Pinned) */}
+      <div className="px-3 mt-auto">
+        {/* Divider above Settings */}
+        <div className="py-2">
+          <Separator className="bg-sidebar-border/50" />
+        </div>
         
-        {/* Settings */}
         <Tooltip>
           <TooltipTrigger asChild>
             <NavLink to="/settings" className="block">
@@ -258,7 +365,7 @@ export const Sidebar = () => {
             </TooltipContent>
           )}
         </Tooltip>
-      </nav>
+      </div>
 
       {/* Collapse Button */}
       <div className="p-4 border-t border-sidebar-border">
