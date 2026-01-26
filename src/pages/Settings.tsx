@@ -28,7 +28,7 @@ import {
 } from '@/components/ui/select';
 
 const Settings = () => {
-  const { accounts, addAccount, removeAccount, updateAccount, getActiveAccountsWithStats, getArchivedAccountsWithStats, archiveAccount, unarchiveAccount, deleteAccountPermanently, addTransaction, getTransactionsForAccount } = useAccountsContext();
+  const { accounts, addAccount, removeAccount, updateAccount, getActiveAccountsWithStats, getArchivedAccountsWithStats, archiveAccount, unarchiveAccount, deleteAccountPermanently, addTransaction, getTransactionsForAccount, getAccountBalanceBeforeTrades } = useAccountsContext();
   const { bulkAddTrades, trades, deleteTradesByAccountId, deleteTradesByAccountName } = useTradesContext();
   const { currency, setCurrency, currencyConfig, breakevenTolerance, setBreakevenTolerance } = useGlobalFilters();
 
@@ -99,12 +99,16 @@ const Settings = () => {
         return;
       }
 
+      // Get account balance BEFORE trades for Return % calculation
+      const accountBalanceSnapshot = getAccountBalanceBeforeTrades(importAccountId);
+      
       toast.info(`Importing trades from ${file.name}...`);
 
       const result = await importMT5Trades(
         file,
         account.name,
         importAccountId,
+        accountBalanceSnapshot,
         bulkAddTrades
       );
 

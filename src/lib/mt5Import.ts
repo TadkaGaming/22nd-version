@@ -217,7 +217,8 @@ function findHeaderRowIndex(lines: string[]): number {
 export function parseCSVToTrades(
   csvContent: string,
   accountName: string,
-  accountId: string
+  accountId: string,
+  accountBalanceSnapshot: number
 ): { trades: TradeFormData[]; skipped: number } {
   const lines = csvContent.split('\n').filter(line => line.trim().length > 0);
   
@@ -321,11 +322,12 @@ export function parseCSVToTrades(
         });
       }
       
-      // Calculate Return % at import time based on invested amount
-      // For LONG: invested = entryPrice * volume
-      // For SHORT: invested = entryPrice * volume (same, as it represents margin/exposure)
-      const investedAmount = entryPrice * volume;
-      const calculatedReturnPercent = investedAmount > 0 ? (netPnl / investedAmount) * 100 : 0;
+      // Calculate Return % at import time based on ACCOUNT BALANCE (not invested amount)
+      // Return % = (Net P&L / Account Balance at Trade Time) * 100
+      // This ensures consistency with manual trades and prevents inflated percentages
+      const calculatedReturnPercent = accountBalanceSnapshot > 0 
+        ? (netPnl / accountBalanceSnapshot) * 100 
+        : 0;
       
       // Calculate R-Multiple if we have trade risk (MT5 doesn't provide this, so it stays 0)
       const calculatedRMultiple = 0; // No trade risk from MT5, so R-Multiple is not applicable
@@ -342,9 +344,11 @@ export function parseCSVToTrades(
         tags: [],
         notes: '',
         manualGrossPnl: grossPnl,
-        // Persist Return % calculated at import time - this prevents recalculation on reload
+        // Persist Return % calculated at import time using account balance
         savedReturnPercent: calculatedReturnPercent,
         savedRMultiple: calculatedRMultiple,
+        // Store account balance snapshot for potential recalculation on edit
+        accountBalanceSnapshot,
       };
       
       trades.push(trade);
@@ -362,6 +366,7 @@ export async function importMT5Trades(
   file: File,
   accountName: string,
   accountId: string,
+  accountBalanceSnapshot: number,
   bulkAddTrades: (tradesData: TradeFormData[]) => void
 ): Promise<MT5ImportResult> {
   const errors: string[] = [];
@@ -372,8 +377,8 @@ export async function importMT5Trades(
     // Step 1: HTML → CSV
     const csvContent = parseMT5HtmlToCSV(htmlContent);
     
-    // Step 2: CSV → Trades
-    const { trades, skipped } = parseCSVToTrades(csvContent, accountName, accountId);
+    // Step 2: CSV → Trades (pass account balance for Return % calculation)
+    const { trades, skipped } = parseCSVToTrades(csvContent, accountName, accountId, accountBalanceSnapshot);
     
     if (trades.length === 0) {
       return {
