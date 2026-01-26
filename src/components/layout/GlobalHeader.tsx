@@ -352,511 +352,319 @@ export const GlobalHeader = () => {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start" className="w-[900px] p-4 bg-popover border-border z-50">
-          <div className="grid grid-cols-6 gap-3">
-            {/* Row 1: Instrument, Outcome, Month, Hour, Trade Type, Checklist Type */}
-            {/* Instrument - Multi-select from trades */}
-            <div className="space-y-1.5">
-              <label className="text-xs text-muted-foreground flex items-center gap-1.5">
-                <Globe className="w-3 h-3" />
-                Instrument
-              </label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" className="w-full h-9 justify-between text-sm font-normal bg-background border-border">
-                    {selectedInstruments.length === 0 ? 'All' : `${selectedInstruments.length} selected`}
-                    <ChevronDown className="w-3 h-3 opacity-50" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-48 p-2 bg-popover border-border z-[70]" align="start">
-                  <div className="space-y-1 max-h-48 overflow-auto">
-                    {availableInstruments.length === 0 ? (
-                      <div className="text-xs text-muted-foreground py-2 text-center">No instruments found</div>
-                    ) : (
-                      availableInstruments.map((instrument) => (
-                        <div 
-                          key={instrument} 
-                          className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-accent cursor-pointer"
-                          onClick={() => handleInstrumentToggle(instrument)}
-                        >
-                          <Checkbox checked={selectedInstruments.includes(instrument)} />
-                          <span className="text-sm">{instrument}</span>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                  {selectedInstruments.length > 0 && (
-                    <>
-                      <DropdownMenuSeparator className="my-2" />
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="w-full text-xs"
-                        onClick={() => setSelectedInstruments([])}
-                      >
-                        Clear selection
-                      </Button>
-                    </>
-                  )}
-                </PopoverContent>
-              </Popover>
-            </div>
-
-            {/* Outcome - Multi-select */}
-            <div className="space-y-1.5">
-              <label className="text-xs text-muted-foreground flex items-center gap-1.5">
-                <TrendingUp className="w-3 h-3" />
-                Outcome
-              </label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" className="w-full h-9 justify-between text-sm font-normal bg-background border-border">
-                    {selectedOutcomes.length === 0 ? 'All' : `${selectedOutcomes.length} selected`}
-                    <ChevronDown className="w-3 h-3 opacity-50" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-40 p-2 bg-popover border-border z-[70]" align="start">
-                  <div className="space-y-1">
-                    {OUTCOME_OPTIONS.map((option) => (
-                      <div 
-                        key={option.value} 
-                        className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-accent cursor-pointer"
-                        onClick={() => handleOutcomeToggle(option.value)}
-                      >
-                        <Checkbox checked={selectedOutcomes.includes(option.value)} />
-                        <span className="text-sm">{option.label}</span>
-                      </div>
-                    ))}
-                  </div>
-                  {selectedOutcomes.length > 0 && (
-                    <>
-                      <DropdownMenuSeparator className="my-2" />
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="w-full text-xs"
-                        onClick={() => setSelectedOutcomes([])}
-                      >
-                        Clear selection
-                      </Button>
-                    </>
-                  )}
-                </PopoverContent>
-              </Popover>
-            </div>
-
-            {/* Month - UI only (not wired) */}
-            <div className="space-y-1.5">
-              <label className="text-xs text-muted-foreground flex items-center gap-1.5">
-                <CalendarIcon2 className="w-3 h-3" />
-                Month
-              </label>
-              <Select>
-                <SelectTrigger className="h-9 bg-background border-border">
-                  <SelectValue placeholder="All" />
-                </SelectTrigger>
-                <SelectContent className="bg-popover border-border z-[60]">
-                  <SelectItem value="all">All</SelectItem>
-                  <SelectItem value="1">January</SelectItem>
-                  <SelectItem value="2">February</SelectItem>
-                  <SelectItem value="3">March</SelectItem>
-                  <SelectItem value="4">April</SelectItem>
-                  <SelectItem value="5">May</SelectItem>
-                  <SelectItem value="6">June</SelectItem>
-                  <SelectItem value="7">July</SelectItem>
-                  <SelectItem value="8">August</SelectItem>
-                  <SelectItem value="9">September</SelectItem>
-                  <SelectItem value="10">October</SelectItem>
-                  <SelectItem value="11">November</SelectItem>
-                  <SelectItem value="12">December</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Hour - Multi-select */}
-            <div className="space-y-1.5">
-              <label className="text-xs text-muted-foreground flex items-center gap-1.5">
-                <Clock className="w-3 h-3" />
-                Hour
-              </label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" className="w-full h-9 justify-between text-sm font-normal bg-background border-border">
-                    {selectedHours.length === 0 ? 'All' : `${selectedHours.length} selected`}
-                    <ChevronDown className="w-3 h-3 opacity-50" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-44 p-2 bg-popover border-border z-[70]" align="start">
-                  <div className="space-y-1 max-h-48 overflow-auto">
-                    {HOUR_OPTIONS.map((option) => (
-                      <div 
-                        key={option.value} 
-                        className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-accent cursor-pointer"
-                        onClick={() => handleHourToggle(option.value)}
-                      >
-                        <Checkbox checked={selectedHours.includes(option.value)} />
-                        <span className="text-sm">{option.label}</span>
-                      </div>
-                    ))}
-                  </div>
-                  {selectedHours.length > 0 && (
-                    <>
-                      <DropdownMenuSeparator className="my-2" />
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="w-full text-xs"
-                        onClick={() => setSelectedHours([])}
-                      >
-                        Clear selection
-                      </Button>
-                    </>
-                  )}
-                </PopoverContent>
-              </Popover>
-            </div>
-
-            {/* Empty cell - Trade Type removed */}
-            <div />
-
-            {/* Empty cell - Checklist moved to after Setup */}
-            <div />
-
-            {/* Row 2: Setup, Direction, Day, Return %, Starred, empty */}
-            {/* Setup - Multi-select from strategies */}
-            <div className="space-y-1.5">
-              <label className="text-xs text-muted-foreground flex items-center gap-1.5">
-                <BarChart2 className="w-3 h-3" />
-                Setup
-              </label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" className="w-full h-9 justify-between text-sm font-normal bg-background border-border">
-                    {selectedSetups.length === 0 ? 'All' : `${selectedSetups.length} selected`}
-                    <ChevronDown className="w-3 h-3 opacity-50" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-48 p-2 bg-popover border-border z-[70]" align="start">
-                  <div className="space-y-1 max-h-48 overflow-auto">
-                    {strategies.length === 0 ? (
-                      <div className="text-xs text-muted-foreground py-2 text-center">No setups found</div>
-                    ) : (
-                      strategies.map((strategy) => (
-                        <div 
-                          key={strategy.id} 
-                          className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-accent cursor-pointer"
-                          onClick={() => handleSetupToggle(strategy.id)}
-                        >
-                          <Checkbox checked={selectedSetups.includes(strategy.id)} />
-                          <span className="text-sm truncate">{strategy.name}</span>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                  {selectedSetups.length > 0 && (
-                    <>
-                      <DropdownMenuSeparator className="my-2" />
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="w-full text-xs"
-                        onClick={() => setSelectedSetups([])}
-                      >
-                        Clear selection
-                      </Button>
-                    </>
-                  )}
-                </PopoverContent>
-              </Popover>
-            </div>
-
-            {/* Checklist of Setup - Depends on Setup selection */}
-            <div className="space-y-1.5">
-              <label className="text-xs text-muted-foreground flex items-center gap-1.5">
-                <ListFilter className="w-3 h-3" />
-                Checklist of Setup
-              </label>
-              <Popover open={checklistOpen} onOpenChange={setChecklistOpen}>
-                <PopoverTrigger asChild>
-                  <Button 
-                    variant="outline" 
-                    className="w-full h-9 justify-between text-sm font-normal bg-background border-border"
-                    disabled={selectedSetups.length === 0}
-                  >
-                    {selectedSetups.length === 0 
-                      ? 'Select setup first' 
-                      : selectedChecklistItems.length === 0 
-                        ? 'All' 
-                        : `${selectedChecklistItems.length} selected`}
-                    <ChevronDown className="w-3 h-3 opacity-50" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-56 p-2 bg-popover border-border z-[70]" align="start">
-                  {selectedSetups.length === 0 ? (
-                    <div className="text-xs text-muted-foreground py-3 text-center">
-                      Please select a setup to choose checklist items.
-                    </div>
-                  ) : availableChecklistItems.length === 0 ? (
-                    <div className="text-xs text-muted-foreground py-3 text-center">
-                      No checklist items for selected setups.
-                    </div>
-                  ) : (
-                    <>
-                      <div className="space-y-1 max-h-48 overflow-auto">
-                        {availableChecklistItems.map((item) => (
+          <div className="space-y-4">
+            {/* Row 1: Core Trade Context - Instrument, Setup, Checklist of Setup, Outcome, Direction, Starred */}
+            <div className="grid grid-cols-6 gap-3">
+              {/* Instrument - Multi-select from trades */}
+              <div className="space-y-1.5">
+                <label className="text-xs text-muted-foreground flex items-center gap-1.5">
+                  <Globe className="w-3 h-3" />
+                  Instrument
+                </label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className="w-full h-9 justify-between text-sm font-normal bg-background border-border">
+                      {selectedInstruments.length === 0 ? 'All' : `${selectedInstruments.length} selected`}
+                      <ChevronDown className="w-3 h-3 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-48 p-2 bg-popover border-border z-[70]" align="start">
+                    <div className="space-y-1 max-h-48 overflow-auto">
+                      {availableInstruments.length === 0 ? (
+                        <div className="text-xs text-muted-foreground py-2 text-center">No instruments found</div>
+                      ) : (
+                        availableInstruments.map((instrument) => (
                           <div 
-                            key={item} 
+                            key={instrument} 
                             className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-accent cursor-pointer"
-                            onClick={() => handleChecklistItemToggle(item)}
+                            onClick={() => handleInstrumentToggle(instrument)}
                           >
-                            <Checkbox checked={selectedChecklistItems.includes(item)} />
-                            <span className="text-sm truncate">{item}</span>
+                            <Checkbox checked={selectedInstruments.includes(instrument)} />
+                            <span className="text-sm">{instrument}</span>
                           </div>
-                        ))}
-                      </div>
-                      {selectedChecklistItems.length > 0 && (
-                        <>
-                          <DropdownMenuSeparator className="my-2" />
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            className="w-full text-xs"
-                            onClick={() => setSelectedChecklistItems([])}
-                          >
-                            Clear selection
-                          </Button>
-                        </>
+                        ))
                       )}
-                    </>
-                  )}
-                </PopoverContent>
-              </Popover>
-            </div>
-
-            {/* Direction - Multi-select */}
-            <div className="space-y-1.5">
-              <label className="text-xs text-muted-foreground flex items-center gap-1.5">
-                <TrendingUp className="w-3 h-3" />
-                Direction
-              </label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" className="w-full h-9 justify-between text-sm font-normal bg-background border-border">
-                    {selectedDirections.length === 0 ? 'All' : `${selectedDirections.length} selected`}
-                    <ChevronDown className="w-3 h-3 opacity-50" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-36 p-2 bg-popover border-border z-[70]" align="start">
-                  <div className="space-y-1">
-                    {DIRECTION_OPTIONS.map((option) => (
-                      <div 
-                        key={option.value} 
-                        className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-accent cursor-pointer"
-                        onClick={() => handleDirectionToggle(option.value)}
-                      >
-                        <Checkbox checked={selectedDirections.includes(option.value)} />
-                        <span className="text-sm">{option.label}</span>
-                      </div>
-                    ))}
-                  </div>
-                  {selectedDirections.length > 0 && (
-                    <>
-                      <DropdownMenuSeparator className="my-2" />
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="w-full text-xs"
-                        onClick={() => setSelectedDirections([])}
-                      >
-                        Clear selection
-                      </Button>
-                    </>
-                  )}
-                </PopoverContent>
-              </Popover>
-            </div>
-
-            {/* Day - Multi-select */}
-            <div className="space-y-1.5">
-              <label className="text-xs text-muted-foreground flex items-center gap-1.5">
-                <CalendarIcon2 className="w-3 h-3" />
-                Day
-              </label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" className="w-full h-9 justify-between text-sm font-normal bg-background border-border">
-                    {selectedDays.length === 0 ? 'All' : `${selectedDays.length} selected`}
-                    <ChevronDown className="w-3 h-3 opacity-50" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-40 p-2 bg-popover border-border z-[70]" align="start">
-                  <div className="space-y-1">
-                    {DAY_OPTIONS.map((option) => (
-                      <div 
-                        key={option.value} 
-                        className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-accent cursor-pointer"
-                        onClick={() => handleDayToggle(option.value)}
-                      >
-                        <Checkbox checked={selectedDays.includes(option.value)} />
-                        <span className="text-sm">{option.label}</span>
-                      </div>
-                    ))}
-                  </div>
-                  {selectedDays.length > 0 && (
-                    <>
-                      <DropdownMenuSeparator className="my-2" />
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="w-full text-xs"
-                        onClick={() => setSelectedDays([])}
-                      >
-                        Clear selection
-                      </Button>
-                    </>
-                  )}
-                </PopoverContent>
-              </Popover>
-            </div>
-
-            {/* Return % - Multi-select */}
-            <div className="space-y-1.5">
-              <label className="text-xs text-muted-foreground flex items-center gap-1.5">
-                <Percent className="w-3 h-3" />
-                Return %
-              </label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" className="w-full h-9 justify-between text-sm font-normal bg-background border-border">
-                    {selectedReturnRanges.length === 0 ? 'All' : `${selectedReturnRanges.length} selected`}
-                    <ChevronDown className="w-3 h-3 opacity-50" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-36 p-2 bg-popover border-border z-[70]" align="start">
-                  <div className="space-y-1">
-                    {RETURN_PERCENT_OPTIONS.map((option) => (
-                      <div 
-                        key={option.value} 
-                        className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-accent cursor-pointer"
-                        onClick={() => handleReturnRangeToggle(option.value)}
-                      >
-                        <Checkbox checked={selectedReturnRanges.includes(option.value)} />
-                        <span className="text-sm">{option.label}</span>
-                      </div>
-                    ))}
-                  </div>
-                  {selectedReturnRanges.length > 0 && (
-                    <>
-                      <DropdownMenuSeparator className="my-2" />
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="w-full text-xs"
-                        onClick={() => setSelectedReturnRanges([])}
-                      >
-                        Clear selection
-                      </Button>
-                    </>
-                  )}
-                </PopoverContent>
-              </Popover>
-            </div>
-
-            {/* Starred - UI only (not wired) */}
-            <div className="space-y-1.5">
-              <label className="text-xs text-muted-foreground flex items-center gap-1.5">
-                <Star className="w-3 h-3" />
-                Starred
-              </label>
-              <Select>
-                <SelectTrigger className="h-9 bg-background border-border">
-                  <SelectValue placeholder="All" />
-                </SelectTrigger>
-                <SelectContent className="bg-popover border-border z-[60]">
-                  <SelectItem value="all">All</SelectItem>
-                  <SelectItem value="starred">Starred Only</SelectItem>
-                  <SelectItem value="unstarred">Unstarred Only</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Empty cell for row alignment */}
-            <div />
-
-            {/* Row 3: RRR, Last Trades, Year, R-Multiple Gain, empty, empty */}
-            {/* RRR - UI only (not wired) */}
-            <div className="space-y-1.5">
-              <label className="text-xs text-muted-foreground flex items-center gap-1.5">
-                <Percent className="w-3 h-3" />
-                RRR
-              </label>
-              <Select>
-                <SelectTrigger className="h-9 bg-background border-border">
-                  <SelectValue placeholder="All" />
-                </SelectTrigger>
-                <SelectContent className="bg-popover border-border z-[60]">
-                  <SelectItem value="all">All</SelectItem>
-                  <SelectItem value="1">1:1</SelectItem>
-                  <SelectItem value="2">1:2</SelectItem>
-                  <SelectItem value="3">1:3+</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Last Trades - Single select */}
-            <div className="space-y-1.5">
-              <label className="text-xs text-muted-foreground flex items-center gap-1.5">
-                <Hash className="w-3 h-3" />
-                Last Trades
-              </label>
-              <Select 
-                value={lastTradesFilter === null ? 'all' : lastTradesFilter.toString()} 
-                onValueChange={(value) => setLastTradesFilter(value === 'all' ? null : parseInt(value) as LastTradesFilter)}
-              >
-                <SelectTrigger className="h-9 bg-background border-border">
-                  <SelectValue placeholder="All" />
-                </SelectTrigger>
-                <SelectContent className="bg-popover border-border z-[60]">
-                  {LAST_TRADES_OPTIONS.map((option) => (
-                    <SelectItem key={option.label} value={option.value === null ? 'all' : option.value.toString()}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Year - Calendar-style year picker */}
-            <div className="space-y-1.5">
-              <label className="text-xs text-muted-foreground flex items-center gap-1.5">
-                <CalendarIcon2 className="w-3 h-3" />
-                Year
-              </label>
-              <Popover open={yearPickerOpen} onOpenChange={setYearPickerOpen}>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" className="w-full h-9 justify-between text-sm font-normal bg-background border-border">
-                    {selectedYear === null ? 'All' : selectedYear.toString()}
-                    <ChevronDown className="w-3 h-3 opacity-50" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-[200px] p-3 bg-popover border-border z-[70]" align="start">
-                  <div className="space-y-2">
-                    <div className="text-xs font-medium text-muted-foreground text-center mb-2">Select Year</div>
-                    <div 
-                      className={cn(
-                        "px-3 py-2 rounded-md text-center text-sm cursor-pointer transition-colors",
-                        selectedYear === null ? "bg-primary text-primary-foreground" : "hover:bg-accent"
-                      )}
-                      onClick={() => handleYearSelect(null)}
-                    >
-                      All Years
                     </div>
-                    <DropdownMenuSeparator />
-                    <div className="grid grid-cols-2 gap-1.5">
-                      {availableYears.length === 0 ? (
-                        // Generate last 5 years if no trades
-                        [0, 1, 2, 3, 4].map(offset => {
-                          const year = new Date().getFullYear() - offset;
-                          return (
+                    {selectedInstruments.length > 0 && (
+                      <>
+                        <DropdownMenuSeparator className="my-2" />
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="w-full text-xs"
+                          onClick={() => setSelectedInstruments([])}
+                        >
+                          Clear selection
+                        </Button>
+                      </>
+                    )}
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              {/* Setup - Multi-select from strategies */}
+              <div className="space-y-1.5">
+                <label className="text-xs text-muted-foreground flex items-center gap-1.5">
+                  <BarChart2 className="w-3 h-3" />
+                  Setup
+                </label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className="w-full h-9 justify-between text-sm font-normal bg-background border-border">
+                      {selectedSetups.length === 0 ? 'All' : `${selectedSetups.length} selected`}
+                      <ChevronDown className="w-3 h-3 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-48 p-2 bg-popover border-border z-[70]" align="start">
+                    <div className="space-y-1 max-h-48 overflow-auto">
+                      {strategies.length === 0 ? (
+                        <div className="text-xs text-muted-foreground py-2 text-center">No setups found</div>
+                      ) : (
+                        strategies.map((strategy) => (
+                          <div 
+                            key={strategy.id} 
+                            className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-accent cursor-pointer"
+                            onClick={() => handleSetupToggle(strategy.id)}
+                          >
+                            <Checkbox checked={selectedSetups.includes(strategy.id)} />
+                            <span className="text-sm truncate">{strategy.name}</span>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                    {selectedSetups.length > 0 && (
+                      <>
+                        <DropdownMenuSeparator className="my-2" />
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="w-full text-xs"
+                          onClick={() => setSelectedSetups([])}
+                        >
+                          Clear selection
+                        </Button>
+                      </>
+                    )}
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              {/* Checklist of Setup - Depends on Setup selection */}
+              <div className="space-y-1.5">
+                <label className="text-xs text-muted-foreground flex items-center gap-1.5">
+                  <ListFilter className="w-3 h-3" />
+                  Checklist of Setup
+                </label>
+                <Popover open={checklistOpen} onOpenChange={setChecklistOpen}>
+                  <PopoverTrigger asChild>
+                    <Button 
+                      variant="outline" 
+                      className="w-full h-9 justify-between text-sm font-normal bg-background border-border"
+                      disabled={selectedSetups.length === 0}
+                    >
+                      {selectedSetups.length === 0 
+                        ? 'Select setup first' 
+                        : selectedChecklistItems.length === 0 
+                          ? 'All' 
+                          : `${selectedChecklistItems.length} selected`}
+                      <ChevronDown className="w-3 h-3 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-56 p-2 bg-popover border-border z-[70]" align="start">
+                    {selectedSetups.length === 0 ? (
+                      <div className="text-xs text-muted-foreground py-3 text-center">
+                        Please select a setup to choose checklist items.
+                      </div>
+                    ) : availableChecklistItems.length === 0 ? (
+                      <div className="text-xs text-muted-foreground py-3 text-center">
+                        No checklist items for selected setups.
+                      </div>
+                    ) : (
+                      <>
+                        <div className="space-y-1 max-h-48 overflow-auto">
+                          {availableChecklistItems.map((item) => (
+                            <div 
+                              key={item} 
+                              className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-accent cursor-pointer"
+                              onClick={() => handleChecklistItemToggle(item)}
+                            >
+                              <Checkbox checked={selectedChecklistItems.includes(item)} />
+                              <span className="text-sm truncate">{item}</span>
+                            </div>
+                          ))}
+                        </div>
+                        {selectedChecklistItems.length > 0 && (
+                          <>
+                            <DropdownMenuSeparator className="my-2" />
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="w-full text-xs"
+                              onClick={() => setSelectedChecklistItems([])}
+                            >
+                              Clear selection
+                            </Button>
+                          </>
+                        )}
+                      </>
+                    )}
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              {/* Outcome - Multi-select */}
+              <div className="space-y-1.5">
+                <label className="text-xs text-muted-foreground flex items-center gap-1.5">
+                  <TrendingUp className="w-3 h-3" />
+                  Outcome
+                </label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className="w-full h-9 justify-between text-sm font-normal bg-background border-border">
+                      {selectedOutcomes.length === 0 ? 'All' : `${selectedOutcomes.length} selected`}
+                      <ChevronDown className="w-3 h-3 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-40 p-2 bg-popover border-border z-[70]" align="start">
+                    <div className="space-y-1">
+                      {OUTCOME_OPTIONS.map((option) => (
+                        <div 
+                          key={option.value} 
+                          className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-accent cursor-pointer"
+                          onClick={() => handleOutcomeToggle(option.value)}
+                        >
+                          <Checkbox checked={selectedOutcomes.includes(option.value)} />
+                          <span className="text-sm">{option.label}</span>
+                        </div>
+                      ))}
+                    </div>
+                    {selectedOutcomes.length > 0 && (
+                      <>
+                        <DropdownMenuSeparator className="my-2" />
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="w-full text-xs"
+                          onClick={() => setSelectedOutcomes([])}
+                        >
+                          Clear selection
+                        </Button>
+                      </>
+                    )}
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              {/* Direction - Multi-select */}
+              <div className="space-y-1.5">
+                <label className="text-xs text-muted-foreground flex items-center gap-1.5">
+                  <TrendingUp className="w-3 h-3" />
+                  Direction
+                </label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className="w-full h-9 justify-between text-sm font-normal bg-background border-border">
+                      {selectedDirections.length === 0 ? 'All' : `${selectedDirections.length} selected`}
+                      <ChevronDown className="w-3 h-3 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-36 p-2 bg-popover border-border z-[70]" align="start">
+                    <div className="space-y-1">
+                      {DIRECTION_OPTIONS.map((option) => (
+                        <div 
+                          key={option.value} 
+                          className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-accent cursor-pointer"
+                          onClick={() => handleDirectionToggle(option.value)}
+                        >
+                          <Checkbox checked={selectedDirections.includes(option.value)} />
+                          <span className="text-sm">{option.label}</span>
+                        </div>
+                      ))}
+                    </div>
+                    {selectedDirections.length > 0 && (
+                      <>
+                        <DropdownMenuSeparator className="my-2" />
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="w-full text-xs"
+                          onClick={() => setSelectedDirections([])}
+                        >
+                          Clear selection
+                        </Button>
+                      </>
+                    )}
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              {/* Starred - UI only (not wired) */}
+              <div className="space-y-1.5">
+                <label className="text-xs text-muted-foreground flex items-center gap-1.5">
+                  <Star className="w-3 h-3" />
+                  Starred
+                </label>
+                <Select>
+                  <SelectTrigger className="h-9 bg-background border-border">
+                    <SelectValue placeholder="All" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-popover border-border z-[60]">
+                    <SelectItem value="all">All</SelectItem>
+                    <SelectItem value="starred">Starred Only</SelectItem>
+                    <SelectItem value="unstarred">Unstarred Only</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {/* Row 2: Time Context - Year, Month, Day, Hour, Last Trades, (empty) */}
+            <div className="grid grid-cols-6 gap-3">
+              {/* Year - Calendar-style year picker */}
+              <div className="space-y-1.5">
+                <label className="text-xs text-muted-foreground flex items-center gap-1.5">
+                  <CalendarIcon2 className="w-3 h-3" />
+                  Year
+                </label>
+                <Popover open={yearPickerOpen} onOpenChange={setYearPickerOpen}>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className="w-full h-9 justify-between text-sm font-normal bg-background border-border">
+                      {selectedYear === null ? 'All' : selectedYear.toString()}
+                      <ChevronDown className="w-3 h-3 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[200px] p-3 bg-popover border-border z-[70]" align="start">
+                    <div className="space-y-2">
+                      <div className="text-xs font-medium text-muted-foreground text-center mb-2">Select Year</div>
+                      <div 
+                        className={cn(
+                          "px-3 py-2 rounded-md text-center text-sm cursor-pointer transition-colors",
+                          selectedYear === null ? "bg-primary text-primary-foreground" : "hover:bg-accent"
+                        )}
+                        onClick={() => handleYearSelect(null)}
+                      >
+                        All Years
+                      </div>
+                      <DropdownMenuSeparator />
+                      <div className="grid grid-cols-2 gap-1.5">
+                        {availableYears.length === 0 ? (
+                          // Generate last 5 years if no trades
+                          [0, 1, 2, 3, 4].map(offset => {
+                            const year = new Date().getFullYear() - offset;
+                            return (
+                              <div
+                                key={year}
+                                className={cn(
+                                  "px-3 py-2 rounded-md text-center text-sm cursor-pointer transition-colors",
+                                  selectedYear === year ? "bg-primary text-primary-foreground" : "hover:bg-accent"
+                                )}
+                                onClick={() => handleYearSelect(year)}
+                              >
+                                {year}
+                              </div>
+                            );
+                          })
+                        ) : (
+                          availableYears.map(year => (
                             <div
                               key={year}
                               className={cn(
@@ -867,82 +675,279 @@ export const GlobalHeader = () => {
                             >
                               {year}
                             </div>
-                          );
-                        })
-                      ) : (
-                        availableYears.map(year => (
-                          <div
-                            key={year}
-                            className={cn(
-                              "px-3 py-2 rounded-md text-center text-sm cursor-pointer transition-colors",
-                              selectedYear === year ? "bg-primary text-primary-foreground" : "hover:bg-accent"
-                            )}
-                            onClick={() => handleYearSelect(year)}
+                          ))
+                        )}
+                      </div>
+                      {selectedYear !== null && (
+                        <>
+                          <DropdownMenuSeparator />
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="w-full text-xs"
+                            onClick={() => handleYearSelect(null)}
                           >
-                            {year}
-                          </div>
-                        ))
+                            Clear selection
+                          </Button>
+                        </>
                       )}
                     </div>
-                    {selectedYear !== null && (
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              {/* Month - UI only (not wired) */}
+              <div className="space-y-1.5">
+                <label className="text-xs text-muted-foreground flex items-center gap-1.5">
+                  <CalendarIcon2 className="w-3 h-3" />
+                  Month
+                </label>
+                <Select>
+                  <SelectTrigger className="h-9 bg-background border-border">
+                    <SelectValue placeholder="All" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-popover border-border z-[60]">
+                    <SelectItem value="all">All</SelectItem>
+                    <SelectItem value="1">January</SelectItem>
+                    <SelectItem value="2">February</SelectItem>
+                    <SelectItem value="3">March</SelectItem>
+                    <SelectItem value="4">April</SelectItem>
+                    <SelectItem value="5">May</SelectItem>
+                    <SelectItem value="6">June</SelectItem>
+                    <SelectItem value="7">July</SelectItem>
+                    <SelectItem value="8">August</SelectItem>
+                    <SelectItem value="9">September</SelectItem>
+                    <SelectItem value="10">October</SelectItem>
+                    <SelectItem value="11">November</SelectItem>
+                    <SelectItem value="12">December</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Day - Multi-select */}
+              <div className="space-y-1.5">
+                <label className="text-xs text-muted-foreground flex items-center gap-1.5">
+                  <CalendarIcon2 className="w-3 h-3" />
+                  Day
+                </label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className="w-full h-9 justify-between text-sm font-normal bg-background border-border">
+                      {selectedDays.length === 0 ? 'All' : `${selectedDays.length} selected`}
+                      <ChevronDown className="w-3 h-3 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-40 p-2 bg-popover border-border z-[70]" align="start">
+                    <div className="space-y-1">
+                      {DAY_OPTIONS.map((option) => (
+                        <div 
+                          key={option.value} 
+                          className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-accent cursor-pointer"
+                          onClick={() => handleDayToggle(option.value)}
+                        >
+                          <Checkbox checked={selectedDays.includes(option.value)} />
+                          <span className="text-sm">{option.label}</span>
+                        </div>
+                      ))}
+                    </div>
+                    {selectedDays.length > 0 && (
                       <>
-                        <DropdownMenuSeparator />
+                        <DropdownMenuSeparator className="my-2" />
                         <Button 
                           variant="ghost" 
                           size="sm" 
                           className="w-full text-xs"
-                          onClick={() => handleYearSelect(null)}
+                          onClick={() => setSelectedDays([])}
                         >
                           Clear selection
                         </Button>
                       </>
                     )}
-                  </div>
-                </PopoverContent>
-              </Popover>
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              {/* Hour - Multi-select */}
+              <div className="space-y-1.5">
+                <label className="text-xs text-muted-foreground flex items-center gap-1.5">
+                  <Clock className="w-3 h-3" />
+                  Hour
+                </label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className="w-full h-9 justify-between text-sm font-normal bg-background border-border">
+                      {selectedHours.length === 0 ? 'All' : `${selectedHours.length} selected`}
+                      <ChevronDown className="w-3 h-3 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-44 p-2 bg-popover border-border z-[70]" align="start">
+                    <div className="space-y-1 max-h-48 overflow-auto">
+                      {HOUR_OPTIONS.map((option) => (
+                        <div 
+                          key={option.value} 
+                          className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-accent cursor-pointer"
+                          onClick={() => handleHourToggle(option.value)}
+                        >
+                          <Checkbox checked={selectedHours.includes(option.value)} />
+                          <span className="text-sm">{option.label}</span>
+                        </div>
+                      ))}
+                    </div>
+                    {selectedHours.length > 0 && (
+                      <>
+                        <DropdownMenuSeparator className="my-2" />
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="w-full text-xs"
+                          onClick={() => setSelectedHours([])}
+                        >
+                          Clear selection
+                        </Button>
+                      </>
+                    )}
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              {/* Last Trades - Single select */}
+              <div className="space-y-1.5">
+                <label className="text-xs text-muted-foreground flex items-center gap-1.5">
+                  <Hash className="w-3 h-3" />
+                  Last Trades
+                </label>
+                <Select 
+                  value={lastTradesFilter === null ? 'all' : lastTradesFilter.toString()} 
+                  onValueChange={(value) => setLastTradesFilter(value === 'all' ? null : parseInt(value) as LastTradesFilter)}
+                >
+                  <SelectTrigger className="h-9 bg-background border-border">
+                    <SelectValue placeholder="All" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-popover border-border z-[60]">
+                    {LAST_TRADES_OPTIONS.map((option) => (
+                      <SelectItem key={option.label} value={option.value === null ? 'all' : option.value.toString()}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Empty placeholder for future use */}
+              <div />
             </div>
 
-            {/* R-Multiple Gain - Multi-select */}
-            <div className="space-y-1.5">
-              <label className="text-xs text-muted-foreground flex items-center gap-1.5">
-                <Hash className="w-3 h-3" />
-                R-Multiple Gain
-              </label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" className="w-full h-9 justify-between text-sm font-normal bg-background border-border">
-                    {selectedRMultipleRanges.length === 0 ? 'All' : `${selectedRMultipleRanges.length} selected`}
-                    <ChevronDown className="w-3 h-3 opacity-50" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-36 p-2 bg-popover border-border z-[70]" align="start">
-                  <div className="space-y-1">
-                    {R_MULTIPLE_OPTIONS.map((option) => (
-                      <div 
-                        key={option.value} 
-                        className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-accent cursor-pointer"
-                        onClick={() => handleRMultipleRangeToggle(option.value)}
-                      >
-                        <Checkbox checked={selectedRMultipleRanges.includes(option.value)} />
-                        <span className="text-sm">{option.label}</span>
-                      </div>
-                    ))}
-                  </div>
-                  {selectedRMultipleRanges.length > 0 && (
-                    <>
-                      <DropdownMenuSeparator className="my-2" />
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="w-full text-xs"
-                        onClick={() => setSelectedRMultipleRanges([])}
-                      >
-                        Clear selection
-                      </Button>
-                    </>
-                  )}
-                </PopoverContent>
-              </Popover>
+            {/* Row 3: Performance Filters - Return %, R-Multiple Gain, RRR, (empty), (empty), (empty) */}
+            <div className="grid grid-cols-6 gap-3">
+              {/* Return % - Multi-select */}
+              <div className="space-y-1.5">
+                <label className="text-xs text-muted-foreground flex items-center gap-1.5">
+                  <Percent className="w-3 h-3" />
+                  Return %
+                </label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className="w-full h-9 justify-between text-sm font-normal bg-background border-border">
+                      {selectedReturnRanges.length === 0 ? 'All' : `${selectedReturnRanges.length} selected`}
+                      <ChevronDown className="w-3 h-3 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-36 p-2 bg-popover border-border z-[70]" align="start">
+                    <div className="space-y-1">
+                      {RETURN_PERCENT_OPTIONS.map((option) => (
+                        <div 
+                          key={option.value} 
+                          className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-accent cursor-pointer"
+                          onClick={() => handleReturnRangeToggle(option.value)}
+                        >
+                          <Checkbox checked={selectedReturnRanges.includes(option.value)} />
+                          <span className="text-sm">{option.label}</span>
+                        </div>
+                      ))}
+                    </div>
+                    {selectedReturnRanges.length > 0 && (
+                      <>
+                        <DropdownMenuSeparator className="my-2" />
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="w-full text-xs"
+                          onClick={() => setSelectedReturnRanges([])}
+                        >
+                          Clear selection
+                        </Button>
+                      </>
+                    )}
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              {/* R-Multiple Gain - Multi-select */}
+              <div className="space-y-1.5">
+                <label className="text-xs text-muted-foreground flex items-center gap-1.5">
+                  <Hash className="w-3 h-3" />
+                  R-Multiple Gain
+                </label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className="w-full h-9 justify-between text-sm font-normal bg-background border-border">
+                      {selectedRMultipleRanges.length === 0 ? 'All' : `${selectedRMultipleRanges.length} selected`}
+                      <ChevronDown className="w-3 h-3 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-36 p-2 bg-popover border-border z-[70]" align="start">
+                    <div className="space-y-1">
+                      {R_MULTIPLE_OPTIONS.map((option) => (
+                        <div 
+                          key={option.value} 
+                          className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-accent cursor-pointer"
+                          onClick={() => handleRMultipleRangeToggle(option.value)}
+                        >
+                          <Checkbox checked={selectedRMultipleRanges.includes(option.value)} />
+                          <span className="text-sm">{option.label}</span>
+                        </div>
+                      ))}
+                    </div>
+                    {selectedRMultipleRanges.length > 0 && (
+                      <>
+                        <DropdownMenuSeparator className="my-2" />
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="w-full text-xs"
+                          onClick={() => setSelectedRMultipleRanges([])}
+                        >
+                          Clear selection
+                        </Button>
+                      </>
+                    )}
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              {/* RRR - UI only (not wired) */}
+              <div className="space-y-1.5">
+                <label className="text-xs text-muted-foreground flex items-center gap-1.5">
+                  <Percent className="w-3 h-3" />
+                  RRR
+                </label>
+                <Select>
+                  <SelectTrigger className="h-9 bg-background border-border">
+                    <SelectValue placeholder="All" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-popover border-border z-[60]">
+                    <SelectItem value="all">All</SelectItem>
+                    <SelectItem value="1">1:1</SelectItem>
+                    <SelectItem value="2">1:2</SelectItem>
+                    <SelectItem value="3">1:3+</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Empty placeholders */}
+              <div />
+              <div />
+              <div />
             </div>
           </div>
         </DropdownMenuContent>
