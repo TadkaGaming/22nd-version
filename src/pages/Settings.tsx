@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Trash2, Edit2, Check, X, Tag, Wallet, TrendingUp, TrendingDown, Settings as SettingsIcon, Download, DollarSign, FolderOpen, Archive, ArchiveRestore, ChevronDown, ChevronUp, Target, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -11,7 +11,7 @@ import DepositWithdrawModal from '@/components/settings/DepositWithdrawModal';
 import { CategoriesManagement } from '@/components/settings/CategoriesManagement';
 import { TagsManagement } from '@/components/settings/TagsManagement';
 import { TradeCommentsManagement } from '@/components/settings/TradeCommentsManagement';
-import { importMT5Trades } from '@/lib/mt5Import';
+import { AccountImportModal } from '@/components/settings/AccountImportModal';
 import { toast } from 'sonner';
 import {
   DropdownMenu,
@@ -28,8 +28,8 @@ import {
 } from '@/components/ui/select';
 
 const Settings = () => {
-  const { accounts, addAccount, removeAccount, updateAccount, getActiveAccountsWithStats, getArchivedAccountsWithStats, archiveAccount, unarchiveAccount, deleteAccountPermanently, addTransaction, getTransactionsForAccount, getAccountBalanceBeforeTrades } = useAccountsContext();
-  const { bulkAddTrades, trades, deleteTradesByAccountId, deleteTradesByAccountName } = useTradesContext();
+  const { accounts, addAccount, updateAccount, getActiveAccountsWithStats, getArchivedAccountsWithStats, archiveAccount, unarchiveAccount, deleteAccountPermanently, addTransaction, getTransactionsForAccount } = useAccountsContext();
+  const { trades, deleteTradesByAccountId, deleteTradesByAccountName } = useTradesContext();
   const { currency, setCurrency, currencyConfig, breakevenTolerance, setBreakevenTolerance } = useGlobalFilters();
 
   const handleCurrencyChange = (newCurrency: CurrencyCode) => {
@@ -78,53 +78,12 @@ const Settings = () => {
   // Deposit/Withdraw modal state
   const [depositWithdrawAccountId, setDepositWithdrawAccountId] = useState<string | null>(null);
 
-  // Import file state
-  const [importAccountId, setImportAccountId] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  // Import modal state
+  const [showImportModal, setShowImportModal] = useState(false);
 
   // Archived accounts toggle
   const [showArchivedAccounts, setShowArchivedAccounts] = useState(false);
 
-  const handleImportClick = (accountId: string) => {
-    setImportAccountId(accountId);
-    fileInputRef.current?.click();
-  };
-
-  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file && importAccountId) {
-      const account = accounts.find(a => a.id === importAccountId);
-      if (!account) {
-        toast.error('Account not found');
-        return;
-      }
-
-      // Get account balance BEFORE trades for Return % calculation
-      const accountBalanceSnapshot = getAccountBalanceBeforeTrades(importAccountId);
-      
-      toast.info(`Importing trades from ${file.name}...`);
-
-      const result = await importMT5Trades(
-        file,
-        account.name,
-        importAccountId,
-        accountBalanceSnapshot,
-        bulkAddTrades
-      );
-
-      if (result.success) {
-        toast.success(
-          `Successfully imported ${result.tradesImported} trades${result.rowsSkipped > 0 ? ` (${result.rowsSkipped} rows skipped)` : ''}`
-        );
-      } else {
-        toast.error(result.errors[0] || 'Failed to import trades');
-      }
-    }
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
-    setImportAccountId(null);
-  };
 
   const activeAccountsWithStats = getActiveAccountsWithStats();
   const archivedAccountsWithStats = getArchivedAccountsWithStats();
@@ -167,14 +126,8 @@ const Settings = () => {
 
   return (
     <div className="space-y-8 animate-fade-in">
-      {/* Hidden file input for import */}
-      <input
-        type="file"
-        ref={fileInputRef}
-        onChange={handleFileSelect}
-        accept=".csv,.htm,.html"
-        className="hidden"
-      />
+      {/* Account Import Modal */}
+      <AccountImportModal open={showImportModal} onOpenChange={setShowImportModal} />
       
       <div>
         <h1 className="text-3xl font-bold text-foreground mb-2">Settings</h1>
@@ -483,7 +436,7 @@ const Settings = () => {
                               <Button
                                 size="sm"
                                 variant="outline"
-                                onClick={() => handleImportClick(account.id)}
+                                onClick={() => setShowImportModal(true)}
                                 className="h-7 text-xs gap-1"
                               >
                                 <Download className="w-3 h-3" />
