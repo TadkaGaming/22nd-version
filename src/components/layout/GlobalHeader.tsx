@@ -33,6 +33,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { AdvancedFiltersPanel } from './AdvancedFiltersPanel';
+import { DisplayModeSelector } from './DisplayModeSelector';
 
 const DATE_PRESETS: { value: DatePreset; label: string }[] = [
   { value: 'today', label: 'Today' },
@@ -971,6 +972,9 @@ export const GlobalHeader = () => {
           <AdvancedFiltersPanel />
         </PopoverContent>
       </Popover>
+
+      {/* Display Mode Selector */}
+      <DisplayModeSelector />
 
       <div className="flex-1" />
 
