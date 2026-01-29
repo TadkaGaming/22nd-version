@@ -30,6 +30,9 @@ export type ReturnPercentRange = '<0' | '0-1' | '1-2' | '3-5' | '5-10' | '>10';
 export type RMultipleRange = '<-2' | '-2-0' | '0-1' | '1-2' | '2-4' | '>4';
 export type YearFilter = number | null; // null means "all years"
 
+// Display Mode for analytics values
+export type DisplayMode = 'dollar' | 'percentage' | 'privacy' | 'tickpip';
+
 // Breakeven Tolerance types
 export type BreakevenToleranceType = 'amount' | 'percentage';
 export type BreakevenModeType = 'automatic' | 'manual';
@@ -62,6 +65,10 @@ interface GlobalFiltersContextType {
   setBreakevenTolerance: (tolerance: BreakevenTolerance) => void;
   // classifyTradeOutcome now accepts optional isBreakeven flag for manual mode
   classifyTradeOutcome: (netPnl: number, returnPercent?: number, isBreakeven?: boolean) => TradeOutcome;
+  
+  // Display Mode
+  displayMode: DisplayMode;
+  setDisplayMode: (mode: DisplayMode) => void;
   
   // Date Range
   dateRange: DateRange;
@@ -125,6 +132,7 @@ const GlobalFiltersContext = createContext<GlobalFiltersContextType | undefined>
 
 // LocalStorage keys
 const CURRENCY_STORAGE_KEY = 'trading-journal-currency';
+const DISPLAY_MODE_STORAGE_KEY = 'trading-journal-display-mode';
 const BREAKEVEN_TOLERANCE_STORAGE_KEY = 'trading-journal-breakeven-tolerance';
 
 // Default breakeven tolerance
@@ -168,12 +176,28 @@ const loadPersistedBreakevenTolerance = (): BreakevenTolerance => {
   return DEFAULT_BREAKEVEN_TOLERANCE;
 };
 
+// Load persisted display mode from localStorage
+const loadPersistedDisplayMode = (): DisplayMode => {
+  try {
+    const stored = localStorage.getItem(DISPLAY_MODE_STORAGE_KEY);
+    if (stored && ['dollar', 'percentage', 'privacy', 'tickpip'].includes(stored)) {
+      return stored as DisplayMode;
+    }
+  } catch (e) {
+    console.warn('Failed to load display mode preference:', e);
+  }
+  return 'dollar';
+};
+
 export const GlobalFiltersProvider = ({ children }: { children: ReactNode }) => {
   // Currency state - load from localStorage
   const [currency, setCurrencyState] = useState<CurrencyCode>(loadPersistedCurrency);
   
   // Breakeven tolerance state - load from localStorage
   const [breakevenTolerance, setBreakevenToleranceState] = useState<BreakevenTolerance>(loadPersistedBreakevenTolerance);
+  
+  // Display mode state - load from localStorage
+  const [displayMode, setDisplayModeState] = useState<DisplayMode>(loadPersistedDisplayMode);
   
   // Date range state - default to all time (undefined)
   const [dateRange, setDateRange] = useState<DateRange>({ from: undefined, to: undefined });
@@ -226,6 +250,16 @@ export const GlobalFiltersProvider = ({ children }: { children: ReactNode }) => 
       localStorage.setItem(BREAKEVEN_TOLERANCE_STORAGE_KEY, JSON.stringify(tolerance));
     } catch (e) {
       console.warn('Failed to save breakeven tolerance:', e);
+    }
+  }, []);
+
+  // Persist display mode to localStorage
+  const setDisplayMode = useCallback((mode: DisplayMode) => {
+    setDisplayModeState(mode);
+    try {
+      localStorage.setItem(DISPLAY_MODE_STORAGE_KEY, mode);
+    } catch (e) {
+      console.warn('Failed to save display mode preference:', e);
     }
   }, []);
 
@@ -407,6 +441,8 @@ export const GlobalFiltersProvider = ({ children }: { children: ReactNode }) => 
     breakevenTolerance,
     setBreakevenTolerance,
     classifyTradeOutcome,
+    displayMode,
+    setDisplayMode,
     dateRange,
     setDateRange,
     datePreset,
@@ -463,6 +499,8 @@ export const GlobalFiltersProvider = ({ children }: { children: ReactNode }) => 
     breakevenTolerance,
     setBreakevenTolerance,
     classifyTradeOutcome,
+    displayMode,
+    setDisplayMode,
     dateRange, 
     datePreset, 
     selectedAccounts,
