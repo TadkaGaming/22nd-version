@@ -3,6 +3,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { motion } from 'framer-motion';
 import { useFilteredTrades } from '@/hooks/useFilteredTrades';
 import { useGlobalFilters } from '@/contexts/GlobalFiltersContext';
+import { usePrivacyMode, PRIVACY_MASK } from '@/hooks/usePrivacyMode';
 import { calculateTradeMetrics } from '@/types/trade';
 import { Info } from 'lucide-react';
 import { Tooltip as UITooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
@@ -16,6 +17,7 @@ interface DirectionData {
 export const LongShortAnalysisChart = () => {
   const { filteredTrades: trades } = useFilteredTrades();
   const { currencyConfig } = useGlobalFilters();
+  const { isPrivacyMode } = usePrivacyMode();
 
   const chartData = useMemo(() => {
     if (trades.length === 0) return [];
@@ -70,6 +72,7 @@ export const LongShortAnalysisChart = () => {
   }, [trades]);
 
   const formatCurrency = (value: number) => {
+    if (isPrivacyMode) return PRIVACY_MASK;
     if (Math.abs(value) >= 1000) {
       return `${value >= 0 ? '' : '-'}${currencyConfig.symbol}${(Math.abs(value) / 1000).toFixed(1)}k`;
     }
@@ -155,8 +158,8 @@ export const LongShortAnalysisChart = () => {
                   return (
                     <div className="glass-card rounded-lg px-3 py-2 border border-border/50">
                       <p className="text-xs text-muted-foreground mb-1">{data.direction}</p>
-                      <p className={`text-sm font-semibold font-mono ${data.pnl >= 0 ? 'profit-text' : 'loss-text'}`}>
-                        {data.pnl >= 0 ? '+' : ''}{formatCurrency(data.pnl)}
+                      <p className={`text-sm font-semibold font-mono ${isPrivacyMode ? 'text-foreground' : data.pnl >= 0 ? 'profit-text' : 'loss-text'}`}>
+                        {isPrivacyMode ? PRIVACY_MASK : `${data.pnl >= 0 ? '+' : ''}${formatCurrency(data.pnl)}`}
                       </p>
                       <p className="text-xs text-muted-foreground mt-1">
                         {data.tradeCount} trade{data.tradeCount !== 1 ? 's' : ''}

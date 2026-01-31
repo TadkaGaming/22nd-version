@@ -1,4 +1,5 @@
 import { CompareGroupStats } from '@/lib/compareUtils';
+import { usePrivacyMode, PRIVACY_MASK } from '@/hooks/usePrivacyMode';
 
 interface CompareStatisticsTableProps {
   groupNumber: 1 | 2;
@@ -6,7 +7,9 @@ interface CompareStatisticsTableProps {
 }
 
 export const CompareStatisticsTable = ({ groupNumber, stats }: CompareStatisticsTableProps) => {
+  const { isPrivacyMode } = usePrivacyMode();
   const formatCurrency = (value: number) => {
+    if (isPrivacyMode) return PRIVACY_MASK;
     const formatted = Math.abs(value).toFixed(2);
     return value < 0 ? `-$${formatted}` : `$${formatted}`;
   };

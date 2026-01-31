@@ -1,5 +1,6 @@
 import { useFilteredTrades } from '@/hooks/useFilteredTrades';
 import { useGlobalFilters } from '@/contexts/GlobalFiltersContext';
+import { usePrivacyMode } from '@/hooks/usePrivacyMode';
 import { calculateTradeMetrics, Trade } from '@/types/trade';
 import { Button } from '@/components/ui/button';
 import { ExternalLink } from 'lucide-react';
@@ -11,6 +12,7 @@ interface DiaryTradeSummaryProps {
 
 export const DiaryTradeSummary = ({ trade }: DiaryTradeSummaryProps) => {
   const { formatCurrency } = useGlobalFilters();
+  const { isPrivacyMode, maskCurrency, maskPercent } = usePrivacyMode();
   const { openModal } = useTradeModal();
   
   const metrics = calculateTradeMetrics(trade);
@@ -36,8 +38,8 @@ export const DiaryTradeSummary = ({ trade }: DiaryTradeSummaryProps) => {
   return (
     <div className="border border-border/50 rounded-lg p-4 bg-muted/20">
       <div className="flex items-center justify-between mb-4">
-        <div className={`text-lg font-semibold ${netPnl >= 0 ? 'text-profit' : 'text-loss'}`}>
-          Net P&L {netPnl >= 0 ? '' : '-'}${Math.abs(netPnl).toFixed(2)}
+        <div className={`text-lg font-semibold ${isPrivacyMode ? 'text-foreground' : netPnl >= 0 ? 'text-profit' : 'text-loss'}`}>
+          Net P&L {maskCurrency(netPnl, (v) => `${v >= 0 ? '' : '-'}$${Math.abs(v).toFixed(2)}`)}
         </div>
         <Button
           variant="default"
@@ -61,15 +63,17 @@ export const DiaryTradeSummary = ({ trade }: DiaryTradeSummaryProps) => {
         </div>
         <div>
           <div className="text-xs text-muted-foreground mb-1">Commissions</div>
-          <div className="text-sm font-medium">{formatCurrency(commissions)}</div>
+          <div className="text-sm font-medium">{maskCurrency(commissions, formatCurrency)}</div>
         </div>
         <div>
           <div className="text-xs text-muted-foreground mb-1">Net ROI</div>
-          <div className="text-sm font-medium">{netRoi}%</div>
+          <div className="text-sm font-medium">
+            {netRoi === '–' ? '–' : maskPercent(parseFloat(netRoi))}
+          </div>
         </div>
         <div>
           <div className="text-xs text-muted-foreground mb-1">Gross P&L</div>
-          <div className="text-sm font-medium">{formatCurrency(grossPnl)}</div>
+          <div className="text-sm font-medium">{maskCurrency(grossPnl, formatCurrency)}</div>
         </div>
       </div>
     </div>

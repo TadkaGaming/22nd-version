@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { usePrivacyMode } from '@/hooks/usePrivacyMode';
 
 interface ProfitFactorRingProps {
   profitFactor: number;
@@ -11,6 +12,7 @@ export const ProfitFactorRing = ({
   totalProfits, 
   totalLosses
 }: ProfitFactorRingProps) => {
+  const { isPrivacyMode, maskProfitFactor } = usePrivacyMode();
   const size = 60;
   const strokeWidth = 6;
   const radius = (size - strokeWidth) / 2;
@@ -30,7 +32,7 @@ export const ProfitFactorRing = ({
       <div className="flex flex-col">
         <span className="text-xs text-muted-foreground">Profit Factor</span>
         <span className="text-2xl font-bold font-mono">
-          {profitFactor === Infinity ? '∞' : profitFactor.toFixed(2)}
+          {maskProfitFactor(profitFactor)}
         </span>
       </div>
       <div className="relative" style={{ width: size, height: size }}>

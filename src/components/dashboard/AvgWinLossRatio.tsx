@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { useGlobalFilters } from '@/contexts/GlobalFiltersContext';
+import { usePrivacyMode } from '@/hooks/usePrivacyMode';
 
 interface AvgWinLossRatioProps {
   avgWin: number;
@@ -8,6 +9,7 @@ interface AvgWinLossRatioProps {
 
 export const AvgWinLossRatio = ({ avgWin, avgLoss }: AvgWinLossRatioProps) => {
   const { currencyConfig } = useGlobalFilters();
+  const { isPrivacyMode, PRIVACY_MASK } = usePrivacyMode();
   
   const absLoss = Math.abs(avgLoss);
   const ratio = absLoss > 0 ? avgWin / absLoss : avgWin > 0 ? Infinity : 0;
@@ -22,7 +24,14 @@ export const AvgWinLossRatio = ({ avgWin, avgLoss }: AvgWinLossRatioProps) => {
   };
 
   const formatCurrency = (value: number) => {
+    if (isPrivacyMode) return PRIVACY_MASK;
     return `${currencyConfig.symbol}${Math.abs(value).toFixed(1)}`;
+  };
+
+  // For the ratio, also mask in privacy mode
+  const formatRatioDisplay = () => {
+    if (isPrivacyMode) return PRIVACY_MASK;
+    return formatRatio(ratio);
   };
 
   return (
@@ -36,7 +45,7 @@ export const AvgWinLossRatio = ({ avgWin, avgLoss }: AvgWinLossRatioProps) => {
           className="font-bold font-mono"
           style={{ fontSize: 20 }}
         >
-          {formatRatio(ratio)}
+          {formatRatioDisplay()}
         </motion.span>
       </div>
 

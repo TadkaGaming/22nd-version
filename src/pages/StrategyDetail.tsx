@@ -9,6 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { useStrategiesContext } from '@/contexts/StrategiesContext';
 import { useFilteredTrades } from '@/hooks/useFilteredTrades';
 import { useGlobalFilters } from '@/contexts/GlobalFiltersContext';
+import { usePrivacyMode } from '@/hooks/usePrivacyMode';
 import { calculateTradeMetrics } from '@/types/trade';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -21,6 +22,7 @@ const StrategyDetail = () => {
   const { getStrategyById } = useStrategiesContext();
   const { filteredTrades } = useFilteredTrades();
   const { formatCurrency, currencyConfig } = useGlobalFilters();
+  const { isPrivacyMode, maskCurrency, maskProfitFactor } = usePrivacyMode();
 
   const strategy = id ? getStrategyById(id) : undefined;
 
@@ -125,21 +127,21 @@ const StrategyDetail = () => {
               <div className="flex items-center gap-2 mb-3">
                 <div className={cn(
                   "w-8 h-8 rounded-lg flex items-center justify-center",
-                  stats.totalPnl >= 0 ? "bg-profit/20" : "bg-loss/20"
+                  isPrivacyMode ? "bg-primary/20" : stats.totalPnl >= 0 ? "bg-profit/20" : "bg-loss/20"
                 )}>
                   {stats.totalPnl >= 0 ? (
-                    <TrendingUp className="w-4 h-4 text-profit" />
+                    <TrendingUp className={cn("w-4 h-4", isPrivacyMode ? "text-primary" : "text-profit")} />
                   ) : (
-                    <TrendingDown className="w-4 h-4 text-loss" />
+                    <TrendingDown className={cn("w-4 h-4", isPrivacyMode ? "text-primary" : "text-loss")} />
                   )}
                 </div>
                 <span className="text-sm text-muted-foreground">Total P&L</span>
               </div>
               <p className={cn(
                 "text-2xl font-bold font-mono",
-                stats.totalPnl >= 0 ? "profit-text" : "loss-text"
+                isPrivacyMode ? "text-foreground" : stats.totalPnl >= 0 ? "profit-text" : "loss-text"
               )}>
-                {formatCurrency(stats.totalPnl)}
+                {maskCurrency(stats.totalPnl, formatCurrency)}
               </p>
             </motion.div>
 
@@ -178,7 +180,7 @@ const StrategyDetail = () => {
                 <span className="text-sm text-muted-foreground">Profit Factor</span>
               </div>
               <p className="text-2xl font-bold font-mono">
-                {stats.profitFactor.toFixed(2)}
+                {maskProfitFactor(stats.profitFactor)}
               </p>
             </motion.div>
 
@@ -209,11 +211,11 @@ const StrategyDetail = () => {
             </div>
             <div className="glass-card rounded-xl p-5">
               <p className="text-sm text-muted-foreground mb-1">Average Win</p>
-              <p className="text-xl font-bold font-mono profit-text">{formatCurrency(stats.avgWin)}</p>
+              <p className={cn("text-xl font-bold font-mono", isPrivacyMode ? "text-foreground" : "profit-text")}>{maskCurrency(stats.avgWin, formatCurrency)}</p>
             </div>
             <div className="glass-card rounded-xl p-5">
               <p className="text-sm text-muted-foreground mb-1">Average Loss</p>
-              <p className="text-xl font-bold font-mono loss-text">{formatCurrency(stats.avgLoss)}</p>
+              <p className={cn("text-xl font-bold font-mono", isPrivacyMode ? "text-foreground" : "loss-text")}>{maskCurrency(stats.avgLoss, formatCurrency)}</p>
             </div>
           </div>
 
@@ -272,9 +274,9 @@ const StrategyDetail = () => {
                         </TableCell>
                         <TableCell className={cn(
                           "text-right font-mono font-medium",
-                          metrics.netPnl >= 0 ? "profit-text" : "loss-text"
+                          isPrivacyMode ? "text-foreground" : metrics.netPnl >= 0 ? "profit-text" : "loss-text"
                         )}>
-                          {formatCurrency(metrics.netPnl)}
+                          {maskCurrency(metrics.netPnl, formatCurrency)}
                         </TableCell>
                         <TableCell className="text-right font-mono">
                           {trade.savedRMultiple !== undefined && trade.savedRMultiple !== null 

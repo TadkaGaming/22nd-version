@@ -11,12 +11,13 @@ import { InstrumentAnalysisChart } from '@/components/dashboard/InstrumentAnalys
 import { LongShortAnalysisChart } from '@/components/dashboard/LongShortAnalysisChart';
 import { useFilteredTrades } from '@/hooks/useFilteredTrades';
 import { useGlobalFilters } from '@/contexts/GlobalFiltersContext';
+import { usePrivacyMode } from '@/hooks/usePrivacyMode';
 import { motion } from 'framer-motion';
 
 const Dashboard = () => {
   const { stats } = useFilteredTrades();
   const { formatCurrency } = useGlobalFilters();
-
+  const { isPrivacyMode, maskCurrency } = usePrivacyMode();
   return (
     <div className="space-y-8">
       <motion.div
@@ -44,8 +45,8 @@ const Dashboard = () => {
               {stats.totalTrades}
             </span>
           </div>
-          <p className={`text-2xl font-bold font-mono ${stats.netPnl >= 0 ? 'profit-text' : 'loss-text'}`}>
-            {formatCurrency(stats.netPnl)}
+          <p className={`text-2xl font-bold font-mono ${isPrivacyMode ? 'text-foreground' : stats.netPnl >= 0 ? 'profit-text' : 'loss-text'}`}>
+            {maskCurrency(stats.netPnl, formatCurrency)}
           </p>
         </motion.div>
 

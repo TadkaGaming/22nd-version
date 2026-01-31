@@ -4,6 +4,7 @@ import { format, parseISO } from 'date-fns';
 import { motion } from 'framer-motion';
 import { useFilteredTrades } from '@/hooks/useFilteredTrades';
 import { useGlobalFilters } from '@/contexts/GlobalFiltersContext';
+import { usePrivacyMode, PRIVACY_MASK } from '@/hooks/usePrivacyMode';
 import { calculateTradeMetrics } from '@/types/trade';
 import { Info } from 'lucide-react';
 import { Tooltip as UITooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
@@ -18,6 +19,7 @@ interface DailyData {
 export const NetDailyPnLChart = () => {
   const { filteredTrades: trades } = useFilteredTrades();
   const { currencyConfig } = useGlobalFilters();
+  const { isPrivacyMode } = usePrivacyMode();
 
   const chartData = useMemo(() => {
     if (trades.length === 0) return [];
@@ -54,6 +56,7 @@ export const NetDailyPnLChart = () => {
   }, [trades]);
 
   const formatCurrency = (value: number) => {
+    if (isPrivacyMode) return PRIVACY_MASK;
     const prefix = value >= 0 ? '$' : '-$';
     return `${prefix}${Math.abs(value).toFixed(0)}`;
   };
@@ -137,8 +140,8 @@ export const NetDailyPnLChart = () => {
                   return (
                     <div className="glass-card rounded-lg px-3 py-2 border border-border/50">
                       <p className="text-xs text-muted-foreground mb-1">{data.displayDate}</p>
-                      <p className={`text-sm font-semibold font-mono ${data.dailyPnl >= 0 ? 'profit-text' : 'loss-text'}`}>
-                        {data.dailyPnl >= 0 ? '+' : ''}{formatCurrency(data.dailyPnl)}
+                      <p className={`text-sm font-semibold font-mono ${isPrivacyMode ? 'text-foreground' : data.dailyPnl >= 0 ? 'profit-text' : 'loss-text'}`}>
+                        {isPrivacyMode ? PRIVACY_MASK : `${data.dailyPnl >= 0 ? '+' : ''}${formatCurrency(data.dailyPnl)}`}
                       </p>
                       <p className="text-xs text-muted-foreground mt-1">
                         {data.tradeCount} trade{data.tradeCount !== 1 ? 's' : ''}

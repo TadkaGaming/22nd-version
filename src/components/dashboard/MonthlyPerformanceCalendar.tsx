@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useFilteredTrades } from '@/hooks/useFilteredTrades';
 import { useGlobalFilters } from '@/contexts/GlobalFiltersContext';
+import { usePrivacyMode, PRIVACY_MASK } from '@/hooks/usePrivacyMode';
 import { calculateTradeMetrics } from '@/types/trade';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, addMonths, subMonths, isSameMonth, getDay, startOfWeek, endOfWeek } from 'date-fns';
 import { ChevronLeft, ChevronRight, Settings } from 'lucide-react';
@@ -38,6 +39,7 @@ interface DisplaySettings {
 export const MonthlyPerformanceCalendar = () => {
   const { filteredTrades: trades } = useFilteredTrades();
   const { currencyConfig } = useGlobalFilters();
+  const { isPrivacyMode } = usePrivacyMode();
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [displaySettings, setDisplaySettings] = useState<DisplaySettings>({
     dailyPnl: true,
@@ -160,11 +162,13 @@ export const MonthlyPerformanceCalendar = () => {
   }, [currentMonth, dayStatsMap]);
 
   const formatCurrency = (value: number) => {
+    if (isPrivacyMode) return PRIVACY_MASK;
     const prefix = value >= 0 ? currencyConfig.symbol : `-${currencyConfig.symbol}`;
     return `${prefix}${Math.abs(value).toFixed(0)}`;
   };
 
   const formatCurrencyDecimal = (value: number) => {
+    if (isPrivacyMode) return PRIVACY_MASK;
     const prefix = value >= 0 ? currencyConfig.symbol : `-${currencyConfig.symbol}`;
     return `${prefix}${Math.abs(value).toFixed(2)}`;
   };
@@ -204,7 +208,7 @@ export const MonthlyPerformanceCalendar = () => {
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-3 text-sm">
             <span className="text-muted-foreground">Monthly stats:</span>
-            <span className={`font-mono font-semibold ${monthlyStats.pnl >= 0 ? 'profit-text' : 'loss-text'}`}>
+            <span className={`font-mono font-semibold ${isPrivacyMode ? 'text-foreground' : monthlyStats.pnl >= 0 ? 'profit-text' : 'loss-text'}`}>
               {formatCurrencyDecimal(monthlyStats.pnl)}
             </span>
             <span className="text-muted-foreground bg-secondary px-2 py-0.5 rounded text-xs">
@@ -290,7 +294,7 @@ export const MonthlyPerformanceCalendar = () => {
                       {hasData && (
                         <div className="space-y-0.5">
                           {displaySettings.dailyPnl && (
-                            <div className={`text-sm font-bold font-mono ${stats.pnl >= 0 ? 'profit-text' : 'loss-text'}`}>
+                            <div className={`text-sm font-bold font-mono ${isPrivacyMode ? 'text-foreground' : stats.pnl >= 0 ? 'profit-text' : 'loss-text'}`}>
                               {formatCurrencyDecimal(stats.pnl)}
                             </div>
                           )}
@@ -328,7 +332,7 @@ export const MonthlyPerformanceCalendar = () => {
               style={{ marginTop: index === 0 ? '0' : '4px' }}
             >
               <div className="text-xs text-muted-foreground mb-1">Week {summary.weekNumber}</div>
-              <div className={`text-sm font-bold font-mono ${summary.pnl >= 0 ? 'profit-text' : 'loss-text'}`}>
+              <div className={`text-sm font-bold font-mono ${isPrivacyMode ? 'text-foreground' : summary.pnl >= 0 ? 'profit-text' : 'loss-text'}`}>
                 {formatCurrencyDecimal(summary.pnl)}
               </div>
               <div className={`text-[10px] px-1.5 py-0.5 rounded mt-0.5 ${
