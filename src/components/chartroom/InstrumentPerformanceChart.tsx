@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useFilteredTrades } from '@/hooks/useFilteredTrades';
 import { useGlobalFilters } from '@/contexts/GlobalFiltersContext';
+import { usePrivacyMode, PRIVACY_MASK } from '@/hooks/usePrivacyMode';
 import { useAccountsContext } from '@/contexts/AccountsContext';
 import { calculateTradeMetrics, Trade } from '@/types/trade';
 import { ChartDisplayType, mapGlobalToChartDisplay } from '@/hooks/useChartDisplayMode';
@@ -50,6 +51,7 @@ export const InstrumentPerformanceChart = ({
 }: InstrumentPerformanceChartProps) => {
   const { filteredTrades } = useFilteredTrades();
   const { currencyConfig, selectedAccounts, isAllAccountsSelected, classifyTradeOutcome, displayMode } = useGlobalFilters();
+  const { isPrivacyMode } = usePrivacyMode();
   const { accounts, getAccountBalanceBeforeTrades } = useAccountsContext();
   
   // Calculate initial display type from global filter or prop
@@ -235,6 +237,10 @@ export const InstrumentPerformanceChart = ({
                   tickLine={false}
                   tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 10 }}
                   tickFormatter={(value) => {
+                    // Hide Y-axis values for dollar/percent modes when privacy is active
+                    if (isPrivacyMode && (displayType === 'dollar' || displayType === 'percent')) {
+                      return PRIVACY_MASK;
+                    }
                     switch (displayType) {
                       case 'dollar':
                         return `${currencyConfig.symbol}${value.toFixed(0)}`;

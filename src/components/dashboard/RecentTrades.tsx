@@ -4,6 +4,7 @@ import { ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useFilteredTrades } from '@/hooks/useFilteredTrades';
 import { useGlobalFilters } from '@/contexts/GlobalFiltersContext';
+import { usePrivacyMode } from '@/hooks/usePrivacyMode';
 import { useTradeModal } from '@/contexts/TradeModalContext';
 import { Trade, calculateTradeMetrics } from '@/types/trade';
 import { cn } from '@/lib/utils';
@@ -14,6 +15,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 export const RecentTrades = () => {
   const { filteredTrades } = useFilteredTrades();
   const { formatCurrency } = useGlobalFilters();
+  const { isPrivacyMode, maskCurrency } = usePrivacyMode();
   const { openModal } = useTradeModal();
   const navigate = useNavigate();
   const [showViewMore, setShowViewMore] = useState(false);
@@ -92,9 +94,9 @@ export const RecentTrades = () => {
             <>
               <p className={cn(
                 "font-mono font-semibold",
-                metrics.netPnl >= 0 ? "profit-text" : "loss-text"
+                isPrivacyMode ? "text-foreground" : metrics.netPnl >= 0 ? "profit-text" : "loss-text"
               )}>
-                {formatCurrency(metrics.netPnl)}
+                {maskCurrency(metrics.netPnl, formatCurrency)}
               </p>
               <p className="text-xs text-muted-foreground">{trade.side}</p>
             </>

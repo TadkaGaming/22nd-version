@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useFilteredTrades } from '@/hooks/useFilteredTrades';
 import { useGlobalFilters } from '@/contexts/GlobalFiltersContext';
+import { usePrivacyMode, PRIVACY_MASK } from '@/hooks/usePrivacyMode';
 import { useAccountsContext } from '@/contexts/AccountsContext';
 import { calculateTradeMetrics } from '@/types/trade';
 import { parseISO } from 'date-fns';
@@ -30,12 +31,13 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 
-// Drawdown-specific display type (subset of ChartDisplayType)
-type DrawdownDisplayType = 'return' | 'percent' | 'tickpip' | 'privacy';
+// Drawdown-specific display type (subset of ChartDisplayType) - privacy removed from dropdown
+type DrawdownDisplayType = 'return' | 'percent' | 'tickpip';
 
 const Drawdown = () => {
   const { filteredTrades } = useFilteredTrades();
   const { selectedAccounts, isAllAccountsSelected, currencyConfig, displayMode } = useGlobalFilters();
+  const { isPrivacyMode } = usePrivacyMode();
   const { accounts, getAccountBalanceBeforeTrades } = useAccountsContext();
   
   // Map global display mode to drawdown display type
@@ -44,7 +46,7 @@ const Drawdown = () => {
     if (mapped === 'dollar') return 'return';
     if (mapped === 'percent') return 'percent';
     if (mapped === 'tickpip') return 'tickpip';
-    if (mapped === 'privacy') return 'privacy';
+    // Privacy mode falls back to 'return' (handled by mapGlobalToChartDisplay)
     return 'return';
   };
   
@@ -231,6 +233,7 @@ const Drawdown = () => {
 
   // Format currency for display (always positive for metrics)
   const formatCurrency = (value: number) => {
+    if (isPrivacyMode) return PRIVACY_MASK;
     const absValue = Math.abs(value);
     if (absValue >= 1000) {
       return `${value < 0 ? '-' : ''}${currencyConfig.symbol}${(absValue / 1000).toFixed(1)}K`;
@@ -240,16 +243,15 @@ const Drawdown = () => {
 
   // Format percentage for display
   const formatPercent = (value: number) => {
+    if (isPrivacyMode) return PRIVACY_MASK;
     return `${value.toFixed(2)}%`;
   };
 
   // Format value based on display type
   const formatValue = (value: number) => {
+    if (isPrivacyMode) return PRIVACY_MASK;
     if (displayType === 'percent') {
       return formatPercent(value);
-    }
-    if (displayType === 'privacy') {
-      return '•••••';
     }
     if (displayType === 'tickpip') {
       // Placeholder for tick/pip display
@@ -259,6 +261,7 @@ const Drawdown = () => {
   };
 
   const formatMetricCurrency = (value: number) => {
+    if (isPrivacyMode) return PRIVACY_MASK;
     return `${currencyConfig.symbol}${value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   };
 

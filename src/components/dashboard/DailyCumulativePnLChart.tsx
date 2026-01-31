@@ -4,6 +4,7 @@ import { format, parseISO } from 'date-fns';
 import { motion } from 'framer-motion';
 import { useFilteredTrades } from '@/hooks/useFilteredTrades';
 import { useGlobalFilters } from '@/contexts/GlobalFiltersContext';
+import { usePrivacyMode, PRIVACY_MASK } from '@/hooks/usePrivacyMode';
 import { calculateTradeMetrics } from '@/types/trade';
 import { Info } from 'lucide-react';
 import { Tooltip as UITooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
@@ -18,6 +19,7 @@ interface DailyData {
 export const DailyCumulativePnLChart = () => {
   const { filteredTrades: trades } = useFilteredTrades();
   const { formatCurrency: globalFormatCurrency, currencyConfig } = useGlobalFilters();
+  const { isPrivacyMode } = usePrivacyMode();
 
   const chartData = useMemo(() => {
     if (trades.length === 0) return [];
@@ -53,6 +55,7 @@ export const DailyCumulativePnLChart = () => {
   }, [trades]);
 
   const formatCurrency = (value: number) => {
+    if (isPrivacyMode) return PRIVACY_MASK;
     const prefix = value >= 0 ? '$' : '-$';
     return `${prefix}${Math.abs(value).toFixed(0)}`;
   };
@@ -162,8 +165,8 @@ export const DailyCumulativePnLChart = () => {
                   return (
                     <div className="glass-card rounded-lg px-3 py-2 border border-border/50">
                       <p className="text-xs text-muted-foreground mb-1">{label}</p>
-                      <p className={`text-sm font-semibold font-mono ${value >= 0 ? 'profit-text' : 'loss-text'}`}>
-                        {value >= 0 ? '+' : ''}{formatCurrency(value)}
+                      <p className={`text-sm font-semibold font-mono ${isPrivacyMode ? 'text-foreground' : value >= 0 ? 'profit-text' : 'loss-text'}`}>
+                        {isPrivacyMode ? PRIVACY_MASK : `${value >= 0 ? '+' : ''}${formatCurrency(value)}`}
                       </p>
                     </div>
                   );

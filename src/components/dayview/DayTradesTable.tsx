@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Plus } from 'lucide-react';
 import { Trade, calculateTradeMetrics } from '@/types/trade';
 import { useGlobalFilters } from '@/contexts/GlobalFiltersContext';
+import { usePrivacyMode } from '@/hooks/usePrivacyMode';
 import { useStrategiesContext } from '@/contexts/StrategiesContext';
 import { useTagsContext } from '@/contexts/TagsContext';
 import { useTradesContext } from '@/contexts/TradesContext';
@@ -25,6 +26,7 @@ interface DayTradesTableProps {
 
 export const DayTradesTable = ({ trades }: DayTradesTableProps) => {
   const { formatCurrency } = useGlobalFilters();
+  const { isPrivacyMode, maskCurrency, maskPercent } = usePrivacyMode();
   const { strategies } = useStrategiesContext();
   const { tags } = useTagsContext();
   const { updateTrade } = useTradesContext();
@@ -111,12 +113,12 @@ export const DayTradesTable = ({ trades }: DayTradesTableProps) => {
                     </Badge>
                   </TableCell>
                   <TableCell className="text-foreground">{trade.side}</TableCell>
-                  <TableCell className={cn(isProfit ? 'text-profit' : 'text-loss')}>
-                    {formatCurrency(metrics.netPnl)}
+                  <TableCell className={cn(isPrivacyMode ? 'text-foreground' : isProfit ? 'text-profit' : 'text-loss')}>
+                    {maskCurrency(metrics.netPnl, formatCurrency)}
                   </TableCell>
-                  <TableCell className={cn(isProfit ? 'text-profit' : 'text-loss')}>
+                  <TableCell className={cn(isPrivacyMode ? 'text-foreground' : isProfit ? 'text-profit' : 'text-loss')}>
                     {trade.savedReturnPercent !== undefined
-                      ? `${trade.savedReturnPercent.toFixed(2)}%`
+                      ? maskPercent(trade.savedReturnPercent)
                       : '–'}
                   </TableCell>
                   <TableCell className="text-foreground">

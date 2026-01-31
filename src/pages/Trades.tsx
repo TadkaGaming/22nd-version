@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { useFilteredTrades } from '@/hooks/useFilteredTrades';
 import { useTradeModal } from '@/contexts/TradeModalContext';
 import { useGlobalFilters } from '@/contexts/GlobalFiltersContext';
+import { usePrivacyMode } from '@/hooks/usePrivacyMode';
 import { calculateTradeMetrics } from '@/types/trade';
 import { cn } from '@/lib/utils';
 import {
@@ -32,6 +33,7 @@ const Trades = () => {
   const { filteredTrades, deleteTrade } = useFilteredTrades();
   const { openModal } = useTradeModal();
   const { formatCurrency, currencyConfig } = useGlobalFilters();
+  const { isPrivacyMode, maskCurrency } = usePrivacyMode();
 
   const sortedTrades = [...filteredTrades].sort((a, b) => {
     const metricsA = calculateTradeMetrics(a);
@@ -116,15 +118,15 @@ const Trades = () => {
                     <TableCell className="font-mono">{metrics.totalQuantity}</TableCell>
                     <TableCell className={cn(
                       "font-mono font-semibold",
-                      metrics.grossPnl >= 0 ? "profit-text" : "loss-text"
+                      isPrivacyMode ? "text-foreground" : metrics.grossPnl >= 0 ? "profit-text" : "loss-text"
                     )}>
-                      {formatCurrency(metrics.grossPnl)}
+                      {maskCurrency(metrics.grossPnl, formatCurrency)}
                     </TableCell>
                     <TableCell className={cn(
                       "font-mono font-semibold",
-                      metrics.netPnl >= 0 ? "profit-text" : "loss-text"
+                      isPrivacyMode ? "text-foreground" : metrics.netPnl >= 0 ? "profit-text" : "loss-text"
                     )}>
-                      {formatCurrency(metrics.netPnl)}
+                      {maskCurrency(metrics.netPnl, formatCurrency)}
                     </TableCell>
                     <TableCell className="font-mono">
                       {trade.savedRMultiple !== undefined && trade.savedRMultiple !== null 

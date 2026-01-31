@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useFilteredTrades } from '@/hooks/useFilteredTrades';
 import { useGlobalFilters } from '@/contexts/GlobalFiltersContext';
+import { usePrivacyMode, PRIVACY_MASK } from '@/hooks/usePrivacyMode';
 import { calculateTradeMetrics, Trade } from '@/types/trade';
 import { mapGlobalToChartDisplay } from '@/hooks/useChartDisplayMode';
 import {
@@ -28,7 +29,8 @@ import {
 } from '@/components/chartroom/TradeDurationBucketCharts';
 
 type TimeUnit = 'days' | 'hours' | 'minutes';
-type DisplayType = 'dollar' | 'percent' | 'tickpip' | 'privacy';
+// Privacy removed from dropdown - handled via global filter
+type DisplayType = 'dollar' | 'percent' | 'tickpip';
 
 interface HoldingTimeData {
   holdingTime: number;
@@ -43,6 +45,7 @@ interface HoldingTimeData {
 const HoldingTime = () => {
   const { filteredTrades } = useFilteredTrades();
   const { displayMode } = useGlobalFilters();
+  const { isPrivacyMode } = usePrivacyMode();
   const [timeUnit, setTimeUnit] = useState<TimeUnit>('hours');
   
   // Map global display mode to holding time display type
@@ -51,7 +54,7 @@ const HoldingTime = () => {
     if (mapped === 'dollar') return 'dollar';
     if (mapped === 'percent') return 'percent';
     if (mapped === 'tickpip') return 'tickpip';
-    if (mapped === 'privacy') return 'privacy';
+    // Privacy mode falls back to 'dollar' (handled by mapGlobalToChartDisplay)
     return 'dollar';
   };
   
@@ -285,14 +288,13 @@ const HoldingTime = () => {
                     tickLine={false}
                     tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
                     tickFormatter={(value) => {
-                      if (displayType === 'privacy') return '•••••';
+                      if (isPrivacyMode) return PRIVACY_MASK;
                       if (displayType === 'tickpip') return `${value.toFixed(0)} T`;
                       if (displayType === 'percent') return `${value.toFixed(1)}%`;
                       return `$${value.toFixed(0)}`;
                     }}
                     label={{
-                      value: displayType === 'privacy' ? 'Return' 
-                        : displayType === 'tickpip' ? 'Return (Tick/Pip)'
+                      value: displayType === 'tickpip' ? 'Return (Tick/Pip)'
                         : displayType === 'percent' ? 'Return (%)' 
                         : 'Return ($)',
                       angle: -90,
@@ -326,22 +328,17 @@ const HoldingTime = () => {
                             </p>
                             {displayType === 'dollar' && (
                               <p className={data.isWinner ? 'text-green-500' : 'text-red-500'}>
-                                Net P/L: ${data.netPnl.toFixed(2)}
+                                Net P/L: {isPrivacyMode ? PRIVACY_MASK : `$${data.netPnl.toFixed(2)}`}
                               </p>
                             )}
                             {displayType === 'percent' && (
                               <p className={data.isWinner ? 'text-green-500' : 'text-red-500'}>
-                                Return: {data.returnPercent.toFixed(2)}%
+                                Return: {isPrivacyMode ? PRIVACY_MASK : `${data.returnPercent.toFixed(2)}%`}
                               </p>
                             )}
                             {displayType === 'tickpip' && (
                               <p className={data.isWinner ? 'text-green-500' : 'text-red-500'}>
-                                Tick/Pip: --
-                              </p>
-                            )}
-                            {displayType === 'privacy' && (
-                              <p className={data.isWinner ? 'text-green-500' : 'text-red-500'}>
-                                P/L: •••••
+                                Tick/Pip: {isPrivacyMode ? PRIVACY_MASK : '--'}
                               </p>
                             )}
                           </div>

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { Trade, calculateTradeMetrics } from '@/types/trade';
 import { useGlobalFilters } from '@/contexts/GlobalFiltersContext';
+import { usePrivacyMode } from '@/hooks/usePrivacyMode';
 import { IntradayPnLChart } from './IntradayPnLChart';
 import { DayTradesTable } from './DayTradesTable';
 import { format } from 'date-fns';
@@ -16,6 +17,7 @@ interface DayCardProps {
 export const DayCard = ({ date, trades }: DayCardProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const { formatCurrency, classifyTradeOutcome } = useGlobalFilters();
+  const { isPrivacyMode, maskCurrency, maskProfitFactor } = usePrivacyMode();
 
   // Calculate day stats
   const dayStats = trades.reduce(
@@ -84,8 +86,8 @@ export const DayCard = ({ date, trades }: DayCardProps) => {
         <div className="flex items-center gap-3">
           <span className="font-semibold text-foreground">{formattedDate}</span>
           <span className="text-muted-foreground">•</span>
-          <span className={cn('font-semibold', isProfit ? 'text-profit' : 'text-loss')}>
-            Net P&L {formatCurrency(dayStats.netPnl)}
+          <span className={cn('font-semibold', isPrivacyMode ? 'text-foreground' : isProfit ? 'text-profit' : 'text-loss')}>
+            Net P&L {maskCurrency(dayStats.netPnl, formatCurrency)}
           </span>
         </div>
       </button>
@@ -111,14 +113,14 @@ export const DayCard = ({ date, trades }: DayCardProps) => {
             </div>
             <div>
               <p className="text-xs text-muted-foreground mb-1">Gross P&L</p>
-              <p className={cn('text-lg font-semibold', isProfit ? 'text-profit' : 'text-loss')}>
-                {formatCurrency(dayStats.grossPnl)}
+              <p className={cn('text-lg font-semibold', isPrivacyMode ? 'text-foreground' : isProfit ? 'text-profit' : 'text-loss')}>
+                {maskCurrency(dayStats.grossPnl, formatCurrency)}
               </p>
             </div>
             <div>
               <p className="text-xs text-muted-foreground mb-1">Commissions</p>
               <p className="text-lg font-semibold text-foreground">
-                {formatCurrency(dayStats.totalCommissions, false)}
+                {maskCurrency(dayStats.totalCommissions, (v) => formatCurrency(v, false))}
               </p>
             </div>
 
@@ -138,7 +140,7 @@ export const DayCard = ({ date, trades }: DayCardProps) => {
             <div>
               <p className="text-xs text-muted-foreground mb-1">Profit Factor</p>
               <p className="text-lg font-semibold text-foreground">
-                {profitFactor === Infinity ? '∞' : profitFactor === 0 ? '–' : profitFactor.toFixed(2)}
+                {maskProfitFactor(profitFactor)}
               </p>
             </div>
           </div>

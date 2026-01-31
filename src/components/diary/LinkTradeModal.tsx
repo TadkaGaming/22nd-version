@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useFilteredTrades } from '@/hooks/useFilteredTrades';
 import { useGlobalFilters } from '@/contexts/GlobalFiltersContext';
+import { usePrivacyMode } from '@/hooks/usePrivacyMode';
 import { calculateTradeMetrics } from '@/types/trade';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -24,6 +25,7 @@ interface LinkTradeModalProps {
 export const LinkTradeModal = ({ open, onOpenChange, onLink }: LinkTradeModalProps) => {
   const { trades } = useFilteredTrades();
   const { formatCurrency } = useGlobalFilters();
+  const { isPrivacyMode, maskCurrency } = usePrivacyMode();
   const [searchQuery, setSearchQuery] = useState('');
 
   // Sort trades by open date (newest first) and filter by search
@@ -112,9 +114,9 @@ export const LinkTradeModal = ({ open, onOpenChange, onLink }: LinkTradeModalPro
                     <div className="text-sm font-medium">{trade.symbol}</div>
                     <div className={cn(
                       "text-sm font-medium",
-                      netPnl >= 0 ? "text-profit" : "text-loss"
+                      isPrivacyMode ? "text-foreground" : netPnl >= 0 ? "text-profit" : "text-loss"
                     )}>
-                      {netPnl >= 0 ? '' : '-'}${Math.abs(netPnl).toFixed(2)}
+                      {maskCurrency(netPnl, (v) => `${v >= 0 ? '' : '-'}$${Math.abs(v).toFixed(2)}`)}
                     </div>
                     <Button
                       variant="ghost"

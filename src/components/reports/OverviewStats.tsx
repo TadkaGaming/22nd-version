@@ -3,6 +3,7 @@ import { format } from 'date-fns';
 import { ChevronDown, Info } from 'lucide-react';
 import { useFilteredTrades } from '@/hooks/useFilteredTrades';
 import { useGlobalFilters } from '@/contexts/GlobalFiltersContext';
+import { usePrivacyMode, PRIVACY_MASK } from '@/hooks/usePrivacyMode';
 import { calculateTradeMetrics } from '@/types/trade';
 import {
   DropdownMenu,
@@ -24,6 +25,7 @@ const OverviewStats = () => {
   const [pnlType, setPnlType] = useState<PnLType>('net');
   const { filteredTrades } = useFilteredTrades();
   const { formatCurrency, dateRange } = useGlobalFilters();
+  const { isPrivacyMode } = usePrivacyMode();
 
   const stats = useMemo(() => {
     const tradesWithMetrics = filteredTrades.map(trade => ({
@@ -315,33 +317,53 @@ const OverviewStats = () => {
 
   const formatValue = (value: number, isCurrency: boolean = true): string => {
     if (isCurrency) {
+      if (isPrivacyMode) return PRIVACY_MASK;
       return formatCurrency(value, false);
     }
     return value.toFixed(2);
   };
 
+  // Helper to format currency values with privacy mode
+  const privacyFormatCurrency = (value: number, showSign: boolean = false): string => {
+    if (isPrivacyMode) return PRIVACY_MASK;
+    return formatCurrency(value, showSign);
+  };
+
+  // Helper to format profit factor with privacy mode
+  const privacyFormatProfitFactor = (value: number): string => {
+    if (isPrivacyMode) return PRIVACY_MASK;
+    if (value === Infinity) return '∞';
+    return value.toFixed(2);
+  };
+
+  // Helper to format percentage with privacy mode (only for Return %)
+  const privacyFormatPercent = (value: number): string => {
+    if (isPrivacyMode) return PRIVACY_MASK;
+    return `${value.toFixed(2)}%`;
+  };
+
   const leftColumnStats = [
-    { label: 'Total P&L', value: formatCurrency(stats.totalPnL, false), highlight: true },
+    { label: 'Total P&L', value: privacyFormatCurrency(stats.totalPnL), highlight: true },
     { label: 'Average daily volume', value: stats.avgDailyVolume.toFixed(2) },
-    { label: 'Average winning trade', value: formatCurrency(stats.avgWinner, false) },
-    { label: 'Average losing trade', value: formatCurrency(stats.avgLoser, false) },
+    { label: 'Average winning trade', value: privacyFormatCurrency(stats.avgWinner) },
+    { label: 'Average losing trade', value: privacyFormatCurrency(stats.avgLoser) },
     { label: 'Total number of trades', value: stats.totalTrades.toString() },
     { label: 'Number of winning trades', value: stats.winningTrades.toString() },
     { label: 'Number of losing trades', value: stats.losingTrades.toString() },
     { label: 'Number of break even trades', value: stats.breakevenTrades.toString() },
     { label: 'Max consecutive wins', value: stats.maxConsecWins.toString() },
     { label: 'Max consecutive losses', value: stats.maxConsecLosses.toString() },
-    { label: 'Total charges', value: formatCurrency(stats.totalCharges, false) },
-    { label: 'Total fees', value: formatCurrency(stats.totalFees, false) },
-    { label: 'Total swap', value: formatCurrency(stats.totalSwap, false) },
-    { label: 'Largest profit', value: formatCurrency(stats.largestProfit, false) },
-    { label: 'Largest loss', value: formatCurrency(stats.largestLoss, false) },
+    { label: 'Total charges', value: privacyFormatCurrency(stats.totalCharges) },
+    { label: 'Total fees', value: privacyFormatCurrency(stats.totalFees) },
+    { label: 'Total swap', value: privacyFormatCurrency(stats.totalSwap) },
+    { label: 'Largest profit', value: privacyFormatCurrency(stats.largestProfit) },
+    { label: 'Largest loss', value: privacyFormatCurrency(stats.largestLoss) },
     { label: 'Average hold time (All trades)', value: formatDuration(stats.avgHoldTimeAll) },
     { label: 'Average hold time (Winning trades)', value: formatDuration(stats.avgHoldTimeWinners) },
     { label: 'Average hold time (Losing trades)', value: formatDuration(stats.avgHoldTimeLosers) },
     { label: 'Average hold time (Scratch trades)', value: formatDuration(stats.avgHoldTimeScratch) },
-    { label: 'Average trade P&L', value: formatCurrency(stats.avgTradePnL, false) },
-    { label: 'Profit factor', value: stats.profitFactor === Infinity ? '∞' : stats.profitFactor.toFixed(2) },
+    { label: 'Average trade P&L', value: privacyFormatCurrency(stats.avgTradePnL) },
+    { label: 'Profit factor', value: privacyFormatProfitFactor(stats.profitFactor) },
   ];
 
   const rightColumnStats = [
@@ -353,18 +375,18 @@ const OverviewStats = () => {
     { label: 'Logged days', value: stats.loggedDays.toString() },
     { label: 'Max consecutive winning days', value: stats.maxConsecWinDays.toString() },
     { label: 'Max consecutive losing days', value: stats.maxConsecLossDays.toString() },
-    { label: 'Average daily P&L', value: formatCurrency(stats.avgDailyPnL, false) },
-    { label: 'Average winning day P&L', value: formatCurrency(stats.avgWinningDayPnL, false) },
-    { label: 'Average losing day P&L', value: formatCurrency(stats.avgLosingDayPnL, false) },
-    { label: 'Largest profitable day (Profits)', value: formatCurrency(stats.largestProfitableDay, false) },
-    { label: 'Largest losing day (Losses)', value: formatCurrency(stats.largestLosingDay, false) },
+    { label: 'Average daily P&L', value: privacyFormatCurrency(stats.avgDailyPnL) },
+    { label: 'Average winning day P&L', value: privacyFormatCurrency(stats.avgWinningDayPnL) },
+    { label: 'Average losing day P&L', value: privacyFormatCurrency(stats.avgLosingDayPnL) },
+    { label: 'Largest profitable day (Profits)', value: privacyFormatCurrency(stats.largestProfitableDay) },
+    { label: 'Largest losing day (Losses)', value: privacyFormatCurrency(stats.largestLosingDay) },
     { label: 'Average planned R-Multiple', value: `${stats.avgPlannedR.toFixed(1)}R` },
     { label: 'Average realized R-Multiple', value: `${stats.avgRealizedR.toFixed(1)}R` },
-    { label: 'Trade expectancy', value: formatCurrency(stats.expectancy, false) },
-    { label: 'Max drawdown', value: formatCurrency(stats.maxDrawdown, false) },
-    { label: 'Max drawdown, %', value: `${stats.maxDrawdownPercent.toFixed(2)}%` },
-    { label: 'Average drawdown', value: formatCurrency(stats.avgDrawdown, false) },
-    { label: 'Average drawdown, %', value: `${stats.avgDrawdownPercent.toFixed(2)}%` },
+    { label: 'Trade expectancy', value: privacyFormatCurrency(stats.expectancy) },
+    { label: 'Max drawdown', value: privacyFormatCurrency(stats.maxDrawdown) },
+    { label: 'Max drawdown, %', value: privacyFormatPercent(stats.maxDrawdownPercent) },
+    { label: 'Average drawdown', value: privacyFormatCurrency(stats.avgDrawdown) },
+    { label: 'Average drawdown, %', value: privacyFormatPercent(stats.avgDrawdownPercent) },
   ];
 
   const getDateLabel = () => {
@@ -419,21 +441,21 @@ const OverviewStats = () => {
         <div className="flex gap-12">
           <div>
             <p className="text-xs text-muted-foreground mb-1">Best month</p>
-            <p className="text-xl font-semibold">{stats.bestMonth ? formatCurrency(stats.bestMonth.pnl, false) : 'N/A'}</p>
+            <p className="text-xl font-semibold">{stats.bestMonth ? privacyFormatCurrency(stats.bestMonth.pnl) : 'N/A'}</p>
             <p className="text-xs text-muted-foreground">
               {stats.bestMonth ? `in ${formatMonth(stats.bestMonth.month)}` : ''}
             </p>
           </div>
           <div>
             <p className="text-xs text-muted-foreground mb-1">Lowest month</p>
-            <p className="text-xl font-semibold">{stats.lowestMonth ? formatCurrency(stats.lowestMonth.pnl, false) : 'N/A'}</p>
+            <p className="text-xl font-semibold">{stats.lowestMonth ? privacyFormatCurrency(stats.lowestMonth.pnl) : 'N/A'}</p>
             <p className="text-xs text-muted-foreground">
               {stats.lowestMonth ? `in ${formatMonth(stats.lowestMonth.month)}` : ''}
             </p>
           </div>
           <div>
             <p className="text-xs text-muted-foreground mb-1">Average</p>
-            <p className="text-xl font-semibold">{formatCurrency(stats.avgPerMonth, false)}</p>
+            <p className="text-xl font-semibold">{privacyFormatCurrency(stats.avgPerMonth)}</p>
             <p className="text-xs text-muted-foreground">per Month</p>
           </div>
         </div>
