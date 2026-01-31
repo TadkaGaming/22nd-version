@@ -300,21 +300,77 @@ export const InstrumentPerformanceChart = ({
                       );
                     }
                     
+                    // Dollar mode: show Net PNL + counts
+                    if (displayType === 'dollar') {
+                      return (
+                        <div className="bg-card border border-border rounded-lg p-3 shadow-lg">
+                          <p className="text-foreground font-medium mb-2">{data.symbol}</p>
+                          <div className="space-y-1 text-sm">
+                            <p className={data.totalPnl >= 0 ? 'text-profit' : 'text-loss'}>
+                              Net PNL: {formatValue(data.totalPnl, 'dollar')}
+                            </p>
+                            <p className="text-muted-foreground">
+                              Total Trades: {data.tradeCount}
+                            </p>
+                            <p className="text-muted-foreground">
+                              Winners: {data.winCount}
+                            </p>
+                            <p className="text-muted-foreground">
+                              Losers: {data.lossCount}
+                            </p>
+                            <p className="text-muted-foreground">
+                              BE: {data.beCount}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    }
+                    
+                    // Percent mode: show Return % + counts
+                    if (displayType === 'percent') {
+                      return (
+                        <div className="bg-card border border-border rounded-lg p-3 shadow-lg">
+                          <p className="text-foreground font-medium mb-2">{data.symbol}</p>
+                          <div className="space-y-1 text-sm">
+                            <p className={data.totalPercent >= 0 ? 'text-profit' : 'text-loss'}>
+                              Return %: {formatValue(data.totalPercent, 'percent')}
+                            </p>
+                            <p className="text-muted-foreground">
+                              Total Trades: {data.tradeCount}
+                            </p>
+                            <p className="text-muted-foreground">
+                              Winners: {data.winCount}
+                            </p>
+                            <p className="text-muted-foreground">
+                              Losers: {data.lossCount}
+                            </p>
+                            <p className="text-muted-foreground">
+                              BE: {data.beCount}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    }
+                    
+                    // Tick/Pip and Privacy modes - placeholder
                     return (
                       <div className="bg-card border border-border rounded-lg p-3 shadow-lg">
                         <p className="text-foreground font-medium mb-2">{data.symbol}</p>
                         <div className="space-y-1 text-sm">
-                          <p className={data.totalPnl >= 0 ? 'text-profit' : 'text-loss'}>
-                            Total P&L: {formatValue(data.totalPnl, 'dollar')}
-                          </p>
-                          <p className={data.totalPercent >= 0 ? 'text-profit' : 'text-loss'}>
-                            Total Return: {formatValue(data.totalPercent, 'percent')}
+                          <p className="text-foreground">
+                            {displayType === 'privacy' ? '•••••' : '--'}
                           </p>
                           <p className="text-muted-foreground">
-                            Trades: {data.tradeCount}
+                            Total Trades: {data.tradeCount}
                           </p>
                           <p className="text-muted-foreground">
-                            Win Rate: {data.winrate.toFixed(1)}%
+                            Winners: {data.winCount}
+                          </p>
+                          <p className="text-muted-foreground">
+                            Losers: {data.lossCount}
+                          </p>
+                          <p className="text-muted-foreground">
+                            BE: {data.beCount}
                           </p>
                         </div>
                       </div>
