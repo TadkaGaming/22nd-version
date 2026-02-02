@@ -118,21 +118,6 @@ const Trades = () => {
     setCurrentPage(1);
   };
 
-  const getPageNumbers = () => {
-    const pages: (number | 'ellipsis')[] = [];
-    if (totalPages <= 7) {
-      for (let i = 1; i <= totalPages; i++) pages.push(i);
-    } else {
-      if (currentPage <= 3) {
-        pages.push(1, 2, 3, 4, 'ellipsis', totalPages);
-      } else if (currentPage >= totalPages - 2) {
-        pages.push(1, 'ellipsis', totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
-      } else {
-        pages.push(1, 'ellipsis', currentPage - 1, currentPage, currentPage + 1, 'ellipsis', totalPages);
-      }
-    }
-    return pages;
-  };
 
   const handleSelectTrade = (tradeId: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -582,7 +567,24 @@ const Trades = () => {
             </div>
 
             {/* Right side: Pagination controls */}
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-2">
+              <Select value={String(currentPage)} onValueChange={(v) => setCurrentPage(Number(v))}>
+                <SelectTrigger className="w-[60px] h-8">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                    <SelectItem key={page} value={String(page)}>
+                      {page}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              
+              <span className="text-sm text-muted-foreground">
+                of {totalPages} pages
+              </span>
+              
               <Button
                 variant="ghost"
                 size="icon"
@@ -592,26 +594,6 @@ const Trades = () => {
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
-              
-              {getPageNumbers().map((page, idx) => (
-                page === 'ellipsis' ? (
-                  <span key={`ellipsis-${idx}`} className="px-2 text-muted-foreground">...</span>
-                ) : (
-                  <Button
-                    key={page}
-                    variant={currentPage === page ? "default" : "ghost"}
-                    size="icon"
-                    className="h-8 w-8"
-                    onClick={() => setCurrentPage(page)}
-                  >
-                    {page}
-                  </Button>
-                )
-              ))}
-
-              <span className="text-sm text-muted-foreground ml-2">
-                of {totalPages} pages
-              </span>
               
               <Button
                 variant="ghost"
