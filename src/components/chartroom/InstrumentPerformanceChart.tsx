@@ -32,6 +32,12 @@ interface InstrumentData {
   displayValue: number;
   avgHoldTimeMinutes: number;
   longestDurationMinutes: number;
+  longWinCount: number;
+  longLossCount: number;
+  longWinrate: number;
+  shortWinCount: number;
+  shortLossCount: number;
+  shortWinrate: number;
 }
 
 interface InstrumentPerformanceChartProps {
@@ -92,6 +98,10 @@ export const InstrumentPerformanceChart = ({
       beCount: number;
       totalDurationMinutes: number;
       longestDurationMinutes: number;
+      longWinCount: number;
+      longLossCount: number;
+      shortWinCount: number;
+      shortLossCount: number;
     }>();
 
     closedTrades.forEach(trade => {
@@ -106,20 +116,32 @@ export const InstrumentPerformanceChart = ({
         beCount: 0,
         totalDurationMinutes: 0,
         longestDurationMinutes: 0,
+        longWinCount: 0,
+        longLossCount: 0,
+        shortWinCount: 0,
+        shortLossCount: 0,
       };
       
       // Use global classifyTradeOutcome for consistent classification
       const outcome = classifyTradeOutcome(metrics.netPnl, trade.savedReturnPercent, trade.breakEven);
       const durationMinutes = metrics.durationMinutes || 0;
+      const isLong = trade.side === 'LONG';
+      const isShort = trade.side === 'SHORT';
+      const isWin = outcome === 'win';
+      const isLoss = outcome === 'loss';
       
       instrumentMap.set(normalizedSymbol, {
         totalPnl: existing.totalPnl + metrics.netPnl,
         tradeCount: existing.tradeCount + 1,
-        winCount: existing.winCount + (outcome === 'win' ? 1 : 0),
-        lossCount: existing.lossCount + (outcome === 'loss' ? 1 : 0),
+        winCount: existing.winCount + (isWin ? 1 : 0),
+        lossCount: existing.lossCount + (isLoss ? 1 : 0),
         beCount: existing.beCount + (outcome === 'breakeven' ? 1 : 0),
         totalDurationMinutes: existing.totalDurationMinutes + durationMinutes,
         longestDurationMinutes: Math.max(existing.longestDurationMinutes, durationMinutes),
+        longWinCount: existing.longWinCount + (isLong && isWin ? 1 : 0),
+        longLossCount: existing.longLossCount + (isLong && isLoss ? 1 : 0),
+        shortWinCount: existing.shortWinCount + (isShort && isWin ? 1 : 0),
+        shortLossCount: existing.shortLossCount + (isShort && isLoss ? 1 : 0),
       });
     });
 
@@ -136,6 +158,14 @@ export const InstrumentPerformanceChart = ({
         
         const avgHoldTimeMinutes = data.tradeCount > 0 ? data.totalDurationMinutes / data.tradeCount : 0;
         const longestDurationMinutes = data.longestDurationMinutes;
+        
+        // Long Win % = Long Wins / (Long Wins + Long Losses)
+        const longWinsAndLosses = data.longWinCount + data.longLossCount;
+        const longWinrate = longWinsAndLosses > 0 ? (data.longWinCount / longWinsAndLosses) * 100 : 0;
+        
+        // Short Win % = Short Wins / (Short Wins + Short Losses)
+        const shortWinsAndLosses = data.shortWinCount + data.shortLossCount;
+        const shortWinrate = shortWinsAndLosses > 0 ? (data.shortWinCount / shortWinsAndLosses) * 100 : 0;
         
         let displayValue: number;
         
@@ -158,6 +188,12 @@ export const InstrumentPerformanceChart = ({
           case 'longest_duration':
             displayValue = longestDurationMinutes;
             break;
+          case 'long_winrate':
+            displayValue = longWinrate;
+            break;
+          case 'short_winrate':
+            displayValue = shortWinrate;
+            break;
           default:
             displayValue = data.totalPnl;
         }
@@ -175,6 +211,12 @@ export const InstrumentPerformanceChart = ({
           displayValue,
           avgHoldTimeMinutes,
           longestDurationMinutes,
+          longWinCount: data.longWinCount,
+          longLossCount: data.longLossCount,
+          longWinrate,
+          shortWinCount: data.shortWinCount,
+          shortLossCount: data.shortLossCount,
+          shortWinrate,
         };
       })
       // Sort by value descending (best first)
@@ -252,6 +294,8 @@ export const InstrumentPerformanceChart = ({
                         return `${currencyConfig.symbol}${value.toFixed(0)}`;
                       case 'percent':
                       case 'winrate':
+                      case 'long_winrate':
+                      case 'short_winrate':
                         return `${value.toFixed(0)}%`;
                       case 'tradecount':
                         return `${Math.round(value)}`;
@@ -346,6 +390,52 @@ export const InstrumentPerformanceChart = ({
                       );
                     }
                     
+                    if (displayType === 'long_winrate') {
+                      const longTotal = data.longWinCount + data.longLossCount;
+                      return (
+                        <div className="bg-card border border-border rounded-lg p-3 shadow-lg">
+                          <p className="text-foreground font-medium mb-2">{data.symbol}</p>
+                          <div className="space-y-1 text-sm">
+                            <p className="text-foreground">
+                              Long Win %: {data.longWinrate.toFixed(1)}%
+                            </p>
+                            <p className="text-muted-foreground">
+                              Long Wins: {data.longWinCount}
+                            </p>
+                            <p className="text-muted-foreground">
+                              Long Losses: {data.longLossCount}
+                            </p>
+                            <p className="text-muted-foreground">
+                              Total Long Trades: {longTotal}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    }
+                    
+                    if (displayType === 'short_winrate') {
+                      const shortTotal = data.shortWinCount + data.shortLossCount;
+                      return (
+                        <div className="bg-card border border-border rounded-lg p-3 shadow-lg">
+                          <p className="text-foreground font-medium mb-2">{data.symbol}</p>
+                          <div className="space-y-1 text-sm">
+                            <p className="text-foreground">
+                              Short Win %: {data.shortWinrate.toFixed(1)}%
+                            </p>
+                            <p className="text-muted-foreground">
+                              Short Wins: {data.shortWinCount}
+                            </p>
+                            <p className="text-muted-foreground">
+                              Short Losses: {data.shortLossCount}
+                            </p>
+                            <p className="text-muted-foreground">
+                              Total Short Trades: {shortTotal}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    }
+                    
                     // Dollar mode: show Net PNL + counts
                     if (displayType === 'dollar') {
                       return (
@@ -431,7 +521,7 @@ export const InstrumentPerformanceChart = ({
                 >
                   {instrumentData.map((entry, index) => {
                     let fillColor: string;
-                    if (displayType === 'winrate' || displayType === 'tradecount' || displayType === 'avg_hold_time' || displayType === 'longest_duration') {
+                    if (displayType === 'winrate' || displayType === 'tradecount' || displayType === 'avg_hold_time' || displayType === 'longest_duration' || displayType === 'long_winrate' || displayType === 'short_winrate') {
                       fillColor = 'hsl(var(--primary))';
                     } else {
                       fillColor = entry.displayValue >= 0 ? 'hsl(var(--profit))' : 'hsl(var(--loss))';
