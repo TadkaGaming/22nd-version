@@ -5,7 +5,7 @@ import { useAccountsContext } from '@/contexts/AccountsContext';
 import { usePrivacyMode } from '@/hooks/usePrivacyMode';
 import { calculateTradeMetrics, Trade } from '@/types/trade';
 import { parseISO, getDay, getMonth, getWeek, getHours, getMinutes } from 'date-fns';
-import { ChartDisplayType, mapGlobalToChartDisplay } from '@/hooks/useChartDisplayMode';
+import { ChartDisplayType, mapGlobalToChartDisplay, formatDuration, formatDurationTick } from '@/hooks/useChartDisplayMode';
 import {
   BarChart,
   Bar,
@@ -41,6 +41,8 @@ interface TimeData {
   breakevenCount: number;
   winrate: number;
   displayValue: number;
+  avgHoldTimeMinutes: number;
+  longestDurationMinutes: number;
 }
 
 interface PerformanceByTimeChartProps {
@@ -185,6 +187,8 @@ export const PerformanceByTimeChart = ({
       winCount: number;
       lossCount: number;
       breakevenCount: number;
+      totalDurationMinutes: number;
+      longestDurationMinutes: number;
     }>();
 
     closedTrades.forEach(trade => {
@@ -198,6 +202,7 @@ export const PerformanceByTimeChart = ({
 
       // Use global classifyTradeOutcome for consistent classification
       const outcome = classifyTradeOutcome(metrics.netPnl, trade.savedReturnPercent, trade.breakEven);
+      const durationMinutes = metrics.durationMinutes || 0;
       
       const existing = timeMap.get(bucket.label) || { 
         sortOrder: bucket.sortOrder,
@@ -206,6 +211,8 @@ export const PerformanceByTimeChart = ({
         winCount: 0,
         lossCount: 0,
         breakevenCount: 0,
+        totalDurationMinutes: 0,
+        longestDurationMinutes: 0,
       };
       
       timeMap.set(bucket.label, {
@@ -215,6 +222,8 @@ export const PerformanceByTimeChart = ({
         winCount: existing.winCount + (outcome === 'win' ? 1 : 0),
         lossCount: existing.lossCount + (outcome === 'loss' ? 1 : 0),
         breakevenCount: existing.breakevenCount + (outcome === 'breakeven' ? 1 : 0),
+        totalDurationMinutes: existing.totalDurationMinutes + durationMinutes,
+        longestDurationMinutes: Math.max(existing.longestDurationMinutes, durationMinutes),
       });
     });
 
@@ -228,6 +237,9 @@ export const PerformanceByTimeChart = ({
           ? (data.totalPnl / totalStartingBalance) * 100 
           : 0;
         
+        const avgHoldTimeMinutes = data.tradeCount > 0 ? data.totalDurationMinutes / data.tradeCount : 0;
+        const longestDurationMinutes = data.longestDurationMinutes;
+        
         let displayValue: number;
         
         switch (displayType) {
@@ -239,6 +251,12 @@ export const PerformanceByTimeChart = ({
             break;
           case 'tradecount':
             displayValue = data.tradeCount;
+            break;
+          case 'avg_hold_time':
+            displayValue = avgHoldTimeMinutes;
+            break;
+          case 'longest_duration':
+            displayValue = longestDurationMinutes;
             break;
           case 'dollar':
           default:
@@ -257,6 +275,8 @@ export const PerformanceByTimeChart = ({
           breakevenCount: data.breakevenCount,
           winrate,
           displayValue,
+          avgHoldTimeMinutes,
+          longestDurationMinutes,
         };
       })
       .sort((a, b) => a.sortOrder - b.sortOrder);
@@ -387,6 +407,9 @@ export const PerformanceByTimeChart = ({
                     if (displayType === 'tradecount') {
                       return `${Math.round(value)}`;
                     }
+                    if (displayType === 'avg_hold_time' || displayType === 'longest_duration') {
+                      return formatDurationTick(value);
+                    }
                     return `${value.toFixed(1)}%`;
                   }}
                   width={50}
@@ -412,6 +435,38 @@ export const PerformanceByTimeChart = ({
                           <p className="text-sm text-foreground">
                             Trade Count: {data.tradeCount}
                           </p>
+                        </div>
+                      );
+                    }
+                    
+                    if (displayType === 'avg_hold_time') {
+                      return (
+                        <div className="bg-card border border-border rounded-lg p-3 shadow-lg z-50">
+                          <p className="text-foreground font-medium mb-2">{data.label}</p>
+                          <div className="space-y-1 text-sm">
+                            <p className="text-foreground">
+                              Avg Hold Time: {formatDuration(data.avgHoldTimeMinutes)}
+                            </p>
+                            <p className="text-muted-foreground">
+                              Total Trades: {data.tradeCount}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    }
+                    
+                    if (displayType === 'longest_duration') {
+                      return (
+                        <div className="bg-card border border-border rounded-lg p-3 shadow-lg z-50">
+                          <p className="text-foreground font-medium mb-2">{data.label}</p>
+                          <div className="space-y-1 text-sm">
+                            <p className="text-foreground">
+                              Longest Duration: {formatDuration(data.longestDurationMinutes)}
+                            </p>
+                            <p className="text-muted-foreground">
+                              Total Trades: {data.tradeCount}
+                            </p>
+                          </div>
                         </div>
                       );
                     }
@@ -525,7 +580,7 @@ export const PerformanceByTimeChart = ({
                     <Cell 
                       key={`cell-${index}`}
                       fill={
-                        displayType === 'tradecount'
+                        displayType === 'tradecount' || displayType === 'avg_hold_time' || displayType === 'longest_duration'
                           ? 'hsl(var(--primary))'
                           : displayType === 'winrate'
                             ? entry.displayValue >= 50 ? 'hsl(142, 71%, 45%)' : 'hsl(0, 84%, 60%)'

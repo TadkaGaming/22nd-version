@@ -27,7 +27,7 @@ interface ChartDisplayDropdownProps {
 
 // Functional options that actually work
 const functionalValues: Set<ChartDisplayType> = new Set([
-  'dollar', 'percent', 'winrate', 'tradecount', 'tickpip'
+  'dollar', 'percent', 'winrate', 'tradecount', 'tickpip', 'avg_hold_time', 'longest_duration'
 ]);
 
 // Display options grouped by category
