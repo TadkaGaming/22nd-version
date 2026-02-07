@@ -36,6 +36,12 @@ interface GroupedData {
   displayValue: number;
   avgHoldTimeMinutes: number;
   longestDurationMinutes: number;
+  longWinCount: number;
+  longLossCount: number;
+  longWinrate: number;
+  shortWinCount: number;
+  shortLossCount: number;
+  shortWinrate: number;
 }
 
 interface TagsCommentsChartProps {
@@ -99,6 +105,10 @@ export const TagsCommentsChart = ({
       beCount: number;
       totalDurationMinutes: number;
       longestDurationMinutes: number;
+      longWinCount: number;
+      longLossCount: number;
+      shortWinCount: number;
+      shortLossCount: number;
     }>();
 
     if (selectionType === 'tradeComments') {
@@ -112,6 +122,11 @@ export const TagsCommentsChart = ({
         
         const outcome = classifyTradeOutcome(metrics.netPnl, trade.savedReturnPercent, trade.breakEven);
         const durationMinutes = metrics.durationMinutes || 0;
+        const isLong = trade.side === 'LONG';
+        const isShort = trade.side === 'SHORT';
+        const isWin = outcome === 'win';
+        const isLoss = outcome === 'loss';
+        
         const existing = dataMap.get(commentValue) || {
           totalPnl: 0,
           tradeCount: 0,
@@ -120,16 +135,24 @@ export const TagsCommentsChart = ({
           beCount: 0,
           totalDurationMinutes: 0,
           longestDurationMinutes: 0,
+          longWinCount: 0,
+          longLossCount: 0,
+          shortWinCount: 0,
+          shortLossCount: 0,
         };
 
         dataMap.set(commentValue, {
           totalPnl: existing.totalPnl + metrics.netPnl,
           tradeCount: existing.tradeCount + 1,
-          winCount: existing.winCount + (outcome === 'win' ? 1 : 0),
-          lossCount: existing.lossCount + (outcome === 'loss' ? 1 : 0),
+          winCount: existing.winCount + (isWin ? 1 : 0),
+          lossCount: existing.lossCount + (isLoss ? 1 : 0),
           beCount: existing.beCount + (outcome === 'breakeven' ? 1 : 0),
           totalDurationMinutes: existing.totalDurationMinutes + durationMinutes,
           longestDurationMinutes: Math.max(existing.longestDurationMinutes, durationMinutes),
+          longWinCount: existing.longWinCount + (isLong && isWin ? 1 : 0),
+          longLossCount: existing.longLossCount + (isLong && isLoss ? 1 : 0),
+          shortWinCount: existing.shortWinCount + (isShort && isWin ? 1 : 0),
+          shortLossCount: existing.shortLossCount + (isShort && isLoss ? 1 : 0),
         });
       });
     } else {
@@ -142,6 +165,10 @@ export const TagsCommentsChart = ({
         const metrics = calculateTradeMetrics(trade);
         const outcome = classifyTradeOutcome(metrics.netPnl, trade.savedReturnPercent, trade.breakEven);
         const durationMinutes = metrics.durationMinutes || 0;
+        const isLong = trade.side === 'LONG';
+        const isShort = trade.side === 'SHORT';
+        const isWin = outcome === 'win';
+        const isLoss = outcome === 'loss';
 
         const tradeTagIds = trade.tags || [];
         const matchedTagIds = tradeTagIds.filter(tagId => targetTagIds.includes(tagId));
@@ -155,15 +182,23 @@ export const TagsCommentsChart = ({
             beCount: 0,
             totalDurationMinutes: 0,
             longestDurationMinutes: 0,
+            longWinCount: 0,
+            longLossCount: 0,
+            shortWinCount: 0,
+            shortLossCount: 0,
           };
           dataMap.set('Untagged', {
             totalPnl: existing.totalPnl + metrics.netPnl,
             tradeCount: existing.tradeCount + 1,
-            winCount: existing.winCount + (outcome === 'win' ? 1 : 0),
-            lossCount: existing.lossCount + (outcome === 'loss' ? 1 : 0),
+            winCount: existing.winCount + (isWin ? 1 : 0),
+            lossCount: existing.lossCount + (isLoss ? 1 : 0),
             beCount: existing.beCount + (outcome === 'breakeven' ? 1 : 0),
             totalDurationMinutes: existing.totalDurationMinutes + durationMinutes,
             longestDurationMinutes: Math.max(existing.longestDurationMinutes, durationMinutes),
+            longWinCount: existing.longWinCount + (isLong && isWin ? 1 : 0),
+            longLossCount: existing.longLossCount + (isLong && isLoss ? 1 : 0),
+            shortWinCount: existing.shortWinCount + (isShort && isWin ? 1 : 0),
+            shortLossCount: existing.shortLossCount + (isShort && isLoss ? 1 : 0),
           });
         } else {
           matchedTagIds.forEach(tagId => {
@@ -176,15 +211,23 @@ export const TagsCommentsChart = ({
               beCount: 0,
               totalDurationMinutes: 0,
               longestDurationMinutes: 0,
+              longWinCount: 0,
+              longLossCount: 0,
+              shortWinCount: 0,
+              shortLossCount: 0,
             };
             dataMap.set(tagName, {
               totalPnl: existing.totalPnl + metrics.netPnl,
               tradeCount: existing.tradeCount + 1,
-              winCount: existing.winCount + (outcome === 'win' ? 1 : 0),
-              lossCount: existing.lossCount + (outcome === 'loss' ? 1 : 0),
+              winCount: existing.winCount + (isWin ? 1 : 0),
+              lossCount: existing.lossCount + (isLoss ? 1 : 0),
               beCount: existing.beCount + (outcome === 'breakeven' ? 1 : 0),
               totalDurationMinutes: existing.totalDurationMinutes + durationMinutes,
               longestDurationMinutes: Math.max(existing.longestDurationMinutes, durationMinutes),
+              longWinCount: existing.longWinCount + (isLong && isWin ? 1 : 0),
+              longLossCount: existing.longLossCount + (isLong && isLoss ? 1 : 0),
+              shortWinCount: existing.shortWinCount + (isShort && isWin ? 1 : 0),
+              shortLossCount: existing.shortLossCount + (isShort && isLoss ? 1 : 0),
             });
           });
         }
@@ -201,6 +244,14 @@ export const TagsCommentsChart = ({
 
         const avgHoldTimeMinutes = data.tradeCount > 0 ? data.totalDurationMinutes / data.tradeCount : 0;
         const longestDurationMinutes = data.longestDurationMinutes;
+        
+        // Long Win % = Long Wins / (Long Wins + Long Losses)
+        const longWinsAndLosses = data.longWinCount + data.longLossCount;
+        const longWinrate = longWinsAndLosses > 0 ? (data.longWinCount / longWinsAndLosses) * 100 : 0;
+        
+        // Short Win % = Short Wins / (Short Wins + Short Losses)
+        const shortWinsAndLosses = data.shortWinCount + data.shortLossCount;
+        const shortWinrate = shortWinsAndLosses > 0 ? (data.shortWinCount / shortWinsAndLosses) * 100 : 0;
 
         let displayValue: number;
         switch (displayType) {
@@ -222,6 +273,12 @@ export const TagsCommentsChart = ({
           case 'longest_duration':
             displayValue = longestDurationMinutes;
             break;
+          case 'long_winrate':
+            displayValue = longWinrate;
+            break;
+          case 'short_winrate':
+            displayValue = shortWinrate;
+            break;
           default:
             displayValue = data.totalPnl;
         }
@@ -239,6 +296,12 @@ export const TagsCommentsChart = ({
           displayValue,
           avgHoldTimeMinutes,
           longestDurationMinutes,
+          longWinCount: data.longWinCount,
+          longLossCount: data.longLossCount,
+          longWinrate,
+          shortWinCount: data.shortWinCount,
+          shortLossCount: data.shortLossCount,
+          shortWinrate,
         };
       })
       .sort((a, b) => b.displayValue - a.displayValue);
@@ -297,6 +360,36 @@ export const TagsCommentsChart = ({
             <p>Winners: {data.winCount}</p>
             <p>Losers: {data.lossCount}</p>
             <p>BE: {data.beCount}</p>
+          </div>
+        </div>
+      );
+    }
+
+    if (displayType === 'long_winrate') {
+      const longTotal = data.longWinCount + data.longLossCount;
+      return (
+        <div className="bg-popover border border-border rounded-lg p-3 shadow-xl text-sm">
+          <p className="font-medium text-foreground mb-2">{label}</p>
+          <div className="space-y-1 text-muted-foreground">
+            <p>Long Win %: <span className="text-foreground">{data.longWinrate.toFixed(1)}%</span></p>
+            <p>Long Wins: {data.longWinCount}</p>
+            <p>Long Losses: {data.longLossCount}</p>
+            <p>Total Long Trades: {longTotal}</p>
+          </div>
+        </div>
+      );
+    }
+
+    if (displayType === 'short_winrate') {
+      const shortTotal = data.shortWinCount + data.shortLossCount;
+      return (
+        <div className="bg-popover border border-border rounded-lg p-3 shadow-xl text-sm">
+          <p className="font-medium text-foreground mb-2">{label}</p>
+          <div className="space-y-1 text-muted-foreground">
+            <p>Short Win %: <span className="text-foreground">{data.shortWinrate.toFixed(1)}%</span></p>
+            <p>Short Wins: {data.shortWinCount}</p>
+            <p>Short Losses: {data.shortLossCount}</p>
+            <p>Total Short Trades: {shortTotal}</p>
           </div>
         </div>
       );
@@ -401,7 +494,7 @@ export const TagsCommentsChart = ({
                     if (isPrivacyMode && (displayType === 'dollar' || displayType === 'percent')) {
                       return '**';
                     }
-                    if (displayType === 'percent' || displayType === 'winrate') return `${value.toFixed(0)}%`;
+                    if (displayType === 'percent' || displayType === 'winrate' || displayType === 'long_winrate' || displayType === 'short_winrate') return `${value.toFixed(0)}%`;
                     if (displayType === 'tradecount') return value.toString();
                     if (displayType === 'privacy') return '•••';
                     if (displayType === 'avg_hold_time' || displayType === 'longest_duration') return formatDurationTick(value);
@@ -416,7 +509,7 @@ export const TagsCommentsChart = ({
                     <Cell 
                       key={`cell-${index}`}
                       fill={
-                        displayType === 'winrate' || displayType === 'tradecount' || displayType === 'avg_hold_time' || displayType === 'longest_duration'
+                        displayType === 'winrate' || displayType === 'tradecount' || displayType === 'avg_hold_time' || displayType === 'longest_duration' || displayType === 'long_winrate' || displayType === 'short_winrate'
                           ? 'hsl(var(--primary))'
                           : entry.displayValue >= 0
                             ? 'hsl(142.1 76.2% 36.3%)'
