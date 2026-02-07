@@ -5,7 +5,7 @@ import { useAccountsContext } from '@/contexts/AccountsContext';
 import { useTagsContext } from '@/contexts/TagsContext';
 import { usePrivacyMode } from '@/hooks/usePrivacyMode';
 import { calculateTradeMetrics, Trade } from '@/types/trade';
-import { ChartDisplayType, mapGlobalToChartDisplay } from '@/hooks/useChartDisplayMode';
+import { ChartDisplayType, mapGlobalToChartDisplay, formatDuration, formatDurationTick } from '@/hooks/useChartDisplayMode';
 import {
   BarChart,
   Bar,
@@ -34,6 +34,8 @@ interface GroupedData {
   avgPnl: number;
   winrate: number;
   displayValue: number;
+  avgHoldTimeMinutes: number;
+  longestDurationMinutes: number;
 }
 
 interface TagsCommentsChartProps {
@@ -95,6 +97,8 @@ export const TagsCommentsChart = ({
       winCount: number;
       lossCount: number;
       beCount: number;
+      totalDurationMinutes: number;
+      longestDurationMinutes: number;
     }>();
 
     if (selectionType === 'tradeComments') {
@@ -107,12 +111,15 @@ export const TagsCommentsChart = ({
         const commentValue = trade[fieldKey as keyof Trade] as string || 'No Comment';
         
         const outcome = classifyTradeOutcome(metrics.netPnl, trade.savedReturnPercent, trade.breakEven);
+        const durationMinutes = metrics.durationMinutes || 0;
         const existing = dataMap.get(commentValue) || {
           totalPnl: 0,
           tradeCount: 0,
           winCount: 0,
           lossCount: 0,
           beCount: 0,
+          totalDurationMinutes: 0,
+          longestDurationMinutes: 0,
         };
 
         dataMap.set(commentValue, {
@@ -121,6 +128,8 @@ export const TagsCommentsChart = ({
           winCount: existing.winCount + (outcome === 'win' ? 1 : 0),
           lossCount: existing.lossCount + (outcome === 'loss' ? 1 : 0),
           beCount: existing.beCount + (outcome === 'breakeven' ? 1 : 0),
+          totalDurationMinutes: existing.totalDurationMinutes + durationMinutes,
+          longestDurationMinutes: Math.max(existing.longestDurationMinutes, durationMinutes),
         });
       });
     } else {
@@ -132,6 +141,7 @@ export const TagsCommentsChart = ({
       closedTrades.forEach(trade => {
         const metrics = calculateTradeMetrics(trade);
         const outcome = classifyTradeOutcome(metrics.netPnl, trade.savedReturnPercent, trade.breakEven);
+        const durationMinutes = metrics.durationMinutes || 0;
 
         const tradeTagIds = trade.tags || [];
         const matchedTagIds = tradeTagIds.filter(tagId => targetTagIds.includes(tagId));
@@ -143,6 +153,8 @@ export const TagsCommentsChart = ({
             winCount: 0,
             lossCount: 0,
             beCount: 0,
+            totalDurationMinutes: 0,
+            longestDurationMinutes: 0,
           };
           dataMap.set('Untagged', {
             totalPnl: existing.totalPnl + metrics.netPnl,
@@ -150,6 +162,8 @@ export const TagsCommentsChart = ({
             winCount: existing.winCount + (outcome === 'win' ? 1 : 0),
             lossCount: existing.lossCount + (outcome === 'loss' ? 1 : 0),
             beCount: existing.beCount + (outcome === 'breakeven' ? 1 : 0),
+            totalDurationMinutes: existing.totalDurationMinutes + durationMinutes,
+            longestDurationMinutes: Math.max(existing.longestDurationMinutes, durationMinutes),
           });
         } else {
           matchedTagIds.forEach(tagId => {
@@ -160,6 +174,8 @@ export const TagsCommentsChart = ({
               winCount: 0,
               lossCount: 0,
               beCount: 0,
+              totalDurationMinutes: 0,
+              longestDurationMinutes: 0,
             };
             dataMap.set(tagName, {
               totalPnl: existing.totalPnl + metrics.netPnl,
@@ -167,6 +183,8 @@ export const TagsCommentsChart = ({
               winCount: existing.winCount + (outcome === 'win' ? 1 : 0),
               lossCount: existing.lossCount + (outcome === 'loss' ? 1 : 0),
               beCount: existing.beCount + (outcome === 'breakeven' ? 1 : 0),
+              totalDurationMinutes: existing.totalDurationMinutes + durationMinutes,
+              longestDurationMinutes: Math.max(existing.longestDurationMinutes, durationMinutes),
             });
           });
         }
@@ -181,6 +199,9 @@ export const TagsCommentsChart = ({
           ? (data.totalPnl / totalStartingBalance) * 100
           : 0;
 
+        const avgHoldTimeMinutes = data.tradeCount > 0 ? data.totalDurationMinutes / data.tradeCount : 0;
+        const longestDurationMinutes = data.longestDurationMinutes;
+
         let displayValue: number;
         switch (displayType) {
           case 'dollar':
@@ -194,6 +215,12 @@ export const TagsCommentsChart = ({
             break;
           case 'tradecount':
             displayValue = data.tradeCount;
+            break;
+          case 'avg_hold_time':
+            displayValue = avgHoldTimeMinutes;
+            break;
+          case 'longest_duration':
+            displayValue = longestDurationMinutes;
             break;
           default:
             displayValue = data.totalPnl;
@@ -210,6 +237,8 @@ export const TagsCommentsChart = ({
           avgPnl: data.totalPnl / data.tradeCount,
           winrate,
           displayValue,
+          avgHoldTimeMinutes,
+          longestDurationMinutes,
         };
       })
       .sort((a, b) => b.displayValue - a.displayValue);
@@ -228,6 +257,30 @@ export const TagsCommentsChart = ({
         <div className="bg-popover border border-border rounded-lg p-3 shadow-xl text-sm">
           <p className="font-medium text-foreground mb-2">{label}</p>
           <div className="space-y-1 text-muted-foreground">
+            <p>Total Trades: {data.tradeCount}</p>
+          </div>
+        </div>
+      );
+    }
+
+    if (displayType === 'avg_hold_time') {
+      return (
+        <div className="bg-popover border border-border rounded-lg p-3 shadow-xl text-sm">
+          <p className="font-medium text-foreground mb-2">{label}</p>
+          <div className="space-y-1 text-muted-foreground">
+            <p>Avg Hold Time: <span className="text-foreground">{formatDuration(data.avgHoldTimeMinutes)}</span></p>
+            <p>Total Trades: {data.tradeCount}</p>
+          </div>
+        </div>
+      );
+    }
+
+    if (displayType === 'longest_duration') {
+      return (
+        <div className="bg-popover border border-border rounded-lg p-3 shadow-xl text-sm">
+          <p className="font-medium text-foreground mb-2">{label}</p>
+          <div className="space-y-1 text-muted-foreground">
+            <p>Longest Duration: <span className="text-foreground">{formatDuration(data.longestDurationMinutes)}</span></p>
             <p>Total Trades: {data.tradeCount}</p>
           </div>
         </div>
@@ -351,6 +404,7 @@ export const TagsCommentsChart = ({
                     if (displayType === 'percent' || displayType === 'winrate') return `${value.toFixed(0)}%`;
                     if (displayType === 'tradecount') return value.toString();
                     if (displayType === 'privacy') return '•••';
+                    if (displayType === 'avg_hold_time' || displayType === 'longest_duration') return formatDurationTick(value);
                     return `${currencyConfig.symbol}${Math.abs(value) >= 1000 ? `${(value / 1000).toFixed(0)}k` : value.toFixed(0)}`;
                   }}
                   width={50}
@@ -362,7 +416,7 @@ export const TagsCommentsChart = ({
                     <Cell 
                       key={`cell-${index}`}
                       fill={
-                        displayType === 'winrate' || displayType === 'tradecount'
+                        displayType === 'winrate' || displayType === 'tradecount' || displayType === 'avg_hold_time' || displayType === 'longest_duration'
                           ? 'hsl(var(--primary))'
                           : entry.displayValue >= 0
                             ? 'hsl(142.1 76.2% 36.3%)'

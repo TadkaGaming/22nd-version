@@ -5,7 +5,7 @@ import { useAccountsContext } from '@/contexts/AccountsContext';
 import { usePrivacyMode } from '@/hooks/usePrivacyMode';
 import { calculateTradeMetrics, Trade } from '@/types/trade';
 import { useStrategiesContext } from '@/contexts/StrategiesContext';
-import { ChartDisplayType, mapGlobalToChartDisplay } from '@/hooks/useChartDisplayMode';
+import { ChartDisplayType, mapGlobalToChartDisplay, formatDuration, formatDurationTick } from '@/hooks/useChartDisplayMode';
 import {
   BarChart,
   Bar,
@@ -31,6 +31,8 @@ interface SetupData {
   avgPnl: number;
   winrate: number;
   displayValue: number;
+  avgHoldTimeMinutes: number;
+  longestDurationMinutes: number;
 }
 
 interface SetupPerformanceChartProps {
@@ -95,6 +97,8 @@ export const SetupPerformanceChart = ({
       winCount: number;
       lossCount: number;
       beCount: number;
+      totalDurationMinutes: number;
+      longestDurationMinutes: number;
     }>();
 
     // Group trades by their strategyId (setup)
@@ -116,11 +120,14 @@ export const SetupPerformanceChart = ({
         tradeCount: 0, 
         winCount: 0,
         lossCount: 0,
-        beCount: 0
+        beCount: 0,
+        totalDurationMinutes: 0,
+        longestDurationMinutes: 0,
       };
       
       // Use global classifyTradeOutcome for consistent classification
       const outcome = classifyTradeOutcome(metrics.netPnl, trade.savedReturnPercent, trade.breakEven);
+      const durationMinutes = metrics.durationMinutes || 0;
       
       setupMap.set(setupName, {
         totalPnl: existing.totalPnl + metrics.netPnl,
@@ -128,6 +135,8 @@ export const SetupPerformanceChart = ({
         winCount: existing.winCount + (outcome === 'win' ? 1 : 0),
         lossCount: existing.lossCount + (outcome === 'loss' ? 1 : 0),
         beCount: existing.beCount + (outcome === 'breakeven' ? 1 : 0),
+        totalDurationMinutes: existing.totalDurationMinutes + durationMinutes,
+        longestDurationMinutes: Math.max(existing.longestDurationMinutes, durationMinutes),
       });
     });
 
@@ -141,6 +150,9 @@ export const SetupPerformanceChart = ({
         const returnPercent = totalStartingBalance > 0 
           ? (data.totalPnl / totalStartingBalance) * 100 
           : 0;
+        
+        const avgHoldTimeMinutes = data.tradeCount > 0 ? data.totalDurationMinutes / data.tradeCount : 0;
+        const longestDurationMinutes = data.longestDurationMinutes;
         
         let displayValue: number;
         
@@ -157,6 +169,12 @@ export const SetupPerformanceChart = ({
           case 'tradecount':
             displayValue = data.tradeCount;
             break;
+          case 'avg_hold_time':
+            displayValue = avgHoldTimeMinutes;
+            break;
+          case 'longest_duration':
+            displayValue = longestDurationMinutes;
+            break;
           default:
             displayValue = data.totalPnl;
         }
@@ -172,6 +190,8 @@ export const SetupPerformanceChart = ({
           avgPnl: data.totalPnl / data.tradeCount,
           winrate,
           displayValue,
+          avgHoldTimeMinutes,
+          longestDurationMinutes,
         };
       })
       // Sort by value descending (best first)
@@ -252,6 +272,9 @@ export const SetupPerformanceChart = ({
                         return `${value.toFixed(0)}%`;
                       case 'tradecount':
                         return `${Math.round(value)}`;
+                      case 'avg_hold_time':
+                      case 'longest_duration':
+                        return formatDurationTick(value);
                       default:
                         return `${value}`;
                     }
@@ -282,6 +305,38 @@ export const SetupPerformanceChart = ({
                           <p className="text-sm text-foreground">
                             Trade Count: {data.tradeCount}
                           </p>
+                        </div>
+                      );
+                    }
+                    
+                    if (displayType === 'avg_hold_time') {
+                      return (
+                        <div className="bg-card border border-border rounded-lg p-3 shadow-lg">
+                          <p className="text-foreground font-medium mb-2">{data.setup}</p>
+                          <div className="space-y-1 text-sm">
+                            <p className="text-foreground">
+                              Avg Hold Time: {formatDuration(data.avgHoldTimeMinutes)}
+                            </p>
+                            <p className="text-muted-foreground">
+                              Total Trades: {data.tradeCount}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    }
+                    
+                    if (displayType === 'longest_duration') {
+                      return (
+                        <div className="bg-card border border-border rounded-lg p-3 shadow-lg">
+                          <p className="text-foreground font-medium mb-2">{data.setup}</p>
+                          <div className="space-y-1 text-sm">
+                            <p className="text-foreground">
+                              Longest Duration: {formatDuration(data.longestDurationMinutes)}
+                            </p>
+                            <p className="text-muted-foreground">
+                              Total Trades: {data.tradeCount}
+                            </p>
+                          </div>
                         </div>
                       );
                     }
@@ -393,7 +448,7 @@ export const SetupPerformanceChart = ({
                 >
                   {setupData.map((entry, index) => {
                     let fillColor: string;
-                    if (displayType === 'winrate' || displayType === 'tradecount') {
+                    if (displayType === 'winrate' || displayType === 'tradecount' || displayType === 'avg_hold_time' || displayType === 'longest_duration') {
                       fillColor = 'hsl(var(--primary))';
                     } else {
                       fillColor = entry.displayValue >= 0 ? 'hsl(var(--profit))' : 'hsl(var(--loss))';

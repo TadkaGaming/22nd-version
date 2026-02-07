@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useGlobalFilters, DisplayMode } from '@/contexts/GlobalFiltersContext';
 
 // Extended chart display type including new options
-export type ChartDisplayType = 'dollar' | 'percent' | 'winrate' | 'tradecount' | 'tickpip' | 'privacy';
+export type ChartDisplayType = 'dollar' | 'percent' | 'winrate' | 'tradecount' | 'tickpip' | 'privacy' | 'avg_hold_time' | 'longest_duration';
 
 /**
  * Maps the global DisplayMode to a chart-specific DisplayType.
@@ -89,7 +89,43 @@ export const getDisplayLabel = (displayType: ChartDisplayType): string => {
       return 'Tick / Pip';
     case 'privacy':
       return 'Privacy';
+    case 'avg_hold_time':
+      return 'Avg Hold Time';
+    case 'longest_duration':
+      return 'Longest Duration';
     default:
       return 'Return ($)';
   }
+};
+
+/**
+ * Format duration in minutes to human-readable string (m/h/d)
+ */
+export const formatDuration = (minutes: number): string => {
+  if (minutes < 1) {
+    return '<1m';
+  }
+  if (minutes < 60) {
+    return `${Math.round(minutes)}m`;
+  }
+  if (minutes < 1440) { // Less than 24 hours
+    const hours = minutes / 60;
+    return `${hours.toFixed(1)}h`;
+  }
+  // Days
+  const days = minutes / 1440;
+  return `${days.toFixed(1)}d`;
+};
+
+/**
+ * Format duration for Y-axis tick (shorter format)
+ */
+export const formatDurationTick = (minutes: number): string => {
+  if (minutes < 60) {
+    return `${Math.round(minutes)}m`;
+  }
+  if (minutes < 1440) {
+    return `${Math.round(minutes / 60)}h`;
+  }
+  return `${Math.round(minutes / 1440)}d`;
 };
