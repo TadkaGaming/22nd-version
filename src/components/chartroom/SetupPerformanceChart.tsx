@@ -54,6 +54,12 @@ interface SetupData {
   percentile90TradesPerDay: number;
   maxTradesInDay: number;
   loggedDays: number;
+  // Profitability metrics
+  profitFactor: number;
+  tradeExpectancy: number;
+  avgNetTradePnl: number;
+  grossProfit: number;
+  grossLoss: number;
 }
 
 interface SetupPerformanceChartProps {
@@ -291,12 +297,32 @@ export const SetupPerformanceChart = ({
           case 'logged_days':
             displayValue = getGroupTradingActivityStats(groupDailyCounts, setup).loggedDays;
             break;
+          case 'profit_factor':
+            displayValue = Math.abs(data.lossPnlSum) > 0 ? data.winPnlSum / Math.abs(data.lossPnlSum) : (data.winPnlSum > 0 ? Infinity : 0);
+            break;
+          case 'trade_expectancy':
+            const winPct = data.tradeCount > 0 ? data.winCount / data.tradeCount : 0;
+            const lossPct = data.tradeCount > 0 ? data.lossCount / data.tradeCount : 0;
+            displayValue = (winPct * avgWin) - (lossPct * Math.abs(avgLoss));
+            break;
+          case 'avg_net_trade_pnl':
+            displayValue = data.tradeCount > 0 ? data.totalPnl / data.tradeCount : 0;
+            break;
           default:
             displayValue = data.totalPnl;
         }
         
         // Get trading activity stats for this setup
         const tradingActivityStats = getGroupTradingActivityStats(groupDailyCounts, setup);
+        
+        // Calculate profitability metrics
+        const grossProfit = data.winPnlSum;
+        const grossLoss = Math.abs(data.lossPnlSum);
+        const profitFactor = grossLoss > 0 ? grossProfit / grossLoss : (grossProfit > 0 ? Infinity : 0);
+        const avgNetTradePnl = data.tradeCount > 0 ? data.totalPnl / data.tradeCount : 0;
+        const winPctForExp = data.tradeCount > 0 ? data.winCount / data.tradeCount : 0;
+        const lossPctForExp = data.tradeCount > 0 ? data.lossCount / data.tradeCount : 0;
+        const tradeExpectancy = (winPctForExp * avgWin) - (lossPctForExp * Math.abs(avgLoss));
         
         return {
           setup,
@@ -330,6 +356,11 @@ export const SetupPerformanceChart = ({
           percentile90TradesPerDay: tradingActivityStats.percentile90TradesPerDay,
           maxTradesInDay: tradingActivityStats.maxTradesInDay,
           loggedDays: tradingActivityStats.loggedDays,
+          profitFactor,
+          tradeExpectancy,
+          avgNetTradePnl,
+          grossProfit,
+          grossLoss,
         };
       })
       // Sort by value descending (best first)
@@ -399,7 +430,7 @@ export const SetupPerformanceChart = ({
                   tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 10 }}
                   tickFormatter={(value) => {
                     // Mask $ and % values in privacy mode
-                    if (isPrivacyMode && (displayType === 'dollar' || displayType === 'percent' || displayType === 'avg_win' || displayType === 'avg_loss' || displayType === 'largest_win' || displayType === 'largest_loss')) {
+                    if (isPrivacyMode && (displayType === 'dollar' || displayType === 'percent' || displayType === 'avg_win' || displayType === 'avg_loss' || displayType === 'largest_win' || displayType === 'largest_loss' || displayType === 'trade_expectancy' || displayType === 'avg_net_trade_pnl' || displayType === 'profit_factor')) {
                       return '**';
                     }
                     switch (displayType) {
@@ -408,6 +439,8 @@ export const SetupPerformanceChart = ({
                       case 'avg_loss':
                       case 'largest_win':
                       case 'largest_loss':
+                      case 'trade_expectancy':
+                      case 'avg_net_trade_pnl':
                         return `${currencyConfig.symbol}${value.toFixed(0)}`;
                       case 'percent':
                       case 'winrate':
@@ -425,6 +458,8 @@ export const SetupPerformanceChart = ({
                       case 'avg_hold_time':
                       case 'longest_duration':
                         return formatDurationTick(value);
+                      case 'profit_factor':
+                        return value === Infinity ? '∞' : value.toFixed(2);
                       default:
                         return `${value}`;
                     }
@@ -433,7 +468,7 @@ export const SetupPerformanceChart = ({
                 />
                 
                 {/* Reference Line at 0 - for monetary and percent modes */}
-                {(displayType === 'dollar' || displayType === 'percent' || displayType === 'avg_win' || displayType === 'avg_loss' || displayType === 'largest_win' || displayType === 'largest_loss') && (
+                {(displayType === 'dollar' || displayType === 'percent' || displayType === 'avg_win' || displayType === 'avg_loss' || displayType === 'largest_win' || displayType === 'largest_loss' || displayType === 'trade_expectancy' || displayType === 'avg_net_trade_pnl') && (
                   <ReferenceLine 
                     y={0} 
                     stroke="hsl(var(--muted-foreground))" 
@@ -728,6 +763,70 @@ export const SetupPerformanceChart = ({
                             </p>
                             <p className="text-muted-foreground">
                               Median Trades / Day: {data.medianTradesPerDay.toFixed(1)}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    }
+                    
+                    if (displayType === 'profit_factor') {
+                      const pfDisplay = data.profitFactor === Infinity ? '∞' : data.profitFactor.toFixed(2);
+                      return (
+                        <div className="bg-card border border-border rounded-lg p-3 shadow-lg">
+                          <p className="text-foreground font-medium mb-2">{data.setup}</p>
+                          <div className="space-y-1 text-sm">
+                            <p className="text-foreground">
+                              Profit Factor: {isPrivacyMode ? '**' : pfDisplay}
+                            </p>
+                            <p className={data.grossProfit >= 0 ? 'text-profit' : 'text-foreground'}>
+                              Gross Profit: {isPrivacyMode ? '**' : `+${currencyConfig.symbol}${data.grossProfit.toFixed(2)}`}
+                            </p>
+                            <p className="text-loss">
+                              Gross Loss: {isPrivacyMode ? '**' : `-${currencyConfig.symbol}${data.grossLoss.toFixed(2)}`}
+                            </p>
+                            <p className="text-muted-foreground">
+                              Total Trades: {data.tradeCount}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    }
+                    
+                    if (displayType === 'avg_net_trade_pnl') {
+                      return (
+                        <div className="bg-card border border-border rounded-lg p-3 shadow-lg">
+                          <p className="text-foreground font-medium mb-2">{data.setup}</p>
+                          <div className="space-y-1 text-sm">
+                            <p className={data.avgNetTradePnl >= 0 ? 'text-profit' : 'text-loss'}>
+                              Avg Net P&L / Trade: {isPrivacyMode ? '**' : `${data.avgNetTradePnl >= 0 ? '+' : ''}${currencyConfig.symbol}${data.avgNetTradePnl.toFixed(2)}`}
+                            </p>
+                            <p className={data.totalPnl >= 0 ? 'text-profit' : 'text-loss'}>
+                              Net P&L: {isPrivacyMode ? '**' : `${data.totalPnl >= 0 ? '+' : ''}${currencyConfig.symbol}${data.totalPnl.toFixed(2)}`}
+                            </p>
+                            <p className="text-muted-foreground">
+                              Total Trades: {data.tradeCount}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    }
+                    
+                    if (displayType === 'trade_expectancy') {
+                      return (
+                        <div className="bg-card border border-border rounded-lg p-3 shadow-lg">
+                          <p className="text-foreground font-medium mb-2">{data.setup}</p>
+                          <div className="space-y-1 text-sm">
+                            <p className={data.tradeExpectancy >= 0 ? 'text-profit' : 'text-loss'}>
+                              Trade Expectancy: {isPrivacyMode ? '**' : `${data.tradeExpectancy >= 0 ? '+' : ''}${currencyConfig.symbol}${data.tradeExpectancy.toFixed(2)}`}
+                            </p>
+                            <p className="text-muted-foreground">
+                              Win Rate: {data.winrate.toFixed(1)}%
+                            </p>
+                            <p className={data.avgWin >= 0 ? 'text-profit' : 'text-foreground'}>
+                              Avg Win: {isPrivacyMode ? '**' : `${currencyConfig.symbol}${data.avgWin.toFixed(2)}`}
+                            </p>
+                            <p className="text-loss">
+                              Avg Loss: {isPrivacyMode ? '**' : `-${currencyConfig.symbol}${Math.abs(data.avgLoss).toFixed(2)}`}
                             </p>
                           </div>
                         </div>
