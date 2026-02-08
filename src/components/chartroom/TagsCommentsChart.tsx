@@ -57,6 +57,12 @@ interface GroupedData {
   percentile90TradesPerDay: number;
   maxTradesInDay: number;
   loggedDays: number;
+  // Profitability metrics
+  profitFactor: number;
+  tradeExpectancy: number;
+  avgNetTradePnl: number;
+  grossProfit: number;
+  grossLoss: number;
 }
 
 interface TagsCommentsChartProps {
@@ -397,12 +403,32 @@ export const TagsCommentsChart = ({
           case 'logged_days':
             displayValue = getGroupTradingActivityStats(groupDailyCounts, name).loggedDays;
             break;
+          case 'profit_factor':
+            displayValue = Math.abs(data.lossPnlSum) > 0 ? data.winPnlSum / Math.abs(data.lossPnlSum) : (data.winPnlSum > 0 ? Infinity : 0);
+            break;
+          case 'trade_expectancy':
+            const winPct = data.tradeCount > 0 ? data.winCount / data.tradeCount : 0;
+            const lossPct = data.tradeCount > 0 ? data.lossCount / data.tradeCount : 0;
+            displayValue = (winPct * avgWin) - (lossPct * Math.abs(avgLoss));
+            break;
+          case 'avg_net_trade_pnl':
+            displayValue = data.tradeCount > 0 ? data.totalPnl / data.tradeCount : 0;
+            break;
           default:
             displayValue = data.totalPnl;
         }
 
         // Get trading activity stats for this group
         const tradingActivityStats = getGroupTradingActivityStats(groupDailyCounts, name);
+        
+        // Calculate profitability metrics
+        const grossProfit = data.winPnlSum;
+        const grossLoss = Math.abs(data.lossPnlSum);
+        const profitFactor = grossLoss > 0 ? grossProfit / grossLoss : (grossProfit > 0 ? Infinity : 0);
+        const avgNetTradePnl = data.tradeCount > 0 ? data.totalPnl / data.tradeCount : 0;
+        const winPctForExp = data.tradeCount > 0 ? data.winCount / data.tradeCount : 0;
+        const lossPctForExp = data.tradeCount > 0 ? data.lossCount / data.tradeCount : 0;
+        const tradeExpectancy = (winPctForExp * avgWin) - (lossPctForExp * Math.abs(avgLoss));
 
         return {
           name,
@@ -436,6 +462,11 @@ export const TagsCommentsChart = ({
           percentile90TradesPerDay: tradingActivityStats.percentile90TradesPerDay,
           maxTradesInDay: tradingActivityStats.maxTradesInDay,
           loggedDays: tradingActivityStats.loggedDays,
+          profitFactor,
+          tradeExpectancy,
+          avgNetTradePnl,
+          grossProfit,
+          grossLoss,
         };
       })
       .sort((a, b) => b.displayValue - a.displayValue);
@@ -664,6 +695,48 @@ export const TagsCommentsChart = ({
       );
     }
 
+    if (displayType === 'profit_factor') {
+      const pfDisplay = data.profitFactor === Infinity ? '∞' : data.profitFactor.toFixed(2);
+      return (
+        <div className="bg-popover border border-border rounded-lg p-3 shadow-xl text-sm">
+          <p className="font-medium text-foreground mb-2">{label}</p>
+          <div className="space-y-1 text-muted-foreground">
+            <p>Profit Factor: <span className="text-foreground">{isPrivacyMode ? '**' : pfDisplay}</span></p>
+            <p>Gross Profit: <span className={data.grossProfit >= 0 ? 'text-profit' : 'text-foreground'}>{isPrivacyMode ? '**' : `+${currencyConfig.symbol}${data.grossProfit.toFixed(2)}`}</span></p>
+            <p>Gross Loss: <span className="text-loss">{isPrivacyMode ? '**' : `-${currencyConfig.symbol}${data.grossLoss.toFixed(2)}`}</span></p>
+            <p>Total Trades: {data.tradeCount}</p>
+          </div>
+        </div>
+      );
+    }
+
+    if (displayType === 'avg_net_trade_pnl') {
+      return (
+        <div className="bg-popover border border-border rounded-lg p-3 shadow-xl text-sm">
+          <p className="font-medium text-foreground mb-2">{label}</p>
+          <div className="space-y-1 text-muted-foreground">
+            <p>Avg Net P&L / Trade: <span className={data.avgNetTradePnl >= 0 ? 'text-profit' : 'text-loss'}>{isPrivacyMode ? '**' : `${data.avgNetTradePnl >= 0 ? '+' : ''}${currencyConfig.symbol}${data.avgNetTradePnl.toFixed(2)}`}</span></p>
+            <p>Net P&L: <span className={data.totalPnl >= 0 ? 'text-profit' : 'text-loss'}>{isPrivacyMode ? '**' : `${data.totalPnl >= 0 ? '+' : ''}${currencyConfig.symbol}${data.totalPnl.toFixed(2)}`}</span></p>
+            <p>Total Trades: {data.tradeCount}</p>
+          </div>
+        </div>
+      );
+    }
+
+    if (displayType === 'trade_expectancy') {
+      return (
+        <div className="bg-popover border border-border rounded-lg p-3 shadow-xl text-sm">
+          <p className="font-medium text-foreground mb-2">{label}</p>
+          <div className="space-y-1 text-muted-foreground">
+            <p>Trade Expectancy: <span className={data.tradeExpectancy >= 0 ? 'text-profit' : 'text-loss'}>{isPrivacyMode ? '**' : `${data.tradeExpectancy >= 0 ? '+' : ''}${currencyConfig.symbol}${data.tradeExpectancy.toFixed(2)}`}</span></p>
+            <p>Win Rate: {data.winrate.toFixed(1)}%</p>
+            <p>Avg Win: <span className={data.avgWin >= 0 ? 'text-profit' : 'text-foreground'}>{isPrivacyMode ? '**' : `${currencyConfig.symbol}${data.avgWin.toFixed(2)}`}</span></p>
+            <p>Avg Loss: <span className="text-loss">{isPrivacyMode ? '**' : `-${currencyConfig.symbol}${Math.abs(data.avgLoss).toFixed(2)}`}</span></p>
+          </div>
+        </div>
+      );
+    }
+
     if (displayType === 'dollar') {
       const pnlValue = isPrivacyMode ? '**' : `${data.totalPnl >= 0 ? '+' : ''}${currencyConfig.symbol}${Math.abs(data.totalPnl).toFixed(2)}`;
       return (
@@ -760,13 +833,15 @@ export const TagsCommentsChart = ({
                   tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }}
                   tickFormatter={(value) => {
                     // Mask $ and % values in privacy mode
-                    if (isPrivacyMode && (displayType === 'dollar' || displayType === 'percent' || displayType === 'avg_win' || displayType === 'avg_loss' || displayType === 'largest_win' || displayType === 'largest_loss')) {
+                    if (isPrivacyMode && (displayType === 'dollar' || displayType === 'percent' || displayType === 'avg_win' || displayType === 'avg_loss' || displayType === 'largest_win' || displayType === 'largest_loss' || displayType === 'trade_expectancy' || displayType === 'avg_net_trade_pnl' || displayType === 'profit_factor')) {
                       return '**';
                     }
                     if (displayType === 'percent' || displayType === 'winrate' || displayType === 'long_winrate' || displayType === 'short_winrate') return `${value.toFixed(0)}%`;
                     if (displayType === 'tradecount' || displayType === 'tradecount_long' || displayType === 'tradecount_short' || displayType === 'avg_trades_per_day' || displayType === 'median_trades_per_day' || displayType === '90th_percentile_trades' || displayType === 'logged_days') return value % 1 === 0 ? value.toString() : value.toFixed(1);
                     if (displayType === 'privacy') return '•••';
                     if (displayType === 'avg_hold_time' || displayType === 'longest_duration') return formatDurationTick(value);
+                    if (displayType === 'profit_factor') return value === Infinity ? '∞' : value.toFixed(2);
+                    if (displayType === 'trade_expectancy' || displayType === 'avg_net_trade_pnl') return `${currencyConfig.symbol}${value.toFixed(0)}`;
                     return `${currencyConfig.symbol}${Math.abs(value) >= 1000 ? `${(value / 1000).toFixed(0)}k` : value.toFixed(0)}`;
                   }}
                   width={50}
@@ -778,7 +853,7 @@ export const TagsCommentsChart = ({
                     <Cell 
                       key={`cell-${index}`}
                       fill={
-                        displayType === 'winrate' || displayType === 'tradecount' || displayType === 'avg_hold_time' || displayType === 'longest_duration' || displayType === 'long_winrate' || displayType === 'short_winrate' || displayType === 'tradecount_long' || displayType === 'tradecount_short' || displayType === 'logged_days'
+                        displayType === 'winrate' || displayType === 'tradecount' || displayType === 'avg_hold_time' || displayType === 'longest_duration' || displayType === 'long_winrate' || displayType === 'short_winrate' || displayType === 'tradecount_long' || displayType === 'tradecount_short' || displayType === 'logged_days' || displayType === 'profit_factor' || displayType === 'avg_trades_per_day' || displayType === 'median_trades_per_day' || displayType === '90th_percentile_trades'
                           ? 'hsl(var(--primary))'
                           : entry.displayValue >= 0
                             ? 'hsl(142.1 76.2% 36.3%)'

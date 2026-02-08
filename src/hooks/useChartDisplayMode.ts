@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useGlobalFilters, DisplayMode } from '@/contexts/GlobalFiltersContext';
 
 // Extended chart display type including new options
-export type ChartDisplayType = 'dollar' | 'percent' | 'winrate' | 'tradecount' | 'tickpip' | 'privacy' | 'avg_hold_time' | 'longest_duration' | 'long_winrate' | 'short_winrate' | 'tradecount_long' | 'tradecount_short' | 'avg_win' | 'avg_loss' | 'largest_win' | 'largest_loss' | 'avg_trades_per_day' | 'median_trades_per_day' | '90th_percentile_trades' | 'logged_days';
+export type ChartDisplayType = 'dollar' | 'percent' | 'winrate' | 'tradecount' | 'tickpip' | 'privacy' | 'avg_hold_time' | 'longest_duration' | 'long_winrate' | 'short_winrate' | 'tradecount_long' | 'tradecount_short' | 'avg_win' | 'avg_loss' | 'largest_win' | 'largest_loss' | 'avg_trades_per_day' | 'median_trades_per_day' | '90th_percentile_trades' | 'logged_days' | 'profit_factor' | 'trade_expectancy' | 'avg_net_trade_pnl';
 
 /**
  * Maps the global DisplayMode to a chart-specific DisplayType.
@@ -117,6 +117,12 @@ export const getDisplayLabel = (displayType: ChartDisplayType): string => {
       return '90th Pctl Trades';
     case 'logged_days':
       return 'Logged Days';
+    case 'profit_factor':
+      return 'Profit Factor';
+    case 'trade_expectancy':
+      return 'Trade Expectancy';
+    case 'avg_net_trade_pnl':
+      return 'Avg Net P&L/Trade';
     default:
       return 'Return ($)';
   }
