@@ -716,9 +716,9 @@ export const TradeModal = () => {
                   </div>
                 </div>
 
-                {/* Instrument - Free text input */}
+                {/* Symbol - Free text input */}
                 <div className="space-y-1.5">
-                  <Label className="text-xs text-muted-foreground">Instrument *</Label>
+                  <Label className="text-xs text-muted-foreground">Symbol *</Label>
                   <Input
                     type="text"
                     placeholder="e.g., EURUSD, CL, WTI, AAPL..."
