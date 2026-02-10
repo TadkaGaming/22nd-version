@@ -59,13 +59,16 @@ export const TradeModal = () => {
     getActiveExitComments,
   } = useCustomStats();
 
-  // Symbol dropdown sources ONLY from the Symbol registry (Settings → Symbol Tick/Pip)
+  // Build symbol options from trades + tick size settings (same source as Settings → Symbol Tick/Pip)
   const symbolOptions = useMemo(() => {
-    const registrySymbols = new Set<string>();
-    Object.keys(tickSizes).forEach(s => registrySymbols.add(s));
-    Object.keys(contractSizes).forEach(s => registrySymbols.add(s));
-    return Array.from(registrySymbols).sort();
-  }, [tickSizes, contractSizes]);
+    const allSymbols = new Set<string>();
+    trades.forEach(trade => {
+      if (trade.symbol) allSymbols.add(trade.symbol);
+    });
+    Object.keys(tickSizes).forEach(s => allSymbols.add(s));
+    Object.keys(contractSizes).forEach(s => allSymbols.add(s));
+    return Array.from(allSymbols).sort();
+  }, [trades, tickSizes, contractSizes]);
 
   // Refs
   const scrollContainerRef = useRef<HTMLDivElement>(null);
