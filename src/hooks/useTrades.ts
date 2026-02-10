@@ -24,11 +24,8 @@ export const useTrades = () => {
             };
           }
           
-          // Migration: Remove deprecated instrument field (asset class concept)
-          if ('instrument' in updated) {
-            const { instrument, ...rest } = updated;
-            updated = rest;
-          }
+          // Migration: Preserve instrument field (asset class) if it exists
+          // No action needed - instrument is now a supported optional field
           
           // Calculate metrics once for all derived field reconciliation
           const metrics = calculateTradeMetrics(updated);
