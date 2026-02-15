@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, MoreVertical, ExternalLink, Target } from 'lucide-react';
+import { Plus, MoreVertical, ExternalLink, Target, Edit2, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -53,6 +53,7 @@ const saveRules = (rules: TpSlRule[]) => {
 export const TpSlSettings = () => {
   const [rules, setRules] = useState<TpSlRule[]>(loadRules);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [editingRuleId, setEditingRuleId] = useState<string | null>(null);
 
   // Form state
   const [formAccountId, setFormAccountId] = useState('');
@@ -92,30 +93,70 @@ export const TpSlSettings = () => {
     const account = accounts.find(a => a.id === formAccountId);
     if (!account) return;
 
-    const newRule: TpSlRule = {
-      id: crypto.randomUUID(),
-      accountId: formAccountId,
-      accountName: account.name,
-      instrument: '—',
-      symbol: formSymbol,
-      type: 'Standard',
-      profitTargetUnit: formPtUnit,
-      profitTargetValue: parseFloat(formPtValue) || 0,
-      stopLossUnit: formSlUnit,
-      stopLossValue: parseFloat(formSlValue) || 0,
-      createdAt: new Date().toISOString(),
-    };
-
     // Register new symbol in tick-size registry with default value
     if (!tradedSymbols.includes(formSymbol)) {
       setTickSize(formSymbol, 0.01);
     }
 
-    const updated = [...rules, newRule];
+    if (editingRuleId) {
+      // Update existing rule
+      const updated = rules.map(r =>
+        r.id === editingRuleId
+          ? {
+              ...r,
+              accountId: formAccountId,
+              accountName: account.name,
+              symbol: formSymbol,
+              profitTargetUnit: formPtUnit,
+              profitTargetValue: parseFloat(formPtValue) || 0,
+              stopLossUnit: formSlUnit,
+              stopLossValue: parseFloat(formSlValue) || 0,
+            }
+          : r
+      );
+      setRules(updated);
+      saveRules(updated);
+    } else {
+      // Create new rule
+      const newRule: TpSlRule = {
+        id: crypto.randomUUID(),
+        accountId: formAccountId,
+        accountName: account.name,
+        instrument: '—',
+        symbol: formSymbol,
+        type: 'Standard',
+        profitTargetUnit: formPtUnit,
+        profitTargetValue: parseFloat(formPtValue) || 0,
+        stopLossUnit: formSlUnit,
+        stopLossValue: parseFloat(formSlValue) || 0,
+        createdAt: new Date().toISOString(),
+      };
+      const updated = [...rules, newRule];
+      setRules(updated);
+      saveRules(updated);
+    }
+
+    resetForm();
+    setEditingRuleId(null);
+    setShowAddModal(false);
+  };
+
+  const handleEdit = (rule: TpSlRule) => {
+    setEditingRuleId(rule.id);
+    setFormAccountId(rule.accountId);
+    setFormSymbol(rule.symbol);
+    setFormPtUnit(rule.profitTargetUnit);
+    setFormPtValue(rule.profitTargetValue.toString());
+    setFormSlUnit(rule.stopLossUnit);
+    setFormSlValue(rule.stopLossValue.toString());
+    setShowAddModal(true);
+  };
+
+  const handleDelete = (ruleId: string) => {
+    if (!window.confirm('Are you sure you want to delete this TP / SL rule?')) return;
+    const updated = rules.filter(r => r.id !== ruleId);
     setRules(updated);
     saveRules(updated);
-    resetForm();
-    setShowAddModal(false);
   };
 
   const handleAddNewSymbol = (symbol: string) => {
@@ -147,7 +188,7 @@ export const TpSlSettings = () => {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Button onClick={() => { resetForm(); setShowAddModal(true); }} size="sm">
+            <Button onClick={() => { resetForm(); setEditingRuleId(null); setShowAddModal(true); }} size="sm">
               <Plus className="w-4 h-4 mr-2" />
               Add rule
             </Button>
@@ -204,8 +245,14 @@ export const TpSlSettings = () => {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="bg-popover border-border">
-                          <DropdownMenuItem disabled className="opacity-50 cursor-not-allowed">Edit</DropdownMenuItem>
-                          <DropdownMenuItem disabled className="opacity-50 cursor-not-allowed">Delete</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleEdit(rule)} className="cursor-pointer">
+                            <Edit2 className="w-4 h-4 mr-2" />
+                            Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleDelete(rule.id)} className="cursor-pointer text-loss">
+                            <Trash2 className="w-4 h-4 mr-2" />
+                            Delete
+                          </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>
@@ -218,11 +265,11 @@ export const TpSlSettings = () => {
       </div>
 
       {/* Add Rule Modal */}
-      <Dialog open={showAddModal} onOpenChange={setShowAddModal}>
+      <Dialog open={showAddModal} onOpenChange={(open) => { setShowAddModal(open); if (!open) setEditingRuleId(null); }}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle>Add TP / SL Rule</DialogTitle>
-            <DialogDescription>Define profit target and stop loss for a symbol</DialogDescription>
+            <DialogTitle>{editingRuleId ? 'Edit TP / SL Rule' : 'Add TP / SL Rule'}</DialogTitle>
+            <DialogDescription>{editingRuleId ? 'Update profit target and stop loss values' : 'Define profit target and stop loss for a symbol'}</DialogDescription>
           </DialogHeader>
 
           <div className="space-y-5 py-2">
