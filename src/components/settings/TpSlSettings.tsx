@@ -213,7 +213,7 @@ export const TpSlSettings = () => {
                 <TableHead>Account</TableHead>
                 <TableHead>Instrument</TableHead>
                 <TableHead>Symbols</TableHead>
-                <TableHead>Type</TableHead>
+                
                 <TableHead>Profit Targets</TableHead>
                 <TableHead>Stop Losses</TableHead>
                 <TableHead className="w-10"></TableHead>
@@ -222,7 +222,7 @@ export const TpSlSettings = () => {
             <TableBody>
               {rules.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-12 text-muted-foreground">
+                  <TableCell colSpan={6} className="text-center py-12 text-muted-foreground">
                     <Target className="w-10 h-10 mx-auto mb-3 opacity-20" />
                     <p className="text-sm">No TP / SL rules defined yet</p>
                     <p className="text-xs mt-1">Click "Add rule" to create your first rule</p>
@@ -234,7 +234,7 @@ export const TpSlSettings = () => {
                     <TableCell className="font-medium">{rule.accountName}</TableCell>
                     <TableCell className="text-muted-foreground">{rule.instrument}</TableCell>
                     <TableCell>{rule.symbol}</TableCell>
-                    <TableCell>{rule.type}</TableCell>
+                    
                     <TableCell className="text-profit">{formatValue(rule.profitTargetUnit, rule.profitTargetValue)}</TableCell>
                     <TableCell className="text-loss">{formatValue(rule.stopLossUnit, rule.stopLossValue)}</TableCell>
                     <TableCell>
