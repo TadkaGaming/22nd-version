@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Trash2, Edit2, Check, X, Tag, Wallet, TrendingUp, TrendingDown, Settings as SettingsIcon, Download, DollarSign, FolderOpen, Archive, ArchiveRestore, ChevronDown, ChevronUp, Target, MessageSquare, Ruler } from 'lucide-react';
+import { Plus, Trash2, Edit2, Check, X, Tag, Wallet, TrendingUp, TrendingDown, Settings as SettingsIcon, Download, DollarSign, FolderOpen, Archive, ArchiveRestore, ChevronDown, ChevronUp, Target, MessageSquare, Ruler, MoreVertical, ArrowRightLeft, Eraser } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAccountsContext } from '@/contexts/AccountsContext';
@@ -463,41 +463,39 @@ const Settings = () => {
                                 </div>
                               </div>
                             </div>
-                            <div className="flex items-center gap-2">
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => setShowImportModal(true)}
-                                className="h-7 text-xs gap-1"
-                              >
-                                <Download className="w-3 h-3" />
-                                Import
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => setDepositWithdrawAccountId(account.id)}
-                                className="h-7 text-xs"
-                              >
-                                Deposit / Withdraw
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={() => startEditingAccount(account)}
-                              >
-                                <Edit2 className="w-4 h-4" />
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={() => archiveAccount(account.id)}
-                                className="text-muted-foreground hover:text-foreground"
-                                title="Archive account"
-                              >
-                                <Archive className="w-4 h-4" />
-                              </Button>
-                            </div>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button size="sm" variant="ghost" className="h-8 w-8 p-0">
+                                  <MoreVertical className="w-4 h-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end" className="bg-popover border-border z-50 w-48">
+                                <DropdownMenuItem onClick={() => setShowImportModal(true)} className="cursor-pointer">
+                                  <Download className="w-4 h-4 mr-2" />
+                                  Import
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => setDepositWithdrawAccountId(account.id)} className="cursor-pointer">
+                                  <DollarSign className="w-4 h-4 mr-2" />
+                                  Deposit / Withdraw
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => startEditingAccount(account)} className="cursor-pointer">
+                                  <Edit2 className="w-4 h-4 mr-2" />
+                                  Edit
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => archiveAccount(account.id)} className="cursor-pointer">
+                                  <Archive className="w-4 h-4 mr-2" />
+                                  Archive
+                                </DropdownMenuItem>
+                                <DropdownMenuItem disabled className="cursor-not-allowed opacity-50">
+                                  <ArrowRightLeft className="w-4 h-4 mr-2" />
+                                  Transfer All Data
+                                </DropdownMenuItem>
+                                <DropdownMenuItem disabled className="cursor-not-allowed opacity-50">
+                                  <Eraser className="w-4 h-4 mr-2" />
+                                  Clear Trades
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
                           </>
                         )}
                       </motion.div>
