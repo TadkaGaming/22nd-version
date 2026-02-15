@@ -259,29 +259,29 @@ export const TpSlSettings = () => {
               />
             </div>
 
-            {/* Type / Take Profit / Stop Loss row */}
-            <div className="grid grid-cols-[auto_1fr_1fr] gap-4 items-end">
-              {/* Type toggle */}
+            {/* Type / Take Profit / Stop Loss */}
+            <div className="space-y-3">
+              {/* Unit selector */}
               <div className="space-y-1.5">
-                <label className="text-sm font-medium">Type</label>
-                <div className="flex h-10 rounded-md border border-border overflow-hidden">
+                <label className="text-sm font-medium">Unit Type</label>
+                <div className="flex h-10 rounded-md border border-border overflow-hidden w-fit">
                   <button
                     type="button"
                     onClick={() => { setFormPtUnit('tick'); setFormSlUnit('tick'); }}
                     className={cn(
-                      "px-3 text-sm font-medium transition-colors",
+                      "px-4 text-sm font-medium transition-colors",
                       formPtUnit === 'tick'
                         ? "bg-primary text-primary-foreground"
                         : "bg-input text-muted-foreground hover:text-foreground"
                     )}
                   >
-                    %
+                    Tick / Pip
                   </button>
                   <button
                     type="button"
                     onClick={() => { setFormPtUnit('dollar'); setFormSlUnit('dollar'); }}
                     className={cn(
-                      "px-3 text-sm font-medium transition-colors border-l border-border",
+                      "px-4 text-sm font-medium transition-colors border-l border-border",
                       formPtUnit === 'dollar'
                         ? "bg-primary text-primary-foreground"
                         : "bg-input text-muted-foreground hover:text-foreground"
@@ -292,40 +292,33 @@ export const TpSlSettings = () => {
                 </div>
               </div>
 
-              {/* Take Profit */}
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium text-profit">Take Profit</label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
-                    {formPtUnit === 'tick' ? '%' : currencyConfig.symbol}
-                  </span>
+              {/* TP / SL inputs side by side */}
+              <div className="grid grid-cols-2 gap-4">
+                {/* Take Profit */}
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium text-profit">Take Profit</label>
                   <Input
                     type="number"
                     min="0"
                     step="any"
-                    placeholder="0.00"
+                    placeholder={formPtUnit === 'tick' ? 'Ticks / Pips' : currencyConfig.symbol + ' value'}
                     value={formPtValue}
                     onChange={e => setFormPtValue(e.target.value)}
-                    className="bg-input border-border pl-8"
+                    className="bg-input border-border"
                   />
                 </div>
-              </div>
 
-              {/* Stop Loss */}
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium text-loss">Stop Loss</label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
-                    {formSlUnit === 'tick' ? '%' : currencyConfig.symbol}
-                  </span>
+                {/* Stop Loss */}
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium text-loss">Stop Loss</label>
                   <Input
                     type="number"
                     min="0"
                     step="any"
-                    placeholder="0.00"
+                    placeholder={formSlUnit === 'tick' ? 'Ticks / Pips' : currencyConfig.symbol + ' value'}
                     value={formSlValue}
                     onChange={e => setFormSlValue(e.target.value)}
-                    className="bg-input border-border pl-8"
+                    className="bg-input border-border"
                   />
                 </div>
               </div>
