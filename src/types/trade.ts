@@ -147,7 +147,9 @@ export function calculateTradeMetrics(trade: Trade | TradeFormData): TradeCalcul
   const totalSellQty = sellEntries.reduce((sum, e) => sum + e.quantity, 0);
   const totalBuyCost = buyEntries.reduce((sum, e) => sum + (e.quantity * e.price), 0);
   const totalSellValue = sellEntries.reduce((sum, e) => sum + (e.quantity * e.price), 0);
-  const totalCharges = entries.reduce((sum, e) => sum + e.charges, 0);
+  const computedCharges = entries.reduce((sum, e) => sum + e.charges, 0);
+  // Use manualFees override if defined (like manualGrossPnl), otherwise use entry-level charges
+  const totalCharges = trade.manualFees !== undefined ? trade.manualFees : computedCharges;
   
   // Use the stored side or auto-calculated side for calculations
   const side = trade.side || positionSide || 'LONG';
