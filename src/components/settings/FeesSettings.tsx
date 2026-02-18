@@ -22,6 +22,7 @@ import { useTradedSymbols } from '@/hooks/useTradedSymbols';
 import { useSymbolTickSize } from '@/contexts/SymbolTickSizeContext';
 import { TypeableCombobox } from '@/components/trades/TypeableCombobox';
 import { calculateFeeFromRule } from '@/lib/feeCalculation';
+import { calculateTradeMetrics } from '@/types/trade';
 import { toast } from 'sonner';
 
 export interface FeeRule {
@@ -97,9 +98,23 @@ export const FeesSettings = () => {
       if (!shouldApply) continue;
 
       const fee = calculateFeeFromRule(rule, trade.entries, trade.side);
-      if (trade.manualFees !== fee) {
-        updates.set(trade.id, { manualFees: fee });
+      // Build patch with manualFees and recomputed derived fields
+      const updatedTrade = { ...trade, manualFees: fee };
+      const metrics = calculateTradeMetrics(updatedTrade);
+      
+      const patch: Partial<import('@/types/trade').TradeFormData> = { manualFees: fee };
+      
+      // Recompute savedRMultiple
+      if (trade.tradeRisk > 0 && metrics.positionStatus === 'CLOSED') {
+        patch.savedRMultiple = metrics.netPnl / trade.tradeRisk;
       }
+      
+      // Recompute savedReturnPercent
+      if (trade.accountBalanceSnapshot && trade.accountBalanceSnapshot > 0) {
+        patch.savedReturnPercent = (metrics.netPnl / trade.accountBalanceSnapshot) * 100;
+      }
+
+      updates.set(trade.id, patch);
     }
 
     if (updates.size > 0) {
