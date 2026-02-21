@@ -196,6 +196,17 @@ export const TradeModal = () => {
         const totalEntryQty = editingTrade.scaleEntries?.reduce((sum, e) => sum + e.quantity, 0) || 0;
         const totalExitQty = editingTrade.scaleExits.reduce((sum, e) => sum + e.quantity, 0);
         setOpenQuantity(totalEntryQty - totalExitQty);
+      } else if (editingTrade.entries.length > 0) {
+        // Fallback: compute open quantity from entries array (same as calculateTradeMetrics)
+        let netPosition = 0;
+        for (const entry of editingTrade.entries) {
+          if (entry.type === 'BUY') {
+            netPosition += entry.quantity;
+          } else {
+            netPosition -= entry.quantity;
+          }
+        }
+        setOpenQuantity(Math.abs(netPosition));
       }
       
       // Parse entries to simplified format
