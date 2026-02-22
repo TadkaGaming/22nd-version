@@ -26,7 +26,7 @@ import { useSymbolTickSize } from '@/contexts/SymbolTickSizeContext';
 import { TradeFormData, TradeEntry, ScaleEntry, calculateTradeMetrics, Trade } from '@/types/trade';
 import { getContractSizeForSymbol } from '@/lib/contractSizeRegistry';
 import { loadFeeRules, findMatchingFeeRule, calculateFeeFromRule } from '@/lib/feeCalculation';
-import { loadTpSlRules, findMatchingTpSlRule } from '@/lib/tpslCalculation';
+import { loadTpSlRules, findMatchingTpSlRule, computeAutoTpSl } from '@/lib/tpslCalculation';
 import { cn } from '@/lib/utils';
 import { TradeModalErrorBoundary } from './TradeModalErrorBoundary';
 
@@ -395,22 +395,7 @@ export const TradeModal = () => {
     const rule = findMatchingTpSlRule(rules, selectedAccount.name, trimmedSymbol);
     if (!rule) return { tp: undefined, sl: undefined };
 
-    // Only support tick-based rules for price placeholder calculation
-    let tp: number | undefined;
-    let sl: number | undefined;
-
-    if (rule.profitTargetUnit === 'tick' && rule.profitTargetValue > 0) {
-      tp = direction === 'LONG'
-        ? ep + (rule.profitTargetValue * tickSize)
-        : ep - (rule.profitTargetValue * tickSize);
-    }
-    if (rule.stopLossUnit === 'tick' && rule.stopLossValue > 0) {
-      sl = direction === 'LONG'
-        ? ep - (rule.stopLossValue * tickSize)
-        : ep + (rule.stopLossValue * tickSize);
-    }
-
-    return { tp, sl };
+    return computeAutoTpSl(rule, ep, direction, tickSize);
   }, [selectedAccountId, symbol, entryPrice, direction, accounts, getTickSizeForAccountSymbol]);
 
   // For editing, use the original trade's metrics for auto-calculated gross PnL

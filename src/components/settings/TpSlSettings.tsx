@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Plus, MoreVertical, ExternalLink, Target, Edit2, Trash2, PlayCircle } from 'lucide-react';
+import { toast } from 'sonner';
 import { ApplyToModal } from '@/components/settings/ApplyToModal';
 import { MultiAccountSelect } from '@/components/settings/MultiAccountSelect';
 import { Badge } from '@/components/ui/badge';
@@ -16,10 +17,13 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useAccountsContext } from '@/contexts/AccountsContext';
 import { useGlobalFilters } from '@/contexts/GlobalFiltersContext';
+import { useTradesContext } from '@/contexts/TradesContext';
 import { useTradedSymbols } from '@/hooks/useTradedSymbols';
 import { useSymbolTickSize } from '@/contexts/SymbolTickSizeContext';
 import { TypeableCombobox } from '@/components/trades/TypeableCombobox';
 import { cn } from '@/lib/utils';
+import { computeAutoTpSl } from '@/lib/tpslCalculation';
+import { calculateTradeMetrics, TradeFormData } from '@/types/trade';
 
 export interface TpSlRule {
   id: string;
@@ -69,6 +73,7 @@ export const TpSlSettings = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingRuleId, setEditingRuleId] = useState<string | null>(null);
   const [showApplyTo, setShowApplyTo] = useState(false);
+  const [applyingRule, setApplyingRule] = useState<TpSlRule | null>(null);
 
   // Form state
   const [formAccountIds, setFormAccountIds] = useState<string[]>([]);
@@ -80,10 +85,82 @@ export const TpSlSettings = () => {
 
   const { accounts } = useAccountsContext();
   const { selectedAccounts, isAllAccountsSelected, currencyConfig } = useGlobalFilters();
+  const { trades, bulkUpdateTrades } = useTradesContext();
   const tradedSymbols = useTradedSymbols();
-  const { setTickSize } = useSymbolTickSize();
+  const { setTickSize, getTickSizeForAccountSymbol } = useSymbolTickSize();
 
   const activeAccounts = accounts.filter(a => !a.isArchived);
+
+  const handleApplyTo = (emptyOnly: boolean, overwrite: boolean) => {
+    if (!applyingRule) return;
+    if (!emptyOnly && !overwrite) return;
+
+    const rule = applyingRule;
+    const matchingTrades = trades.filter(
+      t => rule.accountNames.includes(t.accountName) && t.symbol === rule.symbol
+    );
+
+    const updates = new Map<string, Partial<TradeFormData>>();
+
+    for (const trade of matchingTrades) {
+      const metrics = calculateTradeMetrics(trade);
+      if (metrics.avgEntryPrice <= 0) continue;
+
+      const tickSize = getTickSizeForAccountSymbol(trade.accountName, trade.symbol);
+      if (!tickSize || tickSize <= 0) continue;
+
+      const { tp, sl } = computeAutoTpSl(rule, metrics.avgEntryPrice, trade.side, tickSize);
+
+      let newTp = trade.takeProfit;
+      let newSl = trade.stopLoss;
+
+      if (overwrite) {
+        newTp = tp;
+        newSl = sl;
+      } else if (emptyOnly) {
+        if (trade.takeProfit === undefined || trade.takeProfit === null) newTp = tp;
+        if (trade.stopLoss === undefined || trade.stopLoss === null) newSl = sl;
+      }
+
+      // Skip if nothing changed
+      if (newTp === trade.takeProfit && newSl === trade.stopLoss) continue;
+
+      const updatedTrade = { ...trade, takeProfit: newTp, stopLoss: newSl };
+      const updatedMetrics = calculateTradeMetrics(updatedTrade);
+
+      const patch: Partial<TradeFormData> = {
+        takeProfit: newTp,
+        stopLoss: newSl,
+      };
+
+      // Recalculate saved RRR
+      if (newTp !== undefined && newSl !== undefined && metrics.avgEntryPrice > 0) {
+        const risk = Math.abs(metrics.avgEntryPrice - newSl);
+        const reward = Math.abs(newTp - metrics.avgEntryPrice);
+        if (risk > 0) {
+          patch.savedRRR = reward / risk;
+        }
+      }
+
+      // Recalculate R-Multiple
+      if (trade.tradeRisk > 0 && updatedMetrics.positionStatus === 'CLOSED') {
+        patch.savedRMultiple = updatedMetrics.netPnl / trade.tradeRisk;
+      }
+
+      // Recalculate Return %
+      if (trade.accountBalanceSnapshot && trade.accountBalanceSnapshot > 0) {
+        patch.savedReturnPercent = (updatedMetrics.netPnl / trade.accountBalanceSnapshot) * 100;
+      }
+
+      updates.set(trade.id, patch);
+    }
+
+    if (updates.size > 0) {
+      bulkUpdateTrades(updates);
+    }
+
+    toast.success(`TP/SL rule applied to ${updates.size} trade${updates.size !== 1 ? 's' : ''}`);
+  };
 
   // Auto-select accounts from global filter
   useEffect(() => {
@@ -272,7 +349,7 @@ export const TpSlSettings = () => {
                             <Edit2 className="w-4 h-4 mr-2" />
                             Edit
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => setShowApplyTo(true)} className="cursor-pointer">
+                          <DropdownMenuItem onClick={() => { setApplyingRule(rule); setShowApplyTo(true); }} className="cursor-pointer">
                             <PlayCircle className="w-4 h-4 mr-2" />
                             Apply To
                           </DropdownMenuItem>
@@ -400,7 +477,7 @@ export const TpSlSettings = () => {
         </DialogContent>
       </Dialog>
 
-      <ApplyToModal open={showApplyTo} onOpenChange={setShowApplyTo} />
+      <ApplyToModal open={showApplyTo} onOpenChange={setShowApplyTo} onApply={handleApplyTo} />
     </div>
   );
 };
