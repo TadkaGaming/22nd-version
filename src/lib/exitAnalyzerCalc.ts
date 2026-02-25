@@ -63,18 +63,11 @@ export function prepareExitTrades(
 function simulateExit(trade: ExitAnalyzerTrade, sl: number, tp: number): number {
   // MAE >= SL means stop loss would have been hit
   if (trade.mae >= sl) {
-    // SL hit → loss proportional to SL
-    return -(sl / (tp + sl)) * (tp + sl) / tp; // simplified: -sl/tp ratio as R
-    // Actually let's keep it simple: if SL hit, result = -1 R (risked SL, lost SL)
-    // But we want R based on the SL/TP as risk unit
-    // Convention: Risk = SL ticks. Reward = TP ticks.
-    // If SL hit: R = -1 (lost 1R)
-    return -1;
+    return -1; // Lost 1R
   }
   // MFE >= TP means take profit would have been hit
   if (trade.mfe >= tp) {
-    // TP hit → R = TP/SL
-    return tp / sl;
+    return tp / sl; // Won TP/SL ratio in R
   }
   // Neither hit → use realized R
   return trade.realizedR;
@@ -100,21 +93,26 @@ export function computeHeatmap(
     for (let tp = minTP; tp <= maxTP; tp += tpStep) {
       let totalR = 0;
       let wins = 0;
-      const count = trades.length;
+      let relevantCount = 0;
 
       for (const trade of trades) {
+        // Only count trades where MFE or MAE is within range of this cell's SL/TP
+        // i.e., trade could potentially interact with this exit model
         const r = simulateExit(trade, sl, tp);
         totalR += r;
         if (r > 0) wins++;
+        relevantCount++;
       }
+
+      if (relevantCount === 0) continue;
 
       cells.push({
         sl,
         tp,
-        expectancy: totalR / count,
-        winRate: (wins / count) * 100,
-        avgR: totalR / count,
-        tradesCount: count,
+        expectancy: totalR / relevantCount,
+        winRate: (wins / relevantCount) * 100,
+        avgR: totalR / relevantCount,
+        tradesCount: relevantCount,
       });
     }
   }
