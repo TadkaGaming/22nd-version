@@ -222,63 +222,63 @@ const ExitAnalyzer = () => {
           className="glass-card rounded-2xl p-5 overflow-x-auto"
         >
           <h2 className="text-lg font-semibold mb-4">SL / TP Performance Heatmap</h2>
-          <div className="overflow-auto" style={{ maxHeight: `${10 + 10 * 82}px` }}>
-          <div className="inline-block">
-            {/* Header row */}
-            <div className="flex">
-              <div className="w-16 h-10 flex items-center justify-center text-xs text-muted-foreground font-medium">
+          <div className="relative">
+            {/* TP header row - sticky top */}
+            <div className="flex sticky top-0 z-20 bg-card">
+              <div className="w-16 h-10 flex-shrink-0 flex items-center justify-center text-xs text-muted-foreground font-medium sticky left-0 z-30 bg-card">
                 SL\TP
               </div>
               {tpValues.map(tp => (
-                <div key={tp} className="w-20 h-10 flex items-center justify-center text-xs font-mono text-muted-foreground">
+                <div key={tp} className="w-20 h-10 flex-shrink-0 flex items-center justify-center text-xs font-mono text-muted-foreground">
                   {tp}
                 </div>
               ))}
             </div>
-            {/* Data rows */}
-            {slValues.map(sl => (
-              <div key={sl} className="flex">
-                <div className="w-16 h-20 flex items-center justify-center text-xs font-mono text-muted-foreground">
-                  {sl}
+            {/* Scrollable body */}
+            <div className="overflow-auto" style={{ maxHeight: `${10 * 82}px` }}>
+              {slValues.map(sl => (
+                <div key={sl} className="flex">
+                  <div className="w-16 h-20 flex-shrink-0 flex items-center justify-center text-xs font-mono text-muted-foreground sticky left-0 z-10 bg-card">
+                    {sl}
+                  </div>
+                  {tpValues.map(tp => {
+                    const key = `${sl}:${tp}`;
+                    const cell = cellMap.get(key);
+                    if (!cell) return <div key={key} className="w-20 h-20 flex-shrink-0" />;
+                    const isSelected = selectedCells.has(key);
+                    return (
+                      <Tooltip key={key}>
+                        <TooltipTrigger asChild>
+                          <button
+                            onClick={() => toggleCell(key)}
+                            className="w-20 h-20 flex-shrink-0 m-0.5 rounded-lg flex flex-col items-center justify-center gap-0.5 transition-all duration-150 hover:scale-105 cursor-pointer"
+                            style={{
+                              backgroundColor: cellColor(cell.expectancy),
+                              color: cellTextColor(cell.expectancy),
+                              outline: isSelected ? '2px solid hsl(199 89% 48%)' : 'none',
+                              outlineOffset: isSelected ? '-2px' : '0',
+                            }}
+                          >
+                            <span className="text-sm font-bold font-mono">
+                              {cell.expectancy >= 0 ? '+' : ''}{cell.expectancy.toFixed(2)}R
+                            </span>
+                            <span className="text-[10px] opacity-80">
+                              {cell.winRate.toFixed(0)}% win
+                            </span>
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent side="top" className="font-mono text-xs space-y-0.5">
+                          <p>SL: {cell.sl} | TP: {cell.tp}</p>
+                          <p>Expectancy: {cell.expectancy.toFixed(3)}R</p>
+                          <p>Win Rate: {cell.winRate.toFixed(1)}%</p>
+                          <p>Trades: {cell.tradesCount}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    );
+                  })}
                 </div>
-                {tpValues.map(tp => {
-                  const key = `${sl}:${tp}`;
-                  const cell = cellMap.get(key);
-                  if (!cell) return <div key={key} className="w-20 h-20" />;
-                  const isSelected = selectedCells.has(key);
-                  return (
-                    <Tooltip key={key}>
-                      <TooltipTrigger asChild>
-                        <button
-                          onClick={() => toggleCell(key)}
-                          className="w-20 h-20 m-0.5 rounded-lg flex flex-col items-center justify-center gap-0.5 transition-all duration-150 hover:scale-105 cursor-pointer"
-                          style={{
-                            backgroundColor: cellColor(cell.expectancy),
-                            color: cellTextColor(cell.expectancy),
-                            outline: isSelected ? '2px solid hsl(199 89% 48%)' : 'none',
-                            outlineOffset: isSelected ? '-2px' : '0',
-                          }}
-                        >
-                          <span className="text-sm font-bold font-mono">
-                            {cell.expectancy >= 0 ? '+' : ''}{cell.expectancy.toFixed(2)}R
-                          </span>
-                          <span className="text-[10px] opacity-80">
-                            {cell.winRate.toFixed(0)}% win
-                          </span>
-                        </button>
-                      </TooltipTrigger>
-                      <TooltipContent side="top" className="font-mono text-xs space-y-0.5">
-                        <p>SL: {cell.sl} | TP: {cell.tp}</p>
-                        <p>Expectancy: {cell.expectancy.toFixed(3)}R</p>
-                        <p>Win Rate: {cell.winRate.toFixed(1)}%</p>
-                        <p>Trades: {cell.tradesCount}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  );
-                })}
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
           </div>
           {/* Legend */}
           <div className="mt-4 flex items-center gap-2 text-xs text-muted-foreground">
