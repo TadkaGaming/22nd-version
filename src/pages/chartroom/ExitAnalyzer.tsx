@@ -382,6 +382,8 @@ const ExitAnalyzer = () => {
                   color: 'hsl(210 40% 98%)',
                   fontSize: 12,
                 }}
+                itemStyle={{ color: 'hsl(210 40% 98%)' }}
+                labelStyle={{ color: 'hsl(210 40% 98%)' }}
                 formatter={(value: number, name: string) => [value, name]}
               />
               {scatterSL > 0 && (
