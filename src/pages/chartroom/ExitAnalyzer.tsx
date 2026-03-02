@@ -305,8 +305,12 @@ const ExitAnalyzer = () => {
                 axisTick: { lineStyle: { color: 'hsl(222, 47%, 18%)' } },
               },
               visualMap: {
-                min: Math.min(...heatmapCells.map(c => c.expectancy)),
-                max: Math.max(...heatmapCells.map(c => c.expectancy)),
+                min: coloringMode === 'expectancy'
+                  ? Math.min(...heatmapCells.map(c => c.expectancy))
+                  : Math.min(...heatmapCells.map(c => c.winRate)),
+                max: coloringMode === 'expectancy'
+                  ? Math.max(...heatmapCells.map(c => c.expectancy))
+                  : Math.max(...heatmapCells.map(c => c.winRate)),
                 calculable: true,
                 orient: 'horizontal',
                 left: 'center',
