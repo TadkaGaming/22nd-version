@@ -311,7 +311,7 @@ const ExitAnalyzer = () => {
                 max: coloringMode === 'expectancy'
                   ? Math.max(...heatmapCells.map(c => c.expectancy))
                   : Math.max(...heatmapCells.map(c => c.winRate)),
-                calculable: true,
+                calculable: false,
                 orient: 'horizontal',
                 left: 'center',
                 bottom: 0,
@@ -374,12 +374,14 @@ const ExitAnalyzer = () => {
             }}
             onEvents={{
               click: (params: any) => {
-                if (params.componentType === 'series') {
-                  const key = `${slValues[params.value[1]]}:${tpValues[params.value[0]]}`;
+                if (params.componentType === 'series' && params.data?.value) {
+                  const val = params.data.value;
+                  const key = `${slValues[val[1]]}:${tpValues[val[0]]}`;
                   toggleCell(key);
                 }
               },
             }}
+            notMerge={true}
           />
         </motion.div>
       )}
