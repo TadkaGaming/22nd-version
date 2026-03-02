@@ -390,7 +390,7 @@ const ExitAnalyzer = () => {
                   return (
                     <tr
                       key={`${row.sl}:${row.tp}`}
-                      onClick={() => setActiveModel({ sl: row.sl, tp: row.tp })}
+                      onClick={() => { setActiveModel({ sl: row.sl, tp: row.tp }); setScatterSL(row.sl); setScatterTP(row.tp); }}
                       className={`cursor-pointer transition-colors border-b border-border/50 hover:bg-secondary/50 ${isActive ? 'bg-primary/10' : ''}`}
                     >
                       <td className="py-2.5 px-3 font-mono">{row.sl}</td>
@@ -479,24 +479,6 @@ const ExitAnalyzer = () => {
                   strokeWidth={2}
                   label={{ value: `TP ${scatterTP}`, fill: 'hsl(142 76% 45%)', fontSize: 11, position: 'right' }}
                 />
-              )}
-              {activeModel && (
-                <>
-                  <ReferenceLine
-                    x={activeModel.sl}
-                    stroke="hsl(0 84% 60%)"
-                    strokeDasharray="6 3"
-                    strokeWidth={2}
-                    label={{ value: `SL ${activeModel.sl}`, fill: 'hsl(0 84% 60%)', fontSize: 11, position: 'top' }}
-                  />
-                  <ReferenceLine
-                    y={activeModel.tp}
-                    stroke="hsl(142 76% 45%)"
-                    strokeDasharray="6 3"
-                    strokeWidth={2}
-                    label={{ value: `TP ${activeModel.tp}`, fill: 'hsl(142 76% 45%)', fontSize: 11, position: 'right' }}
-                  />
-                </>
               )}
               <Scatter data={scatterData} fill="hsl(199 89% 48%)" fillOpacity={0.6} r={4}>
                 {scatterData.map((_, i) => (
