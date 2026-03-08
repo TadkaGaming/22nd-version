@@ -29,6 +29,8 @@ import Entering from "./pages/Entering";
 import Landing from "./pages/Landing";
 import Landing2 from "./pages/Landing2";
 import Landing3 from "./pages/Landing3";
+import Landing4 from "./pages/Landing4";
+import Landing5 from "./pages/Landing5";
 import Features from "./pages/Features";
 import Pricing from "./pages/Pricing";
 import SupportedPlatforms from "./pages/SupportedPlatforms";
@@ -54,7 +56,9 @@ const AuthenticatedApp = () => {
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/home-2" element={<Landing2 />} />
-        <Route path="/home-3" element={<Landing3 />} />
+            <Route path="/home-3" element={<Landing3 />} />
+            <Route path="/home-4" element={<Landing4 />} />
+            <Route path="/home-5" element={<Landing5 />} />
         <Route path="/features" element={<Features />} />
         <Route path="/pricing" element={<Pricing />} />
         <Route path="/supported-platforms" element={<SupportedPlatforms />} />
