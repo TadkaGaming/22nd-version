@@ -12,6 +12,7 @@ import { LongShortAnalysisChart } from '@/components/dashboard/LongShortAnalysis
 import { useFilteredTrades } from '@/hooks/useFilteredTrades';
 import { useGlobalFilters } from '@/contexts/GlobalFiltersContext';
 import { usePrivacyMode } from '@/hooks/usePrivacyMode';
+import { PageHeader } from '@/components/layout/PageHeader';
 import { motion } from 'framer-motion';
 
 const Dashboard = () => {
