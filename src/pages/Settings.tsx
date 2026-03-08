@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Trash2, Edit2, Check, X, Tag, Wallet, TrendingUp, TrendingDown, Settings as SettingsIcon, Download, DollarSign, FolderOpen, Archive, ArchiveRestore, ChevronDown, ChevronUp, Target, MessageSquare, Ruler, MoreVertical, ArrowRightLeft, Eraser } from 'lucide-react';
+import { Plus, Trash2, Edit2, Check, X, Tag, Wallet, TrendingUp, TrendingDown, Settings as SettingsIcon, Download, DollarSign, FolderOpen, Archive, ArchiveRestore, ChevronDown, ChevronUp, Target, MessageSquare, Ruler, MoreVertical, ArrowRightLeft, Eraser, LogOut } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAccountsContext } from '@/contexts/AccountsContext';
@@ -33,6 +34,7 @@ import {
 const Settings = () => {
   const { accounts, addAccount, updateAccount, getActiveAccountsWithStats, getArchivedAccountsWithStats, archiveAccount, unarchiveAccount, deleteAccountPermanently, addTransaction, getTransactionsForAccount } = useAccountsContext();
   const { trades, deleteTradesByAccountId, deleteTradesByAccountName } = useTradesContext();
+  const { logout } = useAuth();
   const { currency, setCurrency, currencyConfig, breakevenTolerance, setBreakevenTolerance } = useGlobalFilters();
 
   const handleCurrencyChange = (newCurrency: CurrencyCode) => {
@@ -220,6 +222,15 @@ const Settings = () => {
         >
           <DollarSign className="w-4 h-4" />
           Fees Settings
+        </button>
+        <button
+          onClick={() => {
+            logout();
+          }}
+          className="flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors text-red-500 hover:bg-red-500/10 ml-auto"
+        >
+          <LogOut className="w-4 h-4" />
+          Logout
         </button>
       </div>
 
