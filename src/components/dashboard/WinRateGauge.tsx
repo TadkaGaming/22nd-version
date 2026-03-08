@@ -53,7 +53,6 @@ export const WinRateGauge = ({ value, label, winners = 0, losers = 0, breakeven 
             height={75}
             hideLegend
             skipAnimation={false}
-            tooltip={{ trigger: 'item' }}
           />
           {/* Percentage overlay */}
           <div className="absolute inset-0 flex items-end justify-center pb-0">
