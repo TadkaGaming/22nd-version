@@ -29,6 +29,7 @@ import Entering from "./pages/Entering";
 import Landing from "./pages/Landing";
 import Features from "./pages/Features";
 import Pricing from "./pages/Pricing";
+import SupportedPlatforms from "./pages/SupportedPlatforms";
 import Drawdown from "./pages/chartroom/Drawdown";
 import ConsecutiveWinnersLosers from "./pages/chartroom/ConsecutiveWinnersLosers";
 import ExitAnalysis from "./pages/chartroom/ExitAnalysis";
@@ -52,6 +53,7 @@ const AuthenticatedApp = () => {
         <Route path="/" element={<Landing />} />
         <Route path="/features" element={<Features />} />
         <Route path="/pricing" element={<Pricing />} />
+        <Route path="/supported-platforms" element={<SupportedPlatforms />} />
         <Route path="/entering" element={<Entering />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
