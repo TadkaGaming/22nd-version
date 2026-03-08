@@ -9,10 +9,7 @@ export const LandingFooter = () => {
           {/* Brand */}
           <div className="md:col-span-1">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-9 h-9 rounded-xl bg-white flex items-center justify-center">
-                <LineChart className="w-5 h-5 text-slate-900" />
-              </div>
-              <span className="text-lg font-bold tracking-tight">TradeJournal</span>
+              <img src={logo} alt="TradeValley" className="h-7 brightness-0 invert" />
             </div>
             <p className="text-sm text-slate-400 leading-relaxed">
               The premium trading journal built for traders who refuse to stay average.
