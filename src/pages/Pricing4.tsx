@@ -95,11 +95,11 @@ const BillingToggle = ({ isAnnual, onToggle }: { isAnnual: boolean; onToggle: ()
       >
         Annual
         {isAnnual && (
-          <span
+        <span
             className="text-xs px-2 py-0.5 rounded-full"
             style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: '#34d399', background: 'rgba(52,211,153,0.12)' }}
           >
-            Save 15%
+            Save 20%
           </span>
         )}
       </button>
