@@ -467,7 +467,7 @@ const Landing2 = () => {
               transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
               className="flex justify-center lg:justify-end"
             >
-              <HeatmapVisual large />
+              <HeatmapVisual large variant="classic" />
             </motion.div>
           </div>
         </div>
