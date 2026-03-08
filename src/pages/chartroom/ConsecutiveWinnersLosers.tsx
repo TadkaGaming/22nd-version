@@ -313,11 +313,7 @@ const ConsecutiveWinnersLosers = () => {
     return (
       <div className="space-y-6">
         <div className="flex items-center gap-3">
-          <TrendingUp className="w-8 h-8 text-primary" />
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">Consecutive Winners/Losers</h1>
-            <p className="text-muted-foreground">Analyze your winning and losing streaks</p>
-          </div>
+          <PageHeader title="Consecutive Winners/Losers" tooltip="Track your winning and losing streaks to understand momentum patterns." />
         </div>
         <div className="flex items-center justify-center h-64 border border-dashed border-border rounded-xl">
           <p className="text-muted-foreground">No trades found for the selected filters</p>
