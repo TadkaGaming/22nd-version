@@ -4,6 +4,7 @@ import { useGlobalFilters } from '@/contexts/GlobalFiltersContext';
 import { useAccountsContext } from '@/contexts/AccountsContext';
 import { usePrivacyMode, PRIVACY_MASK } from '@/hooks/usePrivacyMode';
 import { calculateTradeMetrics, Trade } from '@/types/trade';
+import { PageHeader } from '@/components/layout/PageHeader';
 import {
   BarChart,
   Bar,
