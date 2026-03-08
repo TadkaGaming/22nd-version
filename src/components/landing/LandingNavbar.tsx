@@ -30,7 +30,7 @@ export const LandingNavbar = () => {
   const [mobileHomeOpen, setMobileHomeOpen] = useState(false);
   const location = useLocation();
 
-  const isHomePage = ['/', '/home-2', '/home-3'].includes(location.pathname);
+  const isHomePage = ['/', '/home-2', '/home-3', '/home-4', '/home-5'].includes(location.pathname);
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200/60">
