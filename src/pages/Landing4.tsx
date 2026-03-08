@@ -42,7 +42,7 @@ const Landing4Navbar = () => {
 
           {/* Center links */}
           <div className="hidden md:flex items-center gap-10">
-            {['Features', 'Pricing', 'How It Works'].map((label) => (
+            {['Home', 'Features', 'Pricing', 'How It Works'].map((label) => (
               <Link
                 key={label}
                 to={label === 'How It Works' ? '#how-it-works' : `/${label.toLowerCase()}`}
