@@ -29,7 +29,7 @@ export const WinRateGauge = ({ value, label, winners = 0, losers = 0, breakeven 
       <div className="flex flex-col items-center w-full">
         <span className="text-xs text-muted-foreground mb-1">{label}</span>
         
-        <div className="relative" style={{ width: 120, height: 70 }}>
+        <div className="relative overflow-visible" style={{ width: 120, height: 70 }}>
           <PieChart
             series={[
               {
