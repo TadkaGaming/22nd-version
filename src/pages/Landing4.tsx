@@ -269,7 +269,7 @@ const Landing4 = () => {
       {/* ════════════════════════════════════════
           SECTION 2 — HERO
       ════════════════════════════════════════ */}
-      <section className="min-h-screen flex items-center pt-8 px-6 lg:px-8">
+      <section className="min-h-screen flex items-center pt-3 px-6 lg:px-8">
         <div className="max-w-7xl mx-auto w-full">
           <div className="grid lg:grid-cols-[55%_45%] gap-12 lg:gap-16 items-center">
             {/* Left column */}
@@ -284,7 +284,7 @@ const Landing4 = () => {
                 <p className="mt-2 text-xs lg:text-[0.8rem] italic max-w-md" style={{ color: '#8A8A8A', fontFamily: "'DM Sans', 'Inter', sans-serif" }}>
                   The traders who improve fastest aren't the ones who study markets harder. They're the ones who study themselves.
                 </p>
-                <div className="w-full h-px" style={{ background: '#EBEBEB', marginTop: '40px', marginBottom: '48px' }} />
+                <div className="w-full h-px" style={{ background: '#EBEBEB', marginTop: '40px', marginBottom: '29px' }} />
               </motion.div>
 
               {/* Headline */}
