@@ -29,6 +29,7 @@ import Entering from "./pages/Entering";
 import Landing from "./pages/Landing";
 import Features from "./pages/Features";
 import Pricing from "./pages/Pricing";
+import SupportedPlatforms from "./pages/SupportedPlatforms";
 import Drawdown from "./pages/chartroom/Drawdown";
 import ConsecutiveWinnersLosers from "./pages/chartroom/ConsecutiveWinnersLosers";
 import ExitAnalysis from "./pages/chartroom/ExitAnalysis";
