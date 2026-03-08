@@ -27,6 +27,8 @@ import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import Entering from "./pages/Entering";
 import Landing from "./pages/Landing";
+import Landing2 from "./pages/Landing2";
+import Landing3 from "./pages/Landing3";
 import Features from "./pages/Features";
 import Pricing from "./pages/Pricing";
 import SupportedPlatforms from "./pages/SupportedPlatforms";
@@ -51,14 +53,11 @@ const AuthenticatedApp = () => {
     return (
       <Routes>
         <Route path="/" element={<Landing />} />
+        <Route path="/home-2" element={<Landing2 />} />
+        <Route path="/home-3" element={<Landing3 />} />
         <Route path="/features" element={<Features />} />
         <Route path="/pricing" element={<Pricing />} />
         <Route path="/supported-platforms" element={<SupportedPlatforms />} />
-        <Route path="/entering" element={<Entering />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    );
-  }
 
   return (
     <CategoriesProvider>
