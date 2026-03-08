@@ -95,11 +95,11 @@ const BillingToggle = ({ isAnnual, onToggle }: { isAnnual: boolean; onToggle: ()
       >
         Annual
         {isAnnual && (
-          <span
+        <span
             className="text-xs px-2 py-0.5 rounded-full"
             style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: '#34d399', background: 'rgba(52,211,153,0.12)' }}
           >
-            Save 15%
+            Save 20%
           </span>
         )}
       </button>
@@ -176,176 +176,159 @@ const Pricing4 = () => {
       ════════════════════════════════════════ */}
       <section style={{ background: '#F8F7F5', paddingTop: 64, paddingBottom: 80 }}>
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row items-start justify-center gap-8 max-w-[900px] mx-auto">
+          <div className="flex flex-col md:flex-row items-stretch justify-center gap-8 max-w-[900px] mx-auto">
 
             {/* ── SOLO Card ── */}
             <motion.div
               initial="hidden" whileInView="visible" viewport={{ once: true }}
               variants={fadeUp} custom={0}
-              className="w-full md:w-[420px]"
+              className="w-full md:w-[420px] flex flex-col"
               style={{
                 background: '#FFFFFF',
-                border: '1px solid #EBEBEB',
+                border: '1px solid #E5E7EB',
                 boxShadow: '0 4px 24px rgba(0,0,0,0.06)',
-                borderRadius: 4,
-                padding: 40,
+                borderRadius: 12,
+                padding: 32,
               }}
             >
-              <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, letterSpacing: 3, color: '#8A8A8A', textTransform: 'uppercase' as const }}>
-                SOLO
-              </p>
-              <p className="mt-1" style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: '#8A8A8A', fontStyle: 'italic' }}>
-                For the individual trader building their edge.
+              <h3 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 20, fontWeight: 600, color: '#0F0F0F' }}>
+                Solo
+              </h3>
+              <p className="mt-1" style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: '#6B7280', fontStyle: 'italic' }}>
+                Everything you need to begin your journaling discipline.
               </p>
 
               {/* Price */}
               <div className="mt-6">
-                <span style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, fontSize: 56, color: '#0F0F0F', lineHeight: 1 }}>
-                  {isAnnual ? '₹424' : '₹499'}
+                <span style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 700, fontSize: 48, color: '#0F0F0F', lineHeight: 1 }}>
+                  {isAnnual ? '₹399' : '₹499'}
                 </span>
-                <span className="ml-1" style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: '#8A8A8A' }}>/month</span>
+                <span className="ml-1" style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: '#6B7280' }}>/month</span>
                 {isAnnual && (
-                  <p className="mt-1" style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: '#8A8A8A' }}>
-                    Billed ₹5,088 annually
+                  <p className="mt-1" style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: '#6B7280' }}>
+                    Billed ₹4,788 annually
                   </p>
                 )}
               </div>
 
-              {/* Anchor comparison — monthly only */}
-              {!isAnnual && (
-                <p className="mt-2" style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: '#8A8A8A', textAlign: 'center' as const }}>
-                  Tradezella ₹1,800 · Edgewonk ₹1,500 · TradeValley ₹499
-                </p>
-              )}
-
-              {/* CTA */}
-              <Link
-                to="/entering"
-                className="block text-center mt-6 transition-colors"
-                style={{
-                  background: '#0F0F0F', color: '#FFFFFF',
-                  fontFamily: "'DM Sans', sans-serif", fontSize: 14, fontWeight: 500, letterSpacing: 0.5,
-                  padding: '14px 24px', borderRadius: 4,
-                }}
-              >
-                Start Free — 14 Days →
-              </Link>
-              <p className="text-center mt-2.5" style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, color: '#8A8A8A' }}>
-                No credit card · Cancel anytime
-              </p>
-
-              {/* Divider */}
-              <div className="my-7" style={{ borderTop: '1px solid #EBEBEB' }} />
-
               {/* Features */}
-              <ul className="space-y-2">
+              <ul className="mt-6 space-y-3 flex-1">
                 {[
-                  { text: 'Exit Analyzer', tag: '★ Exclusive' },
-                  { text: 'Performance dashboard' },
-                  { text: 'Psychology & pattern insights' },
-                  { text: 'Trade log & full history' },
-                  { text: 'Session & day analytics' },
-                  { text: 'Setup tracking', qualifier: 'up to 3 setups' },
-                  { text: 'CSV & broker file import' },
-                  { text: 'Privacy mode' },
-                  { text: '1 trading account' },
+                  'Unlimited trade logging',
+                  'Performance dashboard',
+                  'Day view & calendar',
+                  'Basic reports',
+                  '1 trading account',
+                  'Manual trade entry',
                 ].map((f) => (
-                  <li key={f.text} style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: '#0F0F0F', lineHeight: 1.8 }}>
-                    <span style={{ color: '#AAAAAA', marginRight: 8 }}>—</span>
-                    {f.text}
-                    {f.tag && (
-                      <span className="ml-2" style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: '#34d399' }}>
-                        {f.tag}
-                      </span>
-                    )}
-                    {f.qualifier && (
-                      <span className="ml-2" style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: '#8A8A8A' }}>
-                        {f.qualifier}
-                      </span>
-                    )}
+                  <li key={f} className="flex items-center gap-3" style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: '#374151' }}>
+                    <svg className="w-5 h-5 flex-shrink-0" viewBox="0 0 20 20" fill="none">
+                      <circle cx="10" cy="10" r="10" fill="#D1FAE5" />
+                      <path d="M6 10.5L8.5 13L14 7" stroke="#059669" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    {f}
                   </li>
                 ))}
               </ul>
 
-              <p className="text-center mt-6" style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: '#8A8A8A', fontStyle: 'italic' }}>
-                ★ Exclusive to TradeValley
-              </p>
+              {/* CTA */}
+              <button
+                className="w-full mt-8 transition-colors"
+                style={{
+                  background: '#E5E7EB', color: '#0F0F0F',
+                  fontFamily: "'DM Sans', sans-serif", fontSize: 14, fontWeight: 600,
+                  padding: '14px 24px', borderRadius: 8,
+                }}
+              >
+                Start Free
+              </button>
             </motion.div>
 
-            {/* ── PRO Card ── */}
+            {/* ── PRO Card (Most Popular) ── */}
             <motion.div
               initial="hidden" whileInView="visible" viewport={{ once: true }}
               variants={fadeUp} custom={1}
-              className="w-full md:w-[420px] relative overflow-hidden"
+              className="w-full md:w-[420px] relative flex flex-col"
               style={{
-                background: '#FFFFFF',
-                border: '1px solid #0F0F0F',
-                boxShadow: '0 8px 32px rgba(0,0,0,0.10)',
-                borderRadius: 4,
-                padding: 40,
+                background: '#1E293B',
+                border: '1px solid #334155',
+                boxShadow: '0 8px 32px rgba(0,0,0,0.25)',
+                borderRadius: 12,
+                padding: 32,
               }}
             >
-              {/* Top accent line */}
-              <div className="absolute top-0 left-0 right-0" style={{ height: 3, background: '#0F0F0F', borderRadius: '4px 4px 0 0' }} />
+              {/* Most Popular Badge */}
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                <span
+                  className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full"
+                  style={{
+                    background: '#FCD34D',
+                    fontFamily: "'DM Sans', sans-serif",
+                    fontSize: 12,
+                    fontWeight: 600,
+                    color: '#1E293B',
+                  }}
+                >
+                  <span style={{ fontSize: 14 }}>✨</span> Most Popular
+                </span>
+              </div>
 
-              <p style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, letterSpacing: 3, color: '#0F0F0F', textTransform: 'uppercase' as const, fontWeight: 700 }}>
-                PRO
-              </p>
-              <p className="mt-1" style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: '#8A8A8A', fontStyle: 'italic' }}>
-                For the serious trader who wants every tool.
+              <h3 className="mt-2" style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 20, fontWeight: 600, color: '#FFFFFF' }}>
+                Professional
+              </h3>
+              <p className="mt-1" style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: '#94A3B8', fontStyle: 'italic' }}>
+                For traders who are serious about finding their edge.
               </p>
 
               {/* Price */}
               <div className="mt-6">
-                <span style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, fontSize: 56, color: '#0F0F0F', lineHeight: 1 }}>
-                  {isAnnual ? '₹679' : '₹799'}
+                <span style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 700, fontSize: 48, color: '#FFFFFF', lineHeight: 1 }}>
+                  {isAnnual ? '₹639' : '₹799'}
                 </span>
-                <span className="ml-1" style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: '#8A8A8A' }}>/month</span>
+                <span className="ml-1" style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: '#94A3B8' }}>/month</span>
                 {isAnnual && (
-                  <p className="mt-1" style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: '#8A8A8A' }}>
-                    Billed ₹8,148 annually
+                  <p className="mt-1" style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: '#94A3B8' }}>
+                    Billed ₹7,668 annually
                   </p>
                 )}
               </div>
 
-              {/* CTA */}
-              <Link
-                to="/entering"
-                className="block text-center mt-6 transition-colors"
-                style={{
-                  background: '#0F0F0F', color: '#FFFFFF',
-                  fontFamily: "'DM Sans', sans-serif", fontSize: 14, fontWeight: 500, letterSpacing: 0.5,
-                  padding: '14px 24px', borderRadius: 4,
-                }}
-              >
-                Start Free — 14 Days →
-              </Link>
-              <p className="text-center mt-2.5" style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, color: '#8A8A8A' }}>
-                No credit card · Cancel anytime
-              </p>
-
-              {/* Divider */}
-              <div className="my-7" style={{ borderTop: '1px solid #EBEBEB' }} />
-
               {/* Features */}
-              <ul className="space-y-2">
+              <ul className="mt-6 space-y-3 flex-1">
                 {[
-                  { text: 'Everything in Solo' },
-                  { text: 'Mentor mode' },
-                  { text: 'Up to 10 setups' },
-                  { text: 'Up to 3 trading accounts' },
-                  { text: 'Priority support' },
+                  'Everything in Solo',
+                  'Full Chart Room (10 modules)',
+                  'Exit Analyzer (Auto & Manual)',
+                  'Trading Diary with rich text',
+                  'Setup & strategy tracking',
+                  'Multi-account support',
+                  'Compare tool & advanced reports',
+                  'CSV import/export',
+                  'Privacy mode',
+                  'Priority support',
                 ].map((f) => (
-                  <li key={f.text} style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: '#0F0F0F', lineHeight: 1.8 }}>
-                    <span style={{ color: '#AAAAAA', marginRight: 8 }}>—</span>
-                    {f.text}
+                  <li key={f} className="flex items-center gap-3" style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: '#E2E8F0' }}>
+                    <svg className="w-5 h-5 flex-shrink-0" viewBox="0 0 20 20" fill="none">
+                      <circle cx="10" cy="10" r="10" fill="#34D399" />
+                      <path d="M6 10.5L8.5 13L14 7" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    {f}
                   </li>
                 ))}
               </ul>
 
-              <p className="text-center mt-6" style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: '#8A8A8A', fontStyle: 'italic' }}>
-                ★ Exclusive to TradeValley
-              </p>
+              {/* CTA */}
+              <button
+                className="w-full mt-8 transition-colors"
+                style={{
+                  background: '#FFFFFF', color: '#1E293B',
+                  fontFamily: "'DM Sans', sans-serif", fontSize: 14, fontWeight: 600,
+                  padding: '14px 24px', borderRadius: 8,
+                  border: '2px solid #FFFFFF',
+                }}
+              >
+                Go Professional
+              </button>
             </motion.div>
 
           </div>
