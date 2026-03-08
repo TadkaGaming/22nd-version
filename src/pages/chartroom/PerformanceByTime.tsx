@@ -5,6 +5,7 @@ import { useAccountsContext } from '@/contexts/AccountsContext';
 import { usePrivacyMode, PRIVACY_MASK } from '@/hooks/usePrivacyMode';
 import { calculateTradeMetrics, Trade } from '@/types/trade';
 import { parseISO, getDay, getMonth, getWeek, getHours, getMinutes, format } from 'date-fns';
+import { PageHeader } from '@/components/layout/PageHeader';
 import {
   BarChart,
   Bar,
@@ -462,10 +463,7 @@ const PerformanceByTime = () => {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-foreground">Performance by Time</h1>
-        <p className="text-muted-foreground mt-1">Analyze your trading performance across different time periods.</p>
-      </div>
+      <PageHeader title="Performance by Time" tooltip="Find your best and worst trading hours, days, and months." />
 
       {/* Side-by-Side Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">

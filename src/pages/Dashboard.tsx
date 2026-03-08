@@ -12,6 +12,7 @@ import { LongShortAnalysisChart } from '@/components/dashboard/LongShortAnalysis
 import { useFilteredTrades } from '@/hooks/useFilteredTrades';
 import { useGlobalFilters } from '@/contexts/GlobalFiltersContext';
 import { usePrivacyMode } from '@/hooks/usePrivacyMode';
+import { PageHeader } from '@/components/layout/PageHeader';
 import { motion } from 'framer-motion';
 
 const Dashboard = () => {
@@ -25,10 +26,7 @@ const Dashboard = () => {
         animate={{ opacity: 1, y: 0 }}
         className="flex items-center justify-between"
       >
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-          <p className="text-muted-foreground mt-1">Track your trading performance</p>
-        </div>
+        <PageHeader title="Dashboard" tooltip="Your trading overview — track net P&L, win rates, and key metrics at a glance." />
       </motion.div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-3">
