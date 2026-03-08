@@ -15,6 +15,8 @@ const homeLinks = [
   { label: 'Home 1', path: '/' },
   { label: 'Home 2', path: '/home-2' },
   { label: 'Home 3', path: '/home-3' },
+  { label: 'Home 4', path: '/home-4' },
+  { label: 'Home 5', path: '/home-5' },
 ];
 
 const navLinks = [
