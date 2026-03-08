@@ -58,6 +58,11 @@ const AuthenticatedApp = () => {
         <Route path="/features" element={<Features />} />
         <Route path="/pricing" element={<Pricing />} />
         <Route path="/supported-platforms" element={<SupportedPlatforms />} />
+        <Route path="/entering" element={<Entering />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    );
+  }
 
   return (
     <CategoriesProvider>
