@@ -284,7 +284,7 @@ const Landing4 = () => {
                 <p className="mt-2 text-xs lg:text-[0.8rem] italic max-w-md" style={{ color: '#8A8A8A', fontFamily: "'DM Sans', 'Inter', sans-serif" }}>
                   The traders who improve fastest aren't the ones who study markets harder. They're the ones who study themselves.
                 </p>
-                <div className="w-full h-px" style={{ background: '#EBEBEB', marginTop: '40px', marginBottom: '48px' }} />
+                <div className="w-full h-px" style={{ background: '#EBEBEB', marginTop: '40px', marginBottom: '29px' }} />
               </motion.div>
 
               {/* Headline */}
