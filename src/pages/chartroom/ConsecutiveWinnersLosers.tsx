@@ -7,6 +7,7 @@ import { useChartDisplayMode, ChartDisplayType, getDisplayLabel } from '@/hooks/
 import { calculateTradeMetrics, Trade } from '@/types/trade';
 import { parseISO } from 'date-fns';
 import { motion } from 'framer-motion';
+import { PageHeader } from '@/components/layout/PageHeader';
 import {
   ComposedChart,
   Bar,
