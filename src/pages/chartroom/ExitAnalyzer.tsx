@@ -57,6 +57,7 @@ const ExitAnalyzer = () => {
   const [maxTP, setMaxTP] = useState(30);
   const [slStep, setSlStep] = useState(5);
   const [tpStep, setTpStep] = useState(5);
+  const [activeTab, setActiveTab] = useState('auto');
   const [treatMissingAsZero, setTreatMissingAsZero] = useState(true);
   const [coloringMode, setColoringMode] = useState<'expectancy' | 'winrate'>('expectancy');
 
