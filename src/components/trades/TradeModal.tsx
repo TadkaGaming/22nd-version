@@ -136,6 +136,8 @@ export const TradeModal = () => {
   const [priceReachedFirst, setPriceReachedFirst] = useState<'takeProfit' | 'stopLoss' | ''>('');
   const [breakEven, setBreakEven] = useState<boolean | null>(null);
   
+  // Screenshots state
+  const [screenshots, setScreenshots] = useState<TradeScreenshot[]>([]);
 
 
   // Get current strategy's checklist items
