@@ -15,9 +15,9 @@ const fadeUp = {
 
 const plans = [
   {
-    name: 'Starter',
-    price: 'Free',
-    period: '',
+    name: 'Solo',
+    price: '₹499',
+    period: '/month',
     description: 'Everything you need to begin your journaling discipline.',
     features: [
       'Unlimited trade logging',
@@ -32,11 +32,11 @@ const plans = [
   },
   {
     name: 'Professional',
-    price: '$29',
+    price: '₹799',
     period: '/month',
     description: 'For traders who are serious about finding their edge.',
     features: [
-      'Everything in Starter',
+      'Everything in Solo',
       'Full Chart Room (10 modules)',
       'Exit Analyzer (Auto & Manual)',
       'Trading Diary with rich text',
@@ -49,22 +49,6 @@ const plans = [
     ],
     cta: 'Go Professional',
     highlighted: true,
-  },
-  {
-    name: 'Institution',
-    price: '$79',
-    period: '/month',
-    description: 'For prop firms and trading teams.',
-    features: [
-      'Everything in Professional',
-      'Team dashboards',
-      'Custom branding',
-      'API access',
-      'Dedicated account manager',
-      'Custom integrations',
-    ],
-    cta: 'Contact Sales',
-    highlighted: false,
   },
 ];
 
