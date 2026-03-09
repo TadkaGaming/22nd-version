@@ -66,6 +66,10 @@ const ManualExitTab = () => {
   const [treatMissingAsZero, setTreatMissingAsZero] = useState(true);
   const [minTradeCount, setMinTradeCount] = useState(1);
 
+  // Quick calculator
+  const [quickSL, setQuickSL] = useState(10);
+  const [quickTP, setQuickTP] = useState(20);
+
   // Draggable selection
   const [selectedSL, setSelectedSL] = useState<number | null>(null);
   const [selectedTP, setSelectedTP] = useState<number | null>(null);
@@ -84,6 +88,32 @@ const ManualExitTab = () => {
     () => computeTPSweep(exitTrades, fixedSL, tpRangeMin, tpRangeMax, tpStep).filter(p => p.tradesCount >= minTradeCount),
     [exitTrades, fixedSL, tpRangeMin, tpRangeMax, tpStep, minTradeCount]
   );
+
+  // Quick calculator computation
+  const quickResult = useMemo(() => {
+    if (exitTrades.length === 0 || quickSL <= 0 || quickTP <= 0) {
+      return { winRate: 0, expectancy: 0, trades: 0 };
+    }
+    let totalR = 0;
+    let wins = 0;
+    for (const trade of exitTrades) {
+      let r: number;
+      if (trade.mae >= quickSL) {
+        r = -1; // SL hit
+      } else if (trade.mfe >= quickTP) {
+        r = quickTP / quickSL; // TP hit
+      } else {
+        r = trade.realizedR; // Neither hit
+      }
+      totalR += r;
+      if (r > 0) wins++;
+    }
+    return {
+      winRate: (wins / exitTrades.length) * 100,
+      expectancy: totalR / exitTrades.length,
+      trades: exitTrades.length,
+    };
+  }, [exitTrades, quickSL, quickTP]);
 
   // Find best point for display
   const bestSL = useMemo(() => {
@@ -133,6 +163,24 @@ const ManualExitTab = () => {
 
   return (
     <>
+      {/* QUICK */}
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.03 }}
+        className="glass-card rounded-2xl p-5"
+      >
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold">QUICK</h2>
+          <div className="text-xs text-muted-foreground font-mono">{quickResult.trades} trades</div>
+        </div>
+        <div className="flex flex-wrap items-end gap-3 mb-4">
+          <InputField label="SL" value={quickSL} onChange={setQuickSL} />
+          <InputField label="TP" value={quickTP} onChange={setQuickTP} />
+        </div>
+        <div className="flex flex-wrap items-center gap-5 text-sm">
+          <span className="text-muted-foreground">Win Rate: <span className="font-mono font-semibold text-foreground">{quickResult.winRate.toFixed(1)}%</span></span>
+          <span className="text-muted-foreground">Expectancy: <span className={`font-mono font-semibold ${quickResult.expectancy >= 0 ? 'profit-text' : 'loss-text'}`}>{quickResult.expectancy >= 0 ? '+' : ''}{quickResult.expectancy.toFixed(3)}R</span></span>
+        </div>
+      </motion.div>
+
       {/* Controls */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
         className="glass-card rounded-2xl p-5"
