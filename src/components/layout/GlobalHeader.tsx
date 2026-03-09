@@ -988,8 +988,8 @@ export const GlobalHeader = () => {
               <ChevronDown className="w-4 h-4 text-muted-foreground ml-auto" />
             </Button>
           </PopoverTrigger>
-        <PopoverContent className="!w-auto p-0 bg-popover border-border z-50 max-w-none" align="end">
-          <div className="flex w-max">
+        <PopoverContent className="w-auto p-0 bg-popover border-border z-50" align="start">
+          <div className="flex">
             {/* Calendar */}
             <div className="p-3 border-r border-border">
               <Calendar
@@ -1001,7 +1001,7 @@ export const GlobalHeader = () => {
               />
             </div>
             {/* Presets */}
-            <div className="p-2">
+            <div className="p-2 min-w-[150px]">
               <button
                 onClick={() => {
                   applyDatePreset('all');
