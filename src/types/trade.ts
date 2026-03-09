@@ -16,6 +16,14 @@ export interface ScaleEntry {
   quantity: number;
 }
 
+// Screenshot attached to a trade
+export interface TradeScreenshot {
+  id: string;
+  imageData: string; // Base64 encoded image data
+  tagId?: string; // Optional screenshot tag reference
+  createdAt: string;
+}
+
 export interface Trade {
   id: string;
   symbol: string;
