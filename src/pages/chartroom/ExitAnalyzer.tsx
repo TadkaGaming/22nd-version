@@ -64,6 +64,7 @@ const ManualExitTab = () => {
   const [tpStep, setTpStep] = useState(1);
   const [optimiseMetric, setOptimiseMetric] = useState<'winrate' | 'expectancy'>('expectancy');
   const [treatMissingAsZero, setTreatMissingAsZero] = useState(true);
+  const [minTradeCount, setMinTradeCount] = useState(1);
 
   // Draggable selection
   const [selectedSL, setSelectedSL] = useState<number | null>(null);
