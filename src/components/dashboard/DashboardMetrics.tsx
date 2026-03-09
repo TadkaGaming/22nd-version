@@ -31,7 +31,7 @@ import { useGlobalFilters } from '@/contexts/GlobalFiltersContext';
 import { usePrivacyMode } from '@/hooks/usePrivacyMode';
 import { calculateTradeMetrics } from '@/types/trade';
 import { parseISO, format } from 'date-fns';
-import { ResponsiveContainer, AreaChart, Area, defs } from 'recharts';
+import { ResponsiveContainer, AreaChart, Area } from 'recharts';
 
 const DEFAULT_METRICS_ORDER = ['netPnl', 'tradeWinRate', 'profitFactor', 'dayWinRate', 'avgWinLoss'];
 const METRICS_STORAGE_KEY = 'dashboard-metrics-order';
