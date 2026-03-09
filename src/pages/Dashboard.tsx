@@ -114,6 +114,12 @@ const Dashboard = () => {
     }
   };
 
+  const handleAddChart = (chartId: string) => {
+    if (!chartOrder.includes(chartId)) {
+      setChartOrder([...chartOrder, chartId]);
+    }
+  };
+
   const renderChart = (chartId: string) => {
     const config = CHART_CONFIGS[chartId];
     if (!config) return null;
