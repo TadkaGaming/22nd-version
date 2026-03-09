@@ -7,7 +7,7 @@ import { DiaryFolderSidebar } from '@/components/diary/DiaryFolderSidebar';
 import { DiaryNotesList } from '@/components/diary/DiaryNotesList';
 import { DiaryNoteEditor } from '@/components/diary/DiaryNoteEditor';
 import { useScreenshotTagsContext } from '@/contexts/ScreenshotTagsContext';
-import { useTradesContext } from '@/contexts/TradesContext';
+import { useFilteredTrades } from '@/hooks/useFilteredTrades';
 import { useTradeModal } from '@/contexts/TradeModalContext';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
