@@ -37,6 +37,7 @@ const plans: {
       { text: 'Exit Analyzer', included: true },
       { text: 'Can add upto 1 account', included: true },
       { text: 'Add upto 3 Setups', included: true },
+      { text: 'Upto 3 Tag Categories', included: true },
       { text: 'Mentor Mode', included: false },
     ],
     cta: 'Start Free',
