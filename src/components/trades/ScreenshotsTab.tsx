@@ -356,6 +356,19 @@ export const ScreenshotsTab = ({ screenshots, onScreenshotsChange }: Screenshots
           </div>
         </div>
       )}
+
+      {/* Fullscreen View Dialog */}
+      <Dialog open={!!viewingScreenshot} onOpenChange={(open) => !open && setViewingScreenshot(null)}>
+        <DialogContent className="max-w-[90vw] max-h-[90vh] p-0 overflow-hidden bg-background/95 backdrop-blur">
+          {viewingScreenshot && (
+            <img
+              src={viewingScreenshot.imageData}
+              alt="Trade screenshot fullscreen"
+              className="w-full h-full object-contain max-h-[85vh]"
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
