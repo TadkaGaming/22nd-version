@@ -15,6 +15,8 @@ import {
   rectSortingStrategy,
 } from '@dnd-kit/sortable';
 import { Pencil, Check } from 'lucide-react';
+import { AddWidgetPlaceholder } from '@/components/dashboard/AddWidgetPlaceholder';
+import { ChartLibraryModal } from '@/components/dashboard/ChartLibraryModal';
 import { RecentTrades } from '@/components/dashboard/RecentTrades';
 import { WinRateGauge } from '@/components/dashboard/WinRateGauge';
 import { ProfitFactorRing } from '@/components/dashboard/ProfitFactorRing';
@@ -70,6 +72,7 @@ const Dashboard = () => {
   const { formatCurrency } = useGlobalFilters();
   const { isPrivacyMode, maskCurrency } = usePrivacyMode();
   const [isEditMode, setIsEditMode] = useState(false);
+  const [isLibraryOpen, setIsLibraryOpen] = useState(false);
   const [chartOrder, setChartOrder] = useState<string[]>(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
@@ -108,6 +111,12 @@ const Dashboard = () => {
         const newIndex = items.indexOf(over.id as string);
         return arrayMove(items, oldIndex, newIndex);
       });
+    }
+  };
+
+  const handleAddChart = (chartId: string) => {
+    if (!chartOrder.includes(chartId)) {
+      setChartOrder([...chartOrder, chartId]);
     }
   };
 
@@ -246,9 +255,22 @@ const Dashboard = () => {
                 </DraggableChartWrapper>
               );
             })}
+            {isEditMode && (
+              <>
+                <AddWidgetPlaceholder onClick={() => setIsLibraryOpen(true)} />
+                <AddWidgetPlaceholder onClick={() => setIsLibraryOpen(true)} />
+              </>
+            )}
           </div>
         </SortableContext>
       </DndContext>
+
+      <ChartLibraryModal
+        open={isLibraryOpen}
+        onOpenChange={setIsLibraryOpen}
+        activeCharts={chartOrder}
+        onAddChart={handleAddChart}
+      />
     </div>
   );
 };
