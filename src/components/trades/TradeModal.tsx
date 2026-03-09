@@ -315,6 +315,8 @@ export const TradeModal = () => {
     setFarthestPriceInLoss('');
     setPriceReachedFirst('');
     setBreakEven(null);
+    // Reset screenshots
+    setScreenshots([]);
   };
 
   const metrics = useMemo(() => {
