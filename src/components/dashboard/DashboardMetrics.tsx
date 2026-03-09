@@ -92,7 +92,7 @@ interface DashboardMetricsProps {
 }
 
 export const DashboardMetrics = ({ isEditMode }: DashboardMetricsProps) => {
-  const { stats } = useFilteredTrades();
+  const { stats, filteredTrades } = useFilteredTrades();
   const { formatCurrency } = useGlobalFilters();
   const { isPrivacyMode, maskCurrency } = usePrivacyMode();
   const [isMetricsLibraryOpen, setIsMetricsLibraryOpen] = useState(false);
