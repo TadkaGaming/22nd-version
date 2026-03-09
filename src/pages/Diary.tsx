@@ -1,10 +1,13 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { BookOpen, Image } from 'lucide-react';
+import { BookOpen, Image, Check } from 'lucide-react';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { DiaryFolderSidebar } from '@/components/diary/DiaryFolderSidebar';
 import { DiaryNotesList } from '@/components/diary/DiaryNotesList';
 import { DiaryNoteEditor } from '@/components/diary/DiaryNoteEditor';
+import { useScreenshotTagsContext } from '@/contexts/ScreenshotTagsContext';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 const mainTabs = [
