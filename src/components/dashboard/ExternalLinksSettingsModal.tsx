@@ -71,7 +71,7 @@ export const ExternalLinksSettingsModal = ({
     onSave(localLinks);
   };
 
-  const canAdd = newUrl.trim() && isValidUrl(newUrl);
+  const canAdd = newUrl.trim().length > 0;
 
   return (
     <Dialog open={open} onOpenChange={handleOpen}>
