@@ -9,6 +9,7 @@ export const METRIC_LIST = [
   { id: 'dayWinRate', name: 'Day Win %', description: 'Win rate based on trading days' },
   { id: 'avgWinLoss', name: 'Avg Win/Loss Ratio', description: 'Average winning trade vs average losing trade' },
   { id: 'currentStreak', name: 'Current Streak', description: 'Current win/loss streaks for days and trades' },
+  { id: 'tradeExpectancy', name: 'Trade Expectancy', description: 'Average expected gain/loss per trade based on gross margin' },
 ];
 
 interface MetricsLibraryModalProps {
