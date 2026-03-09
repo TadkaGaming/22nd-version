@@ -254,6 +254,7 @@ const Dashboard = () => {
                   isEditMode={isEditMode}
                   colSpan={config.colSpan}
                   rowSpan={config.rowSpan}
+                  onRemove={handleRemoveChart}
                 >
                   {renderChart(chartId)}
                 </DraggableChartWrapper>
