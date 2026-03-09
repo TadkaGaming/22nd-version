@@ -31,10 +31,8 @@ import Landing from "./pages/Landing";
 import Landing2 from "./pages/Landing2";
 import Landing3 from "./pages/Landing3";
 import Landing4 from "./pages/Landing4";
-import Landing5 from "./pages/Landing5";
 import Features from "./pages/Features";
 import Pricing from "./pages/Pricing";
-import Pricing2 from "./pages/Pricing2";
 
 import SupportedPlatforms from "./pages/SupportedPlatforms";
 import Drawdown from "./pages/chartroom/Drawdown";
