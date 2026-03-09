@@ -28,6 +28,7 @@ import { TradeDurationPerformanceChart } from '@/components/dashboard/TradeDurat
 import { MonthlyPerformanceCalendar } from '@/components/dashboard/MonthlyPerformanceCalendar';
 import { SymbolAnalysisChart } from '@/components/dashboard/InstrumentAnalysisChart';
 import { LongShortAnalysisChart } from '@/components/dashboard/LongShortAnalysisChart';
+import { ExternalLinksWidget } from '@/components/dashboard/ExternalLinksWidget';
 import { DraggableChartWrapper } from '@/components/dashboard/DraggableChartWrapper';
 import { useFilteredTrades } from '@/hooks/useFilteredTrades';
 import { useGlobalFilters } from '@/contexts/GlobalFiltersContext';
@@ -52,6 +53,7 @@ const DEFAULT_CHART_ORDER = [
   'tradeDuration',
   'symbolAnalysis',
   'longShortAnalysis',
+  'externalLinks',
 ];
 
 const CHART_CONFIGS: Record<string, Omit<ChartConfig, 'id'>> = {
