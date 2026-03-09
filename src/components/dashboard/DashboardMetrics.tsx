@@ -23,6 +23,7 @@ import { ProfitFactorRing } from '@/components/dashboard/ProfitFactorRing';
 import { AvgWinLossRatio } from '@/components/dashboard/AvgWinLossRatio';
 import { CurrentStreakMetric } from '@/components/dashboard/CurrentStreakMetric';
 import { TradeExpectancyMetric } from '@/components/dashboard/TradeExpectancyMetric';
+import { AccountBalancePnLMetric } from '@/components/dashboard/AccountBalancePnLMetric';
 import { AddWidgetPlaceholder } from '@/components/dashboard/AddWidgetPlaceholder';
 import { MetricsLibraryModal } from '@/components/dashboard/MetricsLibraryModal';
 import { useFilteredTrades } from '@/hooks/useFilteredTrades';
@@ -185,6 +186,12 @@ export const DashboardMetrics = ({ isEditMode }: DashboardMetricsProps) => {
         return (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay }} className="glass-card rounded-xl px-4 py-3 h-full">
             <TradeExpectancyMetric />
+          </motion.div>
+        );
+      case 'accountBalancePnl':
+        return (
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay }} className="glass-card rounded-xl px-4 py-3 h-full">
+            <AccountBalancePnLMetric />
           </motion.div>
         );
       default:
