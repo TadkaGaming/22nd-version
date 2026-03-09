@@ -183,9 +183,6 @@ export const ScreenshotsTab = ({ screenshots, onScreenshotsChange }: Screenshots
   // Remove screenshot
   const removeScreenshot = (id: string) => {
     onScreenshotsChange(screenshots.filter(s => s.id !== id));
-    if (selectedScreenshot?.id === id) {
-      setSelectedScreenshot(null);
-    }
   };
 
   // Update screenshot tag
