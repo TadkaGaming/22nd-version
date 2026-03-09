@@ -3,6 +3,7 @@ import { useTradedSymbols } from '@/hooks/useTradedSymbols';
 import { X, Calendar, Star, Settings2, Clock, ChevronDown, Check, Plus, Info, Tags } from 'lucide-react';
 import { ScaleInOutModal } from './ScaleInOutModal';
 import { AssignTagsModal } from './AssignTagsModal';
+import { ScreenshotsTab } from './ScreenshotsTab';
 import { TypeableCombobox } from './TypeableCombobox';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Input } from '@/components/ui/input';
@@ -23,7 +24,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useCustomStats } from '@/contexts/CustomStatsContext';
 import { useTagsContext } from '@/contexts/TagsContext';
 import { useSymbolTickSize } from '@/contexts/SymbolTickSizeContext';
-import { TradeFormData, TradeEntry, ScaleEntry, calculateTradeMetrics, Trade } from '@/types/trade';
+import { TradeFormData, TradeEntry, ScaleEntry, TradeScreenshot, calculateTradeMetrics, Trade } from '@/types/trade';
 import { getContractSizeForSymbol } from '@/lib/contractSizeRegistry';
 import { loadFeeRules, findMatchingFeeRule, calculateFeeFromRule } from '@/lib/feeCalculation';
 import { loadTpSlRules, findMatchingTpSlRule, computeAutoTpSl } from '@/lib/tpslCalculation';
@@ -135,6 +136,8 @@ export const TradeModal = () => {
   const [priceReachedFirst, setPriceReachedFirst] = useState<'takeProfit' | 'stopLoss' | ''>('');
   const [breakEven, setBreakEven] = useState<boolean | null>(null);
   
+  // Screenshots state
+  const [screenshots, setScreenshots] = useState<TradeScreenshot[]>([]);
 
 
   // Get current strategy's checklist items
@@ -261,6 +264,9 @@ export const TradeModal = () => {
       setPriceReachedFirst(editingTrade.priceReachedFirst || '');
       setBreakEven(editingTrade.breakEven ?? null);
       
+      // Load screenshots
+      setScreenshots(editingTrade.screenshots || []);
+      
     } else {
       resetForm();
       // Auto-select account when exactly one account is selected in global filter (Add Trade only)
@@ -309,6 +315,8 @@ export const TradeModal = () => {
     setFarthestPriceInLoss('');
     setPriceReachedFirst('');
     setBreakEven(null);
+    // Reset screenshots
+    setScreenshots([]);
   };
 
   const metrics = useMemo(() => {
@@ -575,6 +583,8 @@ export const TradeModal = () => {
       // MFE/MAE in ticks — start with existing values for edits, null for new trades
       mfeTickPip: editingTrade ? editingTrade.mfeTickPip ?? null : null,
       maeTickPip: editingTrade ? editingTrade.maeTickPip ?? null : null,
+      // Screenshots
+      screenshots: screenshots.length > 0 ? screenshots : undefined,
     };
 
     // Auto-calculate MFE/MAE in tick/pip units (independently) for BOTH new and edited trades
@@ -1306,9 +1316,10 @@ export const TradeModal = () => {
           )}
 
           {activeTab === 'screenshots' && (
-            <div className="flex items-center justify-center h-64 text-muted-foreground">
-              <p className="text-sm">Screenshots - Coming Soon</p>
-            </div>
+            <ScreenshotsTab 
+              screenshots={screenshots}
+              onScreenshotsChange={setScreenshots}
+            />
           )}
         </div>
 

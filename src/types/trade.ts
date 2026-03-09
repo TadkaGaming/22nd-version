@@ -16,6 +16,14 @@ export interface ScaleEntry {
   quantity: number;
 }
 
+// Screenshot attached to a trade
+export interface TradeScreenshot {
+  id: string;
+  imageData: string; // Base64 encoded image data
+  tagId?: string; // Optional screenshot tag reference
+  createdAt: string;
+}
+
 export interface Trade {
   id: string;
   symbol: string;
@@ -62,6 +70,8 @@ export interface Trade {
   accountBalanceSnapshot?: number;
   // Contract size snapshot — captured at trade creation, never re-read from registry
   contractSize?: number;
+  // Screenshots attached to trade
+  screenshots?: TradeScreenshot[];
 }
 
 // Calculated values (not stored, computed on-the-fly)
