@@ -349,7 +349,7 @@ const ExitAnalyzer = () => {
       heatmapRange.minSL, heatmapRange.maxSL, heatmapRange.slStep,
       heatmapRange.minTP, heatmapRange.maxTP, heatmapRange.tpStep
     ).filter(c => c.tradesCount >= minTradeCount);
-  }, [exitTrades, heatmapRange, isValidRange]);
+  }, [exitTrades, heatmapRange, isValidRange, minTradeCount]);
 
   // Build grid structure
   const { tpValues, slValues, cellMap } = useMemo(() => {
