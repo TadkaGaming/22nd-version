@@ -304,7 +304,8 @@ export const ScreenshotsTab = ({ screenshots, onScreenshotsChange }: Screenshots
                   <img
                     src={screenshot.imageData}
                     alt="Trade screenshot"
-                    className="w-full object-contain"
+                    className="w-full object-contain cursor-pointer"
+                    onClick={() => setViewingScreenshot(screenshot)}
                   />
                   
                   {/* Tag badge (always visible if tagged) */}
