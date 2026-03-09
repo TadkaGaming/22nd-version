@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { useScreenshotTagsContext } from '@/contexts/ScreenshotTagsContext';
 import { TradeScreenshot } from '@/types/trade';
 import { cn } from '@/lib/utils';
