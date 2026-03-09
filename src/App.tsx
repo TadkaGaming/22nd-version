@@ -31,10 +31,8 @@ import Landing from "./pages/Landing";
 import Landing2 from "./pages/Landing2";
 import Landing3 from "./pages/Landing3";
 import Landing4 from "./pages/Landing4";
-import Landing5 from "./pages/Landing5";
 import Features from "./pages/Features";
 import Pricing from "./pages/Pricing";
-import Pricing2 from "./pages/Pricing2";
 
 import SupportedPlatforms from "./pages/SupportedPlatforms";
 import Drawdown from "./pages/chartroom/Drawdown";
@@ -57,14 +55,12 @@ const AuthenticatedApp = () => {
   if (!isAuthenticated) {
     return (
       <Routes>
-        <Route path="/" element={<Landing />} />
+        <Route path="/" element={<Landing4 />} />
+        <Route path="/home-1" element={<Landing />} />
         <Route path="/home-2" element={<Landing2 />} />
-            <Route path="/home-3" element={<Landing3 />} />
-            <Route path="/home-4" element={<Landing4 />} />
-            <Route path="/home-5" element={<Landing5 />} />
+        <Route path="/home-3" element={<Landing3 />} />
         <Route path="/features" element={<Features />} />
         <Route path="/pricing" element={<Pricing />} />
-        <Route path="/pricing-2" element={<Pricing2 />} />
         
         <Route path="/supported-platforms" element={<SupportedPlatforms />} />
         <Route path="/entering" element={<Entering />} />

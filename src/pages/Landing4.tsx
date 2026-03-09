@@ -35,7 +35,7 @@ const Landing4Navbar = () => {
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Wordmark */}
-          <Link to="/home-4" className="text-lg tracking-tight" style={{ fontFamily: "'DM Sans', 'Inter', sans-serif" }}>
+          <Link to="/" className="text-lg tracking-tight" style={{ fontFamily: "'DM Sans', 'Inter', sans-serif" }}>
             <span className="font-normal" style={{ color: scrolled ? '#0F0F0F' : '#0F0F0F' }}>Trade</span>
             <span className="font-bold" style={{ color: scrolled ? '#0F0F0F' : '#0F0F0F' }}>Valley</span>
           </Link>
@@ -45,7 +45,7 @@ const Landing4Navbar = () => {
             {['Home', 'Features', 'Pricing', 'How It Works'].map((label) => (
               <Link
                 key={label}
-                to={label === 'Home' ? '/home-4' : label === 'How It Works' ? '#how-it-works' : label === 'Pricing' ? '/pricing' : `/${label.toLowerCase()}`}
+                to={label === 'Home' ? '/' : label === 'How It Works' ? '#how-it-works' : label === 'Pricing' ? '/pricing' : `/${label.toLowerCase()}`}
                 className="text-sm transition-colors"
                 style={{ color: '#8A8A8A', fontFamily: "'DM Sans', 'Inter', sans-serif" }}
                 onMouseEnter={e => (e.currentTarget.style.color = '#0F0F0F')}
