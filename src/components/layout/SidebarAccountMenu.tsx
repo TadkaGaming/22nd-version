@@ -30,7 +30,7 @@ export const SidebarAccountMenu = ({ isCollapsed }: { isCollapsed: boolean }) =>
                   ? "bg-primary text-primary-foreground shadow-lg"
                   : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
               )}
-              whileHover={{ x: isCollapsed ? 0 : 4 }}
+              whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
               <CircleUser className="w-5 h-5 flex-shrink-0" />
@@ -57,10 +57,10 @@ export const SidebarAccountMenu = ({ isCollapsed }: { isCollapsed: boolean }) =>
       </Tooltip>
 
       <PopoverContent
-        side="right"
-        align="end"
+        side="top"
+        align="start"
         sideOffset={8}
-        className="w-56 p-2"
+        className="w-40 p-2"
       >
         {/* Theme Toggle - Switch style */}
         <div className="flex items-center justify-between px-3 py-2 rounded-lg">
