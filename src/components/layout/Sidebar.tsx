@@ -298,7 +298,6 @@ export const Sidebar = () => {
                     : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                 )}
                 style={isChartRoomActive ? { backgroundColor: 'hsl(var(--primary-active))' } : undefined}
-                )}
                 whileHover={{ x: isChartRoomActive ? 0 : 4 }}
                 whileTap={{ scale: 0.98 }}
               >
