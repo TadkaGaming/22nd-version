@@ -9,13 +9,13 @@ export const useTheme = () => {
   });
 
   useEffect(() => {
-    const root = document.documentElement;
+    const html = document.documentElement;
     if (theme === 'dark') {
-      root.classList.add('dark');
-      root.classList.remove('light');
+      html.classList.add('dark');
+      html.classList.remove('light');
     } else {
-      root.classList.add('light');
-      root.classList.remove('dark');
+      html.classList.add('light');
+      html.classList.remove('dark');
     }
     localStorage.setItem('theme', theme);
   }, [theme]);
