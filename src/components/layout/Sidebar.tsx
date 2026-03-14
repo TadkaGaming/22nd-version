@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { LayoutDashboard, ListOrdered, FileText, Settings, Target, Plus, ChevronLeft, ChevronRight, BarChart3, ChevronDown, Crosshair, Sun, Moon } from 'lucide-react';
-import { useTheme } from '@/hooks/useTheme';
+import { LayoutDashboard, ListOrdered, FileText, Target, Plus, ChevronLeft, ChevronRight, BarChart3, ChevronDown, Crosshair } from 'lucide-react';
 import logo from '@/assets/logo.svg';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -11,6 +10,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 
 import { Calendar, BookOpen } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
+import { SidebarAccountMenu } from './SidebarAccountMenu';
 
 // Section 1: Dashboard (standalone)
 const dashboardItem = { icon: LayoutDashboard, label: 'Dashboard', path: '/' };
@@ -42,48 +42,6 @@ const chartRoomItems = [
   { label: 'Trade Management', path: '/chart-room/trade-management' },
 ];
 
-const ThemeToggle = ({ isCollapsed }: { isCollapsed: boolean }) => {
-  const { theme, toggleTheme } = useTheme();
-  return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <motion.button
-          onClick={toggleTheme}
-          className={cn(
-            "w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200",
-            "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-            isCollapsed ? "justify-center" : ""
-          )}
-          whileHover={{ x: isCollapsed ? 0 : 4 }}
-          whileTap={{ scale: 0.98 }}
-        >
-          {theme === 'dark' ? (
-            <Sun className="w-5 h-5 flex-shrink-0" />
-          ) : (
-            <Moon className="w-5 h-5 flex-shrink-0" />
-          )}
-          <AnimatePresence>
-            {!isCollapsed && (
-              <motion.span
-                initial={{ opacity: 0, width: 0 }}
-                animate={{ opacity: 1, width: 'auto' }}
-                exit={{ opacity: 0, width: 0 }}
-                className="font-medium overflow-hidden whitespace-nowrap"
-              >
-                {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
-              </motion.span>
-            )}
-          </AnimatePresence>
-        </motion.button>
-      </TooltipTrigger>
-      {isCollapsed && (
-        <TooltipContent side="right">
-          <p>{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</p>
-        </TooltipContent>
-      )}
-    </Tooltip>
-  );
-};
 
 export const Sidebar = () => {
   const location = useLocation();
@@ -375,53 +333,12 @@ export const Sidebar = () => {
         )}
       </nav>
 
-      {/* Bottom Section - Theme Toggle & Settings (Pinned) */}
+      {/* Bottom Section - Account Menu (Pinned) */}
       <div className="px-3 mt-auto">
-        {/* Divider above bottom section */}
         <div className="py-2">
           <Separator className="bg-sidebar-border/50" />
         </div>
-
-        {/* Theme Toggle */}
-        <ThemeToggle isCollapsed={isCollapsed} />
-        
-        {/* Settings */}
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <NavLink to="/settings" className="block">
-              <motion.div
-                className={cn(
-                  "flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200",
-                  isCollapsed ? "justify-center" : "",
-                  location.pathname === '/settings'
-                    ? "bg-primary text-primary-foreground shadow-lg"
-                    : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-                )}
-                whileHover={{ x: location.pathname === '/settings' || isCollapsed ? 0 : 4 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <Settings className="w-5 h-5 flex-shrink-0" />
-                <AnimatePresence>
-                  {!isCollapsed && (
-                    <motion.span
-                      initial={{ opacity: 0, width: 0 }}
-                      animate={{ opacity: 1, width: 'auto' }}
-                      exit={{ opacity: 0, width: 0 }}
-                      className="font-medium overflow-hidden whitespace-nowrap"
-                    >
-                      Settings
-                    </motion.span>
-                  )}
-                </AnimatePresence>
-              </motion.div>
-            </NavLink>
-          </TooltipTrigger>
-          {isCollapsed && (
-            <TooltipContent side="right">
-              <p>Settings</p>
-            </TooltipContent>
-          )}
-        </Tooltip>
+        <SidebarAccountMenu isCollapsed={isCollapsed} />
       </div>
 
       {/* Collapse Button */}

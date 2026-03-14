@@ -25,6 +25,7 @@ import Strategies from "./pages/Strategies";
 import StrategyDetail from "./pages/StrategyDetail";
 import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
+import Account from "./pages/Account";
 import NotFound from "./pages/NotFound";
 import Entering from "./pages/Entering";
 import Landing from "./pages/Landing";
@@ -102,6 +103,7 @@ const AuthenticatedApp = () => {
                               <Route path="/chart-room/trade-management" element={<TradeManagement />} />
                               <Route path="/exit-analyzer" element={<ExitAnalyzer />} />
                               <Route path="/settings" element={<Settings />} />
+                              <Route path="/account" element={<Account />} />
                               <Route path="/entering" element={<Navigate to="/" replace />} />
                               <Route path="*" element={<NotFound />} />
                             </Routes>
