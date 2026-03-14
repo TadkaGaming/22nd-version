@@ -11,6 +11,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 
 import { Calendar, BookOpen } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
+import { SidebarAccountMenu } from './SidebarAccountMenu';
 
 // Section 1: Dashboard (standalone)
 const dashboardItem = { icon: LayoutDashboard, label: 'Dashboard', path: '/' };
