@@ -25,6 +25,7 @@ import Strategies from "./pages/Strategies";
 import StrategyDetail from "./pages/StrategyDetail";
 import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
+import Account from "./pages/Account";
 import NotFound from "./pages/NotFound";
 import Entering from "./pages/Entering";
 import Landing from "./pages/Landing";
