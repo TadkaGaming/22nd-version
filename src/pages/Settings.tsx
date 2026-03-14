@@ -135,7 +135,7 @@ const Settings = () => {
       
       <div>
         <h1 className="text-3xl font-bold text-foreground mb-2">Settings</h1>
-        <p className="text-muted-foreground">Manage your trading journal configuration</p>
+        <p className="text-sm text-muted-foreground">Manage your trading journal configuration</p>
       </div>
 
       {/* Settings Navigation Menu */}
@@ -223,15 +223,6 @@ const Settings = () => {
         >
           <DollarSign className="w-4 h-4" />
           Fees Settings
-        </button>
-        <button
-          onClick={() => {
-            logout();
-          }}
-          className="flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors text-red-500 hover:bg-red-500/10 ml-auto"
-        >
-          <LogOut className="w-4 h-4" />
-          Logout
         </button>
       </div>
 
