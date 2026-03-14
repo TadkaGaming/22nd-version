@@ -114,11 +114,11 @@ export const Sidebar = () => {
                 className="overflow-hidden flex flex-col items-center"
               >
                 <span className="text-2xl tracking-tight whitespace-nowrap" style={{ fontFamily: "'DM Sans', 'Inter', sans-serif" }}>
-                  <span className="font-normal text-white">Trade</span>
-                  <span className="font-bold text-white">Valley</span>
+                  <span className="font-normal text-foreground">Trade</span>
+                  <span className="font-bold text-foreground">Valley</span>
                 </span>
-                <span className="text-[9px] tracking-widest uppercase text-white/40 mt-0.5 whitespace-nowrap" style={{ fontFamily: "'DM Sans', 'Inter', sans-serif" }}>
-                  Look inward<span className="text-[13px] font-bold text-white/50 mx-0.5">/</span>Trade forward
+                <span className="text-[9px] tracking-widest uppercase text-muted-foreground mt-0.5 whitespace-nowrap" style={{ fontFamily: "'DM Sans', 'Inter', sans-serif" }}>
+                  Look inward<span className="text-[13px] font-bold text-muted-foreground/70 mx-0.5">/</span>Trade forward
                 </span>
               </motion.div>
             ) : (
