@@ -136,10 +136,9 @@ export const Sidebar = () => {
                   "flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200",
                   isCollapsed ? "justify-center" : "",
                   location.pathname === dashboardItem.path
-                    ? "text-primary-foreground shadow-lg"
+                    ? "bg-primary text-primary-foreground shadow-lg"
                     : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                 )}
-                style={location.pathname === dashboardItem.path ? { backgroundColor: 'hsl(var(--primary-active))' } : undefined}
                 whileHover={{ x: location.pathname === dashboardItem.path || isCollapsed ? 0 : 4 }}
                 whileTap={{ scale: 0.98 }}
               >
