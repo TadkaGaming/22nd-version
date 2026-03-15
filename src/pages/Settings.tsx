@@ -49,6 +49,7 @@ const Settings = () => {
 
   // Breakeven tolerance local state for input
   const [toleranceValue, setToleranceValue] = useState(breakevenTolerance.value.toString());
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
   
   const handleToleranceTypeChange = (type: BreakevenToleranceType) => {
     setBreakevenTolerance({
