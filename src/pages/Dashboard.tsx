@@ -148,11 +148,12 @@ const Dashboard = () => {
         </div>
         <Button
           variant={isEditMode ? "default" : "ghost"}
-          size="icon"
-          className="h-8 w-8"
+          size="sm"
+          className="h-8 gap-1.5 px-3"
           onClick={() => setIsEditMode(!isEditMode)}
         >
           {isEditMode ? <Check className="h-4 w-4" /> : <Pencil className="h-4 w-4" />}
+          <span className="text-sm">{isEditMode ? 'Done' : 'Edit'}</span>
         </Button>
       </motion.div>
 
