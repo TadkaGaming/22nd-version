@@ -332,7 +332,7 @@ export const NewAccountModal = ({ open, onOpenChange, onCreateAccount, currencyS
                 >
                   {/* Animated sliding indicator */}
                   <div
-                    className="absolute top-1 bottom-1 rounded-md bg-primary transition-all duration-300 ease-in-out z-0"
+                    className="absolute top-1 bottom-1 rounded-md bg-propfirm transition-all duration-300 ease-in-out z-0"
                     style={{
                       left: `${indicatorStyle.left}px`,
                       width: `${indicatorStyle.width}px`,
