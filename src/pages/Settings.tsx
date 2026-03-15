@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
+import { DeleteAccountDialog } from '@/components/settings/DeleteAccountDialog';
 import { useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Trash2, Edit2, Check, X, Tag, Wallet, TrendingUp, TrendingDown, Settings as SettingsIcon, Download, DollarSign, FolderOpen, Archive, ArchiveRestore, ChevronDown, ChevronUp, Target, MessageSquare, Ruler, MoreVertical, ArrowRightLeft, Eraser, LogOut, Image } from 'lucide-react';
@@ -48,6 +49,7 @@ const Settings = () => {
 
   // Breakeven tolerance local state for input
   const [toleranceValue, setToleranceValue] = useState(breakevenTolerance.value.toString());
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
   
   const handleToleranceTypeChange = (type: BreakevenToleranceType) => {
     setBreakevenTolerance({
@@ -135,6 +137,7 @@ const Settings = () => {
   };
 
   return (
+    <>
     <SettingsLayout activeTab={activeSettingsTab} onTabChange={setActiveSettingsTab}>
     <div className="space-y-8 animate-fade-in">
       {/* Main Tab Content */}
@@ -511,13 +514,7 @@ const Settings = () => {
                                   <Button
                                     size="sm"
                                     variant="ghost"
-                                    onClick={() => {
-                                      if (window.confirm(`Are you sure you want to permanently delete "${account.name}"? This will also delete ALL trades and data associated with this account. This action cannot be undone.`)) {
-                                        deleteTradesByAccountId(account.id);
-                                        deleteTradesByAccountName(account.name);
-                                        deleteAccountPermanently(account.id);
-                                      }
-                                    }}
+                                    onClick={() => setDeleteTarget({ id: account.id, name: account.name })}
                                     className="text-loss hover:text-loss h-7 text-xs gap-1"
                                     title="Permanently delete"
                                   >
@@ -655,6 +652,21 @@ const Settings = () => {
       })()}
     </div>
     </SettingsLayout>
+
+    <DeleteAccountDialog
+      open={!!deleteTarget}
+      onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}
+      accountName={deleteTarget?.name ?? ''}
+      onConfirm={() => {
+        if (deleteTarget) {
+          deleteTradesByAccountId(deleteTarget.id);
+          deleteTradesByAccountName(deleteTarget.name);
+          deleteAccountPermanently(deleteTarget.id);
+          setDeleteTarget(null);
+        }
+      }}
+    />
+    </>
   );
 };
 
