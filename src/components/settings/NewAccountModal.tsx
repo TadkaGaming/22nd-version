@@ -306,7 +306,7 @@ export const NewAccountModal = ({ open, onOpenChange, onCreateAccount, currencyS
                 className={cn(
                   "py-2.5 text-sm font-medium transition-colors",
                   mode === 'propfirm'
-                    ? "bg-primary text-primary-foreground"
+                    ? "bg-propfirm text-propfirm-foreground"
                     : "bg-input text-muted-foreground hover:text-foreground"
                 )}
               >
@@ -332,7 +332,7 @@ export const NewAccountModal = ({ open, onOpenChange, onCreateAccount, currencyS
                 >
                   {/* Animated sliding indicator */}
                   <div
-                    className="absolute top-1 bottom-1 rounded-md bg-primary transition-all duration-300 ease-in-out z-0"
+                    className="absolute top-1 bottom-1 rounded-md bg-propfirm transition-all duration-300 ease-in-out z-0"
                     style={{
                       left: `${indicatorStyle.left}px`,
                       width: `${indicatorStyle.width}px`,
@@ -353,7 +353,7 @@ export const NewAccountModal = ({ open, onOpenChange, onCreateAccount, currencyS
                         className={cn(
                           "relative z-10 flex-1 py-2 rounded-md text-sm font-medium transition-colors duration-200",
                           isActive
-                            ? "text-primary-foreground"
+                            ? "text-propfirm-foreground"
                             : disabled
                               ? "text-muted-foreground/40 cursor-not-allowed"
                               : "text-muted-foreground hover:text-foreground"
@@ -393,7 +393,10 @@ export const NewAccountModal = ({ open, onOpenChange, onCreateAccount, currencyS
           <Button
             onClick={handleCreate}
             disabled={!canCreate}
-            className="w-full gap-2"
+            className={cn(
+              "w-full gap-2",
+              mode === 'propfirm' && "bg-propfirm text-propfirm-foreground hover:bg-propfirm/90"
+            )}
           >
             <Plus className="h-4 w-4" />
             Create Account
