@@ -509,6 +509,18 @@ const Settings = () => {
                 )}
               </div>
             )}
+
+            {/* New Account CTA */}
+            <div className="mt-6">
+              <Button
+                onClick={() => setShowNewAccountModal(true)}
+                className="w-full gap-2"
+                size="lg"
+              >
+                <Plus className="w-4 h-4" />
+                New Account
+              </Button>
+            </div>
           </div>
         </>
       )}
