@@ -99,21 +99,16 @@ const Settings = () => {
   const activeAccountsWithStats = getActiveAccountsWithStats();
   const archivedAccountsWithStats = getArchivedAccountsWithStats();
 
-  // Account handlers
-  const handleAddAccount = () => {
-    if (newAccountName.trim() && newAccountBalance) {
-      addAccount(newAccountName.trim(), parseFloat(newAccountBalance) || 0);
-      setNewAccountName('');
-      setNewAccountBalance('');
-    }
+  // Account handlers - new modal-based creation
+  const handleCreateAccount = (data: {
+    name: string;
+    startingBalance: number;
+    accountMode: import('@/contexts/AccountsContext').AccountMode;
+    propFirmSettings?: import('@/contexts/AccountsContext').PropFirmSettings;
+  }) => {
+    addAccount(data.name, data.startingBalance, data.accountMode, data.propFirmSettings);
+    toast.success(`Account "${data.name}" created`);
   };
-
-  const handleAccountKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      handleAddAccount();
-    }
-  };
-
   const startEditingAccount = (account: { id: string; name: string; startingBalance: number }) => {
     setEditingAccount(account.id);
     setEditAccountName(account.name);
