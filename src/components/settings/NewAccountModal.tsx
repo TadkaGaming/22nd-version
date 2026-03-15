@@ -88,7 +88,7 @@ export const NewAccountModal = ({ open, onOpenChange, onCreateAccount, currencyS
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md max-h-[85vh] flex flex-col">
         <DialogHeader className="gap-3">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
@@ -101,7 +101,7 @@ export const NewAccountModal = ({ open, onOpenChange, onCreateAccount, currencyS
           </div>
         </DialogHeader>
 
-        <div className="space-y-5 py-2">
+        <div className="space-y-5 py-2 overflow-y-auto flex-1 min-h-0 pr-1">
           {/* Account Name */}
           <div className="space-y-2">
             <Label className="flex items-center gap-2 text-sm font-medium">
