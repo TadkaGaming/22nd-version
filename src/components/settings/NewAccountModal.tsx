@@ -156,7 +156,7 @@ export const NewAccountModal = ({ open, onOpenChange, onCreateAccount, onUpdateA
 
   const canCreate = name.trim() && balance && parseFloat(balance) >= 0;
 
-  const handleCreate = () => {
+  const handleSubmit = () => {
     if (!canCreate) return;
 
     let propFirmSettings;
@@ -170,7 +170,6 @@ export const NewAccountModal = ({ open, onOpenChange, onCreateAccount, onUpdateA
           drawdownType: instantData.drawdownType,
         };
       } else {
-        // Use the highest filled phase
         const isStep2Filled = isPhaseFilled(step2Data);
         const data = isStep2Filled ? step2Data : step1Data;
         propFirmSettings = {
@@ -183,12 +182,18 @@ export const NewAccountModal = ({ open, onOpenChange, onCreateAccount, onUpdateA
       }
     }
 
-    onCreateAccount({
+    const accountData = {
       name: name.trim(),
       startingBalance: parseFloat(balance) || 0,
       accountMode: mode,
       ...(propFirmSettings && { propFirmSettings }),
-    });
+    };
+
+    if (isEditing && editingAccount && onUpdateAccount) {
+      onUpdateAccount({ id: editingAccount.id, ...accountData });
+    } else {
+      onCreateAccount(accountData);
+    }
     handleOpenChange(false);
   };
 
