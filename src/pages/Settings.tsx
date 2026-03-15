@@ -72,8 +72,8 @@ const Settings = () => {
     });
   };
 
-  // Settings tab state - now with 4 tabs
-  const [activeSettingsTab, setActiveSettingsTab] = useState<'main' | 'accounts' | 'custom-tags' | 'trade-comments' | 'symbol-tick' | 'tpsl' | 'fees'>('main');
+  const activeSettingsTab = (searchParams.get('tab') as SettingsTab) || 'main';
+  const setActiveSettingsTab = (tab: SettingsTab) => setSearchParams({ tab });
   
   // Custom Tags sub-tab state
   const [activeTagsSubTab, setActiveTagsSubTab] = useState<'categories' | 'tags' | 'screenshot-tags'>('categories');
