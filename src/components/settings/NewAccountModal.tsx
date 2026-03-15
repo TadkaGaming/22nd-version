@@ -75,7 +75,8 @@ const drawdownOptions: { value: DrawdownType; label: string }[] = [
   { value: 'eod', label: 'EOD' },
 ];
 
-export const NewAccountModal = ({ open, onOpenChange, onCreateAccount, currencySymbol }: NewAccountModalProps) => {
+export const NewAccountModal = ({ open, onOpenChange, onCreateAccount, onUpdateAccount, editingAccount, currencySymbol }: NewAccountModalProps) => {
+  const isEditing = !!editingAccount;
   const [name, setName] = useState('');
   const [balance, setBalance] = useState('');
   const [mode, setMode] = useState<AccountMode>('normal');
@@ -102,6 +103,34 @@ export const NewAccountModal = ({ open, onOpenChange, onCreateAccount, currencyS
       });
     }
   }, [activeTab, mode, open]);
+
+  // Pre-fill form when editing
+  useEffect(() => {
+    if (open && editingAccount) {
+      setName(editingAccount.name);
+      setBalance(editingAccount.startingBalance.toString());
+      setMode(editingAccount.accountMode || 'normal');
+      if (editingAccount.propFirmSettings) {
+        const ps = editingAccount.propFirmSettings;
+        const phaseData: PhaseData = {
+          targetPercent: ps.targetPercent ? ps.targetPercent.toString() : '',
+          totalDrawdown: ps.totalDrawdownPercent ? ps.totalDrawdownPercent.toString() : '',
+          dailyDrawdown: ps.dailyDrawdownPercent ? ps.dailyDrawdownPercent.toString() : '',
+          drawdownType: ps.drawdownType || 'static',
+        };
+        if (ps.step === 'instant') {
+          setInstantData(phaseData);
+          setActiveTab('instant');
+        } else if (ps.step === 'step2') {
+          setStep2Data(phaseData);
+          setActiveTab('step2');
+        } else {
+          setStep1Data(phaseData);
+          setActiveTab('step1');
+        }
+      }
+    }
+  }, [open, editingAccount]);
 
   const resetForm = () => {
     setName('');
