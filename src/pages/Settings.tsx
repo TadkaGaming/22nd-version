@@ -135,27 +135,8 @@ const Settings = () => {
   };
 
   return (
+    <SettingsLayout activeTab={activeSettingsTab} onTabChange={setActiveSettingsTab}>
     <div className="space-y-8 animate-fade-in">
-      
-      <div>
-        <h1 className="text-3xl font-bold text-foreground mb-2">Settings</h1>
-        <p className="text-sm text-muted-foreground">Manage your trading journal configuration</p>
-      </div>
-
-      {/* Settings Navigation Menu */}
-      <div className="flex gap-2 p-1 bg-muted/30 rounded-lg w-fit">
-        <button
-          onClick={() => setActiveSettingsTab('main')}
-          className={cn(
-            "flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors",
-            activeSettingsTab === 'main'
-              ? "bg-background text-foreground shadow-sm"
-              : "text-muted-foreground hover:text-foreground hover:bg-background/50"
-          )}
-        >
-          <SettingsIcon className="w-4 h-4" />
-          Main
-        </button>
         <button
           onClick={() => setActiveSettingsTab('accounts')}
           className={cn(
