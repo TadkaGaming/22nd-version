@@ -17,6 +17,12 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet';
 import { useGlobalFilters, DatePreset, OutcomeFilter, DayFilter, LastTradesFilter, DirectionFilter, ReturnPercentRange, RMultipleRange, YearFilter } from '@/contexts/GlobalFiltersContext';
 import { useAccountsContext } from '@/contexts/AccountsContext';
 import { useTradesContext } from '@/contexts/TradesContext';
