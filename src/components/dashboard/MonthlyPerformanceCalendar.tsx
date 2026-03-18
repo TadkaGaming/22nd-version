@@ -293,20 +293,21 @@ export const MonthlyPerformanceCalendar = () => {
       {/* Calendar Grid */}
       <div className="flex gap-4">
         {/* Calendar */}
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           {/* Week day headers */}
-          <div className="grid grid-cols-7 gap-1 mb-1">
+          <div className="grid grid-cols-7 gap-0.5 md:gap-1 mb-1">
             {weekDays.map(day => (
-              <div key={day} className="text-center text-xs font-medium text-muted-foreground py-2">
-                {day}
+              <div key={day} className="text-center text-[10px] md:text-xs font-medium text-muted-foreground py-1 md:py-2">
+                <span className="hidden sm:inline">{day}</span>
+                <span className="sm:hidden">{day.charAt(0)}</span>
               </div>
             ))}
           </div>
 
           {/* Calendar days */}
-          <div className="space-y-1">
+          <div className="space-y-0.5 md:space-y-1">
             {weeks.map((week, weekIndex) => (
-              <div key={weekIndex} className="grid grid-cols-7 gap-1">
+              <div key={weekIndex} className="grid grid-cols-7 gap-0.5 md:gap-1">
                 {week.map((day, dayIndex) => {
                   const dayKey = format(day, 'yyyy-MM-dd');
                   const stats = dayStatsMap[dayKey];
@@ -325,13 +326,13 @@ export const MonthlyPerformanceCalendar = () => {
                       key={dayKey}
                       onClick={() => isCurrentMonth && handleDayClick(day)}
                       className={`
-                        min-h-[80px] p-2 rounded-lg border-transparent transition-colors
+                        min-h-[48px] md:min-h-[80px] p-1 md:p-2 rounded-md md:rounded-lg border-transparent transition-colors
                         ${isCurrentMonth ? bgClass : 'bg-muted/20 opacity-40'}
                         ${isCurrentMonth ? 'cursor-pointer hover:ring-1 hover:ring-primary/50' : ''}
                       `}
                     >
-                      <div className="flex items-center justify-center w-5 h-5 rounded-full bg-white dark:bg-slate-800 mb-1">
-                        <span className={`text-[10px] font-semibold ${isCurrentMonth ? 'text-black dark:text-white' : 'text-muted-foreground'}`}>
+                      <div className="flex items-center justify-center w-4 h-4 md:w-5 md:h-5 rounded-full bg-white dark:bg-slate-800 mb-0.5 md:mb-1">
+                        <span className={`text-[8px] md:text-[10px] font-semibold ${isCurrentMonth ? 'text-black dark:text-white' : 'text-muted-foreground'}`}>
                           {format(day, 'd')}
                         </span>
                       </div>
@@ -339,22 +340,22 @@ export const MonthlyPerformanceCalendar = () => {
                       {hasData && (
                         <div className="space-y-0.5">
                           {displaySettings.dailyPnl && (
-                            <div className={`text-sm font-bold font-mono ${isPrivacyMode ? 'text-foreground' : stats.pnl >= 0 ? 'profit-text' : 'loss-text'}`}>
+                            <div className={`text-[9px] md:text-sm font-bold font-mono ${isPrivacyMode ? 'text-foreground' : stats.pnl >= 0 ? 'profit-text' : 'loss-text'}`}>
                               {formatCurrencyDecimal(stats.pnl)}
                             </div>
                           )}
                           {displaySettings.numTrades && (
-                            <div className="text-[10px] text-muted-foreground">
+                            <div className="text-[8px] md:text-[10px] text-muted-foreground hidden sm:block">
                               {stats.trades} trade{stats.trades !== 1 ? 's' : ''}
                             </div>
                           )}
                           {displaySettings.winRate && (
-                            <div className="text-[10px] text-muted-foreground">
+                            <div className="text-[8px] md:text-[10px] text-muted-foreground hidden sm:block">
                               {stats.winRate.toFixed(1)}%
                             </div>
                           )}
                           {displaySettings.rMultiple && (
-                            <div className="text-[10px] text-muted-foreground">
+                            <div className="text-[8px] md:text-[10px] text-muted-foreground hidden sm:block">
                               {stats.rMultiple >= 0 ? '+' : ''}{stats.rMultiple.toFixed(2)}R
                             </div>
                           )}
@@ -368,8 +369,8 @@ export const MonthlyPerformanceCalendar = () => {
           </div>
         </div>
 
-        {/* Weekly Summaries */}
-        <div className="w-32 space-y-1 pt-8">
+        {/* Weekly Summaries - hidden on mobile */}
+        <div className="hidden md:block w-32 space-y-1 pt-8">
           {weeklySummaries.map((summary, index) => (
             <div 
               key={index} 
