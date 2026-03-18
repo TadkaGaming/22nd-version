@@ -337,7 +337,7 @@ export const GlobalHeader = () => {
   }, [selectedSymbols, selectedOutcomes, selectedHours, selectedSetups, selectedChecklistItems, selectedDays, lastTradesFilter, selectedDirections, selectedReturnRanges, selectedRMultipleRanges, selectedYear]);
 
   return (
-    <div className="flex items-center gap-3 px-8 py-4 border-b border-border bg-card/50 backdrop-blur-sm">
+    <div className="flex items-center gap-2 md:gap-3 px-4 md:px-8 py-3 md:py-4 border-b border-border bg-card/50 backdrop-blur-sm overflow-x-auto pl-14 md:pl-4">
       {/* Basic Filters Dropdown */}
       <DropdownMenu open={basicFiltersOpen} onOpenChange={setBasicFiltersOpen}>
         <DropdownMenuTrigger asChild>
