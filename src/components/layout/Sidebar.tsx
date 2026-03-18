@@ -1,28 +1,23 @@
 import { useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { LayoutDashboard, ListOrdered, FileText, Target, Plus, ChevronLeft, ChevronRight, BarChart3, ChevronDown, Crosshair } from 'lucide-react';
-import logo from '@/assets/logo.svg';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTradeModal } from '@/contexts/TradeModalContext';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-
 import { Calendar, BookOpen } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { SidebarAccountMenu } from './SidebarAccountMenu';
 
-// Section 1: Dashboard (standalone)
 const dashboardItem = { icon: LayoutDashboard, label: 'Dashboard', path: '/' };
 
-// Section 2: Trading Views
 const tradingViewItems = [
   { icon: ListOrdered, label: 'Trades', path: '/trades' },
   { icon: Calendar, label: 'Day View', path: '/day-view' },
   { icon: BookOpen, label: 'Diary', path: '/diary' },
 ];
 
-// Section 3: Analysis & Planning
 const analysisItems = [
   { icon: Target, label: 'Setups', path: '/strategies' },
   { icon: FileText, label: 'Reports', path: '/reports' },
@@ -42,6 +37,48 @@ const chartRoomItems = [
   { label: 'Trade Management', path: '/chart-room/trade-management' },
 ];
 
+const NavItem = ({ icon: Icon, label, path, isCollapsed, isActive }: {
+  icon: any; label: string; path: string; isCollapsed: boolean; isActive: boolean;
+}) => (
+  <Tooltip>
+    <TooltipTrigger asChild>
+      <NavLink to={path} className="block">
+        <div
+          className={cn(
+            "relative flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200",
+            isCollapsed ? "justify-center" : "",
+            isActive
+              ? "bg-primary/10 text-primary font-medium"
+              : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+          )}
+        >
+          {/* Left accent bar */}
+          {isActive && !isCollapsed && (
+            <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-primary" />
+          )}
+          <Icon className="w-5 h-5 flex-shrink-0" />
+          <AnimatePresence>
+            {!isCollapsed && (
+              <motion.span
+                initial={{ opacity: 0, width: 0 }}
+                animate={{ opacity: 1, width: 'auto' }}
+                exit={{ opacity: 0, width: 0 }}
+                className="overflow-hidden whitespace-nowrap text-sm"
+              >
+                {label}
+              </motion.span>
+            )}
+          </AnimatePresence>
+        </div>
+      </NavLink>
+    </TooltipTrigger>
+    {isCollapsed && (
+      <TooltipContent side="right">
+        <p>{label}</p>
+      </TooltipContent>
+    )}
+  </Tooltip>
+);
 
 export const Sidebar = () => {
   const location = useLocation();
@@ -50,31 +87,27 @@ export const Sidebar = () => {
   const [chartRoomOpen, setChartRoomOpen] = useState(
     location.pathname.startsWith('/chart-room')
   );
-  
+
   const isChartRoomActive = location.pathname.startsWith('/chart-room');
 
   return (
-    <aside 
+    <aside
       className={cn(
-        "fixed left-0 top-0 h-screen bg-sidebar border-r border-sidebar-border flex flex-col z-40 transition-all duration-300 rounded-r-2xl",
+        "fixed left-0 top-0 h-screen bg-sidebar border-r border-sidebar-border flex flex-col z-40 transition-all duration-300",
         isCollapsed ? "w-16" : "w-52"
       )}
     >
-      {/* Collapse/Expand toggle on the right edge */}
+      {/* Collapse/Expand toggle */}
       <motion.button
         onClick={() => setIsCollapsed(!isCollapsed)}
         className="absolute -right-3.5 top-8 z-50 w-7 h-7 rounded-full bg-sidebar border border-sidebar-border shadow-md flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-sidebar-accent transition-colors duration-200"
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
       >
-        {isCollapsed ? (
-          <ChevronRight className="w-4 h-4" />
-        ) : (
-          <ChevronLeft className="w-4 h-4" />
-        )}
+        {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
       </motion.button>
 
-      {/* Logo Section */}
+      {/* Logo */}
       <div className="p-4 border-b border-sidebar-border">
         <div className="flex flex-col items-center justify-center">
           <AnimatePresence>
@@ -103,7 +136,7 @@ export const Sidebar = () => {
       </div>
 
       {/* Add Trade Button */}
-      <div className="p-4">
+      <div className="px-3 pt-3 pb-1">
         <Tooltip>
           <TooltipTrigger asChild>
             <motion.button
@@ -140,158 +173,60 @@ export const Sidebar = () => {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 space-y-1 overflow-y-auto">
-        {/* Section 1: Dashboard */}
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <NavLink to={dashboardItem.path} className="block">
-              <motion.div
-                className={cn(
-                  "flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200",
-                  isCollapsed ? "justify-center" : "",
-                  location.pathname === dashboardItem.path
-                    ? "bg-primary text-primary-foreground shadow-lg"
-                    : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-                )}
-                whileHover={{ x: location.pathname === dashboardItem.path || isCollapsed ? 0 : 4 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <dashboardItem.icon className="w-5 h-5 flex-shrink-0" />
-                <AnimatePresence>
-                  {!isCollapsed && (
-                    <motion.span
-                      initial={{ opacity: 0, width: 0 }}
-                      animate={{ opacity: 1, width: 'auto' }}
-                      exit={{ opacity: 0, width: 0 }}
-                      className="font-medium overflow-hidden whitespace-nowrap"
-                    >
-                      {dashboardItem.label}
-                    </motion.span>
-                  )}
-                </AnimatePresence>
-              </motion.div>
-            </NavLink>
-          </TooltipTrigger>
-          {isCollapsed && (
-            <TooltipContent side="right">
-              <p>{dashboardItem.label}</p>
-            </TooltipContent>
-          )}
-        </Tooltip>
+      <nav className="flex-1 px-3 space-y-0.5 overflow-y-auto pt-1">
+        {/* Dashboard */}
+        <NavItem
+          icon={dashboardItem.icon}
+          label={dashboardItem.label}
+          path={dashboardItem.path}
+          isCollapsed={isCollapsed}
+          isActive={location.pathname === dashboardItem.path}
+        />
 
-        {/* Divider after Dashboard */}
+        {/* Trading Views */}
+        {tradingViewItems.map((item) => (
+          <NavItem
+            key={item.path}
+            icon={item.icon}
+            label={item.label}
+            path={item.path}
+            isCollapsed={isCollapsed}
+            isActive={location.pathname === item.path}
+          />
+        ))}
+
+        {/* Separator */}
         <div className="py-2">
           <Separator className="bg-sidebar-border/50" />
         </div>
 
-        {/* Section 2: Trading Views */}
-        {tradingViewItems.map((item) => {
-          const isActive = location.pathname === item.path;
-          return (
-            <Tooltip key={item.path}>
-              <TooltipTrigger asChild>
-                <NavLink to={item.path} className="block">
-                  <motion.div
-                    className={cn(
-                      "flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200",
-                      isCollapsed ? "justify-center" : "",
-                      isActive
-                        ? "bg-primary text-primary-foreground shadow-lg"
-                        : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-                    )}
-                    whileHover={{ x: isActive || isCollapsed ? 0 : 4 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <item.icon className="w-5 h-5 flex-shrink-0" />
-                    <AnimatePresence>
-                      {!isCollapsed && (
-                        <motion.span
-                          initial={{ opacity: 0, width: 0 }}
-                          animate={{ opacity: 1, width: 'auto' }}
-                          exit={{ opacity: 0, width: 0 }}
-                          className="font-medium overflow-hidden whitespace-nowrap"
-                        >
-                          {item.label}
-                        </motion.span>
-                      )}
-                    </AnimatePresence>
-                  </motion.div>
-                </NavLink>
-              </TooltipTrigger>
-              {isCollapsed && (
-                <TooltipContent side="right">
-                  <p>{item.label}</p>
-                </TooltipContent>
-              )}
-            </Tooltip>
-          );
-        })}
+        {/* Analysis */}
+        {analysisItems.map((item) => (
+          <NavItem
+            key={item.path}
+            icon={item.icon}
+            label={item.label}
+            path={item.path}
+            isCollapsed={isCollapsed}
+            isActive={location.pathname === item.path || (item.path === '/reports' && location.pathname.startsWith('/reports'))}
+          />
+        ))}
 
-        {/* Divider after Trading Views */}
-        <div className="py-2">
-          <Separator className="bg-sidebar-border/50" />
-        </div>
-
-        {/* Section 3: Analysis & Planning */}
-        {analysisItems.map((item) => {
-          const isActive = location.pathname === item.path || 
-            (item.path === '/reports' && location.pathname.startsWith('/reports'));
-          return (
-            <Tooltip key={item.path}>
-              <TooltipTrigger asChild>
-                <NavLink to={item.path} className="block">
-                  <motion.div
-                    className={cn(
-                      "flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200",
-                      isCollapsed ? "justify-center" : "",
-                      isActive
-                        ? "bg-primary text-primary-foreground shadow-lg"
-                        : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-                    )}
-                    whileHover={{ x: isActive || isCollapsed ? 0 : 4 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <item.icon className="w-5 h-5 flex-shrink-0" />
-                    <AnimatePresence>
-                      {!isCollapsed && (
-                        <motion.span
-                          initial={{ opacity: 0, width: 0 }}
-                          animate={{ opacity: 1, width: 'auto' }}
-                          exit={{ opacity: 0, width: 0 }}
-                          className="font-medium overflow-hidden whitespace-nowrap"
-                        >
-                          {item.label}
-                        </motion.span>
-                      )}
-                    </AnimatePresence>
-                  </motion.div>
-                </NavLink>
-              </TooltipTrigger>
-              {isCollapsed && (
-                <TooltipContent side="right">
-                  <p>{item.label}</p>
-                </TooltipContent>
-              )}
-            </Tooltip>
-          );
-        })}
-        
-        {/* Chart Room Dropdown */}
+        {/* Chart Room */}
         {isCollapsed ? (
           <Tooltip>
             <TooltipTrigger asChild>
               <NavLink to="/chart-room/drawdown" className="block">
-                <motion.div
+                <div
                   className={cn(
-                    "flex items-center justify-center px-3 py-3 rounded-xl transition-all duration-200",
+                    "relative flex items-center justify-center px-3 py-2.5 rounded-lg transition-all duration-200",
                     isChartRoomActive
-                      ? "bg-primary text-primary-foreground shadow-lg"
+                      ? "bg-primary/10 text-primary font-medium"
                       : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                   )}
-                  whileTap={{ scale: 0.98 }}
                 >
                   <BarChart3 className="w-5 h-5 flex-shrink-0" />
-                </motion.div>
+                </div>
               </NavLink>
             </TooltipTrigger>
             <TooltipContent side="right">
@@ -301,44 +236,43 @@ export const Sidebar = () => {
         ) : (
           <Collapsible open={chartRoomOpen} onOpenChange={setChartRoomOpen}>
             <CollapsibleTrigger asChild>
-              <motion.button
+              <button
                 className={cn(
-                  "w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200",
+                  "relative w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200",
                   isChartRoomActive
-                    ? "bg-primary text-primary-foreground shadow-lg"
+                    ? "bg-primary/10 text-primary font-medium"
                     : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                 )}
-                whileHover={{ x: isChartRoomActive ? 0 : 4 }}
-                whileTap={{ scale: 0.98 }}
               >
+                {isChartRoomActive && (
+                  <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-primary" />
+                )}
                 <BarChart3 className="w-5 h-5 flex-shrink-0" />
-                <span className="font-medium flex-1 text-left">Chart Room</span>
-                <ChevronDown 
+                <span className="flex-1 text-left text-sm">Chart Room</span>
+                <ChevronDown
                   className={cn(
                     "w-4 h-4 transition-transform duration-200",
                     chartRoomOpen ? "rotate-180" : ""
-                  )} 
+                  )}
                 />
-              </motion.button>
+              </button>
             </CollapsibleTrigger>
             <CollapsibleContent>
-              <div className="ml-4 mt-1 space-y-1 border-l border-sidebar-border pl-4">
+              <div className="ml-4 mt-1 space-y-0.5 border-l border-sidebar-border pl-4">
                 {chartRoomItems.map((item) => {
                   const isSubActive = location.pathname === item.path;
                   return (
                     <NavLink key={item.path} to={item.path} className="block">
-                      <motion.div
+                      <div
                         className={cn(
                           "flex items-center px-3 py-2 rounded-lg text-sm transition-all duration-200",
                           isSubActive
                             ? "bg-primary/10 text-primary font-medium"
                             : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                         )}
-                        whileHover={{ x: isSubActive ? 0 : 4 }}
-                        whileTap={{ scale: 0.98 }}
                       >
                         {item.label}
-                      </motion.div>
+                      </div>
                     </NavLink>
                   );
                 })}
@@ -348,11 +282,9 @@ export const Sidebar = () => {
         )}
       </nav>
 
-      {/* Bottom Section - Account Menu (Pinned) */}
-      <div className="px-3 mt-auto">
-        <div className="py-2">
-          <Separator className="bg-sidebar-border/50" />
-        </div>
+      {/* Bottom Account */}
+      <div className="px-3 pb-3 mt-auto">
+        <Separator className="bg-sidebar-border/50 mb-2" />
         <SidebarAccountMenu isCollapsed={isCollapsed} />
       </div>
     </aside>
