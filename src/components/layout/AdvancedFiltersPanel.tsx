@@ -49,8 +49,10 @@ export const AdvancedFiltersPanel = () => {
     clearTradeCommentCategory,
   } = useGlobalFilters();
 
+  // Get active (non-archived) tags only
   const activeTags = useMemo(() => getActiveTags(), [getActiveTags]);
 
+  // Get tags grouped by category (only active tags)
   const tagsByCategory = useMemo(() => {
     const grouped: Record<string, typeof activeTags> = {};
     categories.forEach(category => {
@@ -59,6 +61,7 @@ export const AdvancedFiltersPanel = () => {
     return grouped;
   }, [categories, activeTags]);
 
+  // Get active comment options
   const activeEntryComments = useMemo(() => getActiveEntryComments(), [getActiveEntryComments]);
   const activeTradeManagements = useMemo(() => getActiveTradeManagements(), [getActiveTradeManagements]);
   const activeExitComments = useMemo(() => getActiveExitComments(), [getActiveExitComments]);
@@ -72,8 +75,11 @@ export const AdvancedFiltersPanel = () => {
   const toggleCategoryExpanded = (categoryId: string) => {
     setExpandedCategories(prev => {
       const next = new Set(prev);
-      if (next.has(categoryId)) next.delete(categoryId);
-      else next.add(categoryId);
+      if (next.has(categoryId)) {
+        next.delete(categoryId);
+      } else {
+        next.add(categoryId);
+      }
       return next;
     });
   };
@@ -82,6 +88,7 @@ export const AdvancedFiltersPanel = () => {
     return (selectedTagsByCategory[categoryId]?.length || 0) > 0;
   };
 
+  // Check if category is in "Select All" mode (all tags are selected)
   const isCategorySelectAllMode = (categoryId: string) => {
     const categoryTags = tagsByCategory[categoryId] || [];
     const selectedTags = selectedTagsByCategory[categoryId] || [];
@@ -91,8 +98,13 @@ export const AdvancedFiltersPanel = () => {
   const handleCategoryCheckToggle = (categoryId: string) => {
     if (isCategoryChecked(categoryId)) {
       clearCategoryTags(categoryId);
-      setExpandedCategories(prev => { const next = new Set(prev); next.delete(categoryId); return next; });
+      setExpandedCategories(prev => {
+        const next = new Set(prev);
+        next.delete(categoryId);
+        return next;
+      });
     } else {
+      // When checking, auto-select ALL tags and expand the category
       const categoryTags = tagsByCategory[categoryId] || [];
       const allTagIds = categoryTags.map(t => t.id);
       selectAllTagsInCategory(categoryId, allTagIds);
@@ -107,16 +119,24 @@ export const AdvancedFiltersPanel = () => {
   };
 
   const handleTagClick = (categoryId: string, tagId: string) => {
+    const categoryTags = tagsByCategory[categoryId] || [];
     const isSelectAll = isCategorySelectAllMode(categoryId);
+    
     if (isSelectAll) {
+      // Transitioning from "Select All" to individual selection
+      // Clear all and select only the clicked item
       selectAllTagsInCategory(categoryId, [tagId]);
     } else {
+      // Normal toggle behavior
       toggleCategoryTagFilter(categoryId, tagId);
     }
   };
 
+  // Visual check: in "Select All" mode, individual items appear unchecked
   const isTagVisuallySelected = (categoryId: string, tagId: string) => {
-    if (isCategorySelectAllMode(categoryId)) return false;
+    if (isCategorySelectAllMode(categoryId)) {
+      return false; // In "Select All" mode, individual items are not visually checked
+    }
     return selectedTagsByCategory[categoryId]?.includes(tagId) || false;
   };
 
@@ -128,10 +148,12 @@ export const AdvancedFiltersPanel = () => {
     return `${selectedCount} selected`;
   };
 
+  // Comment category handlers
   const isCommentCategoryChecked = (category: TradeCommentCategory) => {
     return selectedTradeComments[category].length > 0;
   };
 
+  // Check if comment category is in "Select All" mode
   const isCommentCategorySelectAllMode = (category: TradeCommentCategory, allComments: string[]) => {
     const selectedComments = selectedTradeComments[category];
     return allComments.length > 0 && selectedComments.length === allComments.length;
@@ -140,8 +162,13 @@ export const AdvancedFiltersPanel = () => {
   const handleCommentCategoryCheckToggle = (category: TradeCommentCategory, allComments: string[]) => {
     if (isCommentCategoryChecked(category)) {
       clearTradeCommentCategory(category);
-      setExpandedCommentCategories(prev => { const next = new Set(prev); next.delete(category); return next; });
+      setExpandedCommentCategories(prev => {
+        const next = new Set(prev);
+        next.delete(category);
+        return next;
+      });
     } else {
+      // When checking, auto-select ALL comments and expand
       selectAllCommentsInCategory(category, allComments);
       setExpandedCommentCategories(prev => new Set([...prev, category]));
     }
@@ -153,15 +180,22 @@ export const AdvancedFiltersPanel = () => {
 
   const handleCommentClick = (category: TradeCommentCategory, comment: string, allComments: string[]) => {
     const isSelectAll = isCommentCategorySelectAllMode(category, allComments);
+    
     if (isSelectAll) {
+      // Transitioning from "Select All" to individual selection
+      // Clear all and select only the clicked item
       selectAllCommentsInCategory(category, [comment]);
     } else {
+      // Normal toggle behavior
       toggleTradeComment(category, comment);
     }
   };
 
+  // Visual check: in "Select All" mode, individual items appear unchecked
   const isCommentVisuallySelected = (category: TradeCommentCategory, comment: string, allComments: string[]) => {
-    if (isCommentCategorySelectAllMode(category, allComments)) return false;
+    if (isCommentCategorySelectAllMode(category, allComments)) {
+      return false; // In "Select All" mode, individual items are not visually checked
+    }
     return selectedTradeComments[category].includes(comment);
   };
 
@@ -180,7 +214,7 @@ export const AdvancedFiltersPanel = () => {
   return (
     <div className="flex min-h-[300px]">
       {/* Left Menu */}
-      <div className="w-36 border-r border-border/50 p-2 flex flex-col gap-0.5">
+      <div className="w-40 border-r border-border p-2 flex flex-col gap-1">
         {menuItems.map((item) => (
           <button
             key={item.key}
@@ -188,8 +222,8 @@ export const AdvancedFiltersPanel = () => {
             className={cn(
               "flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-left w-full",
               activeSection === item.key
-                ? "bg-muted text-foreground"
-                : "hover:bg-muted/50 text-muted-foreground hover:text-foreground"
+                ? "bg-primary text-primary-foreground"
+                : "hover:bg-accent text-muted-foreground hover:text-foreground"
             )}
           >
             {item.icon}
@@ -207,7 +241,10 @@ export const AdvancedFiltersPanel = () => {
         {activeSection === 'general' && (
           <div className="space-y-4">
             <div>
-              <div className="text-[10px] tracking-widest text-muted-foreground font-semibold uppercase mb-3">Trade Comments</div>
+              <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
+                <MessageSquare className="w-4 h-4" />
+                Trade Comments
+              </h4>
               <div className="space-y-2">
                 {commentCategories.map(({ key, label, comments }) => {
                   const isExpanded = expandedCommentCategories.has(key) || isCommentCategoryChecked(key);
@@ -215,6 +252,7 @@ export const AdvancedFiltersPanel = () => {
                   
                   return (
                     <div key={key} className="space-y-2">
+                      {/* Category Row */}
                       <div 
                         className="flex items-center gap-2 cursor-pointer"
                         onClick={() => handleCommentCategoryCheckToggle(key, comments)}
@@ -227,6 +265,7 @@ export const AdvancedFiltersPanel = () => {
                         <span className="text-sm">{label}</span>
                       </div>
 
+                      {/* Expanded Comment Selector */}
                       {isExpanded && comments.length > 0 && (
                         <div className="ml-6 space-y-2">
                           <Popover 
@@ -234,12 +273,14 @@ export const AdvancedFiltersPanel = () => {
                             onOpenChange={(open) => setOpenCommentPopovers(prev => ({ ...prev, [key]: open }))}
                           >
                             <PopoverTrigger asChild>
-                              <button
-                                className="w-full h-8 flex items-center justify-between px-2.5 text-sm font-normal rounded-md bg-muted/40 hover:bg-muted/60 transition-colors text-foreground"
+                              <Button
+                                variant="outline"
+                                role="combobox"
+                                className="w-full justify-between h-9 text-sm bg-background border-border"
                               >
                                 {getSelectedCommentsLabel(key, comments)}
                                 <ChevronDown className="ml-2 h-3 w-3 shrink-0 opacity-50" />
-                              </button>
+                              </Button>
                             </PopoverTrigger>
                             <PopoverContent className="w-[220px] p-0 bg-popover border-border z-[100]" align="start">
                               <Command>
@@ -247,15 +288,20 @@ export const AdvancedFiltersPanel = () => {
                                 <CommandList>
                                   <CommandEmpty>No comments found.</CommandEmpty>
                                   <CommandGroup>
+                                    {/* Select All Option */}
                                     <CommandItem
                                       onSelect={() => handleSelectAllComments(key, comments)}
                                       className="cursor-pointer"
                                     >
                                       <div className={cn(
                                         "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
-                                        isSelectAllMode ? "bg-primary text-primary-foreground" : "opacity-50"
+                                        isSelectAllMode
+                                          ? "bg-primary text-primary-foreground"
+                                          : "opacity-50"
                                       )}>
-                                        {isSelectAllMode && <Check className="h-3 w-3" />}
+                                        {isSelectAllMode && (
+                                          <Check className="h-3 w-3" />
+                                        )}
                                       </div>
                                       <span className="font-medium">Select All</span>
                                     </CommandItem>
@@ -270,9 +316,13 @@ export const AdvancedFiltersPanel = () => {
                                       >
                                         <div className={cn(
                                           "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
-                                          isCommentVisuallySelected(key, comment, comments) ? "bg-primary text-primary-foreground" : "opacity-50"
+                                          isCommentVisuallySelected(key, comment, comments)
+                                            ? "bg-primary text-primary-foreground"
+                                            : "opacity-50"
                                         )}>
-                                          {isCommentVisuallySelected(key, comment, comments) && <Check className="h-3 w-3" />}
+                                          {isCommentVisuallySelected(key, comment, comments) && (
+                                            <Check className="h-3 w-3" />
+                                          )}
                                         </div>
                                         <span>{comment}</span>
                                       </CommandItem>
@@ -312,6 +362,7 @@ export const AdvancedFiltersPanel = () => {
                 
                 return (
                   <div key={category.id} className="space-y-2">
+                    {/* Category Row */}
                     <div 
                       className="flex items-center gap-2 cursor-pointer"
                       onClick={() => handleCategoryCheckToggle(category.id)}
@@ -324,6 +375,7 @@ export const AdvancedFiltersPanel = () => {
                       <span className="text-sm">{category.name}</span>
                     </div>
 
+                    {/* Expanded Tag Selector */}
                     {isExpanded && categoryTags.length > 0 && (
                       <div className="ml-6 space-y-2">
                         <Popover 
@@ -331,12 +383,14 @@ export const AdvancedFiltersPanel = () => {
                           onOpenChange={(open) => setOpenPopovers(prev => ({ ...prev, [category.id]: open }))}
                         >
                           <PopoverTrigger asChild>
-                            <button
-                              className="w-full h-8 flex items-center justify-between px-2.5 text-sm font-normal rounded-md bg-muted/40 hover:bg-muted/60 transition-colors text-foreground"
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              className="w-full justify-between h-9 text-sm bg-background border-border"
                             >
                               {getSelectedTagsLabel(category.id)}
                               <ChevronDown className="ml-2 h-3 w-3 shrink-0 opacity-50" />
-                            </button>
+                            </Button>
                           </PopoverTrigger>
                           <PopoverContent className="w-[220px] p-0 bg-popover border-border z-[100]" align="start">
                             <Command>
@@ -344,15 +398,20 @@ export const AdvancedFiltersPanel = () => {
                               <CommandList>
                                 <CommandEmpty>No tags found.</CommandEmpty>
                                 <CommandGroup>
+                                  {/* Select All Option */}
                                   <CommandItem
                                     onSelect={() => handleSelectAllTags(category.id)}
                                     className="cursor-pointer"
                                   >
                                     <div className={cn(
                                       "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
-                                      isSelectAllMode ? "bg-primary text-primary-foreground" : "opacity-50"
+                                      isSelectAllMode
+                                        ? "bg-primary text-primary-foreground"
+                                        : "opacity-50"
                                     )}>
-                                      {isSelectAllMode && <Check className="h-3 w-3" />}
+                                      {isSelectAllMode && (
+                                        <Check className="h-3 w-3" />
+                                      )}
                                     </div>
                                     <span className="font-medium">Select All</span>
                                   </CommandItem>
@@ -367,9 +426,13 @@ export const AdvancedFiltersPanel = () => {
                                     >
                                       <div className={cn(
                                         "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
-                                        isTagVisuallySelected(category.id, tag.id) ? "bg-primary text-primary-foreground" : "opacity-50"
+                                        isTagVisuallySelected(category.id, tag.id)
+                                          ? "bg-primary text-primary-foreground"
+                                          : "opacity-50"
                                       )}>
-                                        {isTagVisuallySelected(category.id, tag.id) && <Check className="h-3 w-3" />}
+                                        {isTagVisuallySelected(category.id, tag.id) && (
+                                          <Check className="h-3 w-3" />
+                                        )}
                                       </div>
                                       <span>{tag.name}</span>
                                     </CommandItem>
