@@ -505,73 +505,39 @@ const Trades = () => {
         className="glass-card rounded-2xl flex flex-col flex-1 min-h-0 overflow-hidden"
       >
         {/* Action Bar */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-border flex-shrink-0">
+        <div className="flex items-center justify-between px-3 md:px-4 py-2 md:py-3 border-b border-border flex-shrink-0">
           <div className="flex items-center gap-2">
-            {/* Select All / Deselect */}
+            {/* Select All / Deselect - always visible */}
             <Button
               variant={someSelected ? "default" : "outline"}
               size="sm"
               onClick={handleSelectAll}
-              className="gap-2"
+              className="gap-1.5 text-xs md:text-sm"
             >
               {someSelected ? (
                 <>
                   <CheckSquare className="w-4 h-4" />
-                  Deselect
+                  <span className="hidden sm:inline">Deselect</span>
                 </>
               ) : (
                 <>
                   <Square className="w-4 h-4" />
-                  Select All
+                  <span className="hidden sm:inline">Select All</span>
                 </>
               )}
             </Button>
 
-            {/* Import */}
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="gap-2"
-              onClick={() => setImportModalOpen(true)}
-            >
-              <Upload className="w-4 h-4" />
-              Import
-            </Button>
-
-            {/* Merge */}
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="gap-2"
-              disabled={selectedTrades.size < 2}
-            >
-              <GitMerge className="w-4 h-4" />
-              Merge
-            </Button>
-
-            {/* Duplicate */}
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="gap-2"
-              disabled={selectedTrades.size === 0}
-              onClick={handleDuplicateSelected}
-            >
-              <Copy className="w-4 h-4" />
-              Duplicate
-            </Button>
-
-            {/* Delete */}
+            {/* Delete - always visible */}
             <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
               <Button 
                 variant="outline" 
                 size="sm" 
-                className="gap-2 text-destructive hover:text-destructive"
+                className="gap-1.5 text-xs md:text-sm text-destructive hover:text-destructive"
                 disabled={selectedTrades.size === 0}
                 onClick={() => setDeleteDialogOpen(true)}
               >
                 <Trash2 className="w-4 h-4" />
-                Delete ({selectedTrades.size})
+                <span className="hidden sm:inline">Delete</span> ({selectedTrades.size})
               </Button>
               <AlertDialogContent>
                 <AlertDialogHeader>
@@ -591,6 +557,66 @@ const Trades = () => {
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
+
+            {/* Desktop: show buttons inline */}
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="gap-2 hidden lg:inline-flex"
+              onClick={() => setImportModalOpen(true)}
+            >
+              <Upload className="w-4 h-4" />
+              Import
+            </Button>
+
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="gap-2 hidden lg:inline-flex"
+              disabled={selectedTrades.size < 2}
+            >
+              <GitMerge className="w-4 h-4" />
+              Merge
+            </Button>
+
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="gap-2 hidden lg:inline-flex"
+              disabled={selectedTrades.size === 0}
+              onClick={handleDuplicateSelected}
+            >
+              <Copy className="w-4 h-4" />
+              Duplicate
+            </Button>
+
+            {/* Mobile/Tablet: burger menu for Import, Merge, Duplicate */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="lg:hidden">
+                  <Menu className="w-4 h-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-44">
+                <DropdownMenuItem onClick={() => setImportModalOpen(true)}>
+                  <Upload className="w-4 h-4 mr-2" />
+                  Import
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  disabled={selectedTrades.size < 2}
+                >
+                  <GitMerge className="w-4 h-4 mr-2" />
+                  Merge
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  disabled={selectedTrades.size === 0}
+                  onClick={handleDuplicateSelected}
+                >
+                  <Copy className="w-4 h-4 mr-2" />
+                  Duplicate
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
           {/* Right Controls */}
