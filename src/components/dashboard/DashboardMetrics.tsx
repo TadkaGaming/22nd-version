@@ -268,18 +268,16 @@ export const DashboardMetrics = ({ isEditMode }: DashboardMetricsProps) => {
     <>
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleMetricDragEnd}>
         <SortableContext items={metricsOrder} strategy={horizontalListSortingStrategy}>
-          <div className={`grid ${gridColsClass} gap-3`}>
+          <div className={`grid ${gridColsClass} gap-3 auto-rows-fr`}>
             {allItems.map((item, i) => {
               const isLast = i === allItems.length - 1;
-              const spanClass = isLast ? `${needsMdSpan ? 'md:col-span-2' : ''} ${needsLgSpan ? 'lg:col-span-2' : ''}` : '';
+              const spanClass = isLast ? `${needsMdSpan ? 'md:col-span-2' : ''} ${needsLgSpan ? 'lg:col-span-2' : ''}`.trim() : '';
               if (item.type === 'add') {
                 return <div key="__add__" className={spanClass}><AddWidgetPlaceholder onClick={() => setIsMetricsLibraryOpen(true)} /></div>;
               }
               return (
-                <SortableMetric key={item.metricId} id={item.metricId} isEditMode={isEditMode} onRemove={handleRemoveMetric}>
-                  <div className={spanClass}>
-                    {renderMetric(item.metricId, item.index)}
-                  </div>
+                <SortableMetric key={item.metricId} id={item.metricId} isEditMode={isEditMode} onRemove={handleRemoveMetric} className={spanClass}>
+                  {renderMetric(item.metricId, item.index)}
                 </SortableMetric>
               );
             })}
