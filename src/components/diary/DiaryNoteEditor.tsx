@@ -128,7 +128,7 @@ export const DiaryNoteEditor = () => {
         </div>
 
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" className="gap-2">
+          <Button variant="outline" size="sm" className="gap-2 hidden lg:inline-flex">
             <Share2 className="h-4 w-4" />
             Share
           </Button>
@@ -139,9 +139,14 @@ export const DiaryNoteEditor = () => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="bg-popover z-50">
+              <DropdownMenuItem className="lg:hidden">
+                <Share2 className="h-4 w-4 mr-2" />
+                Share
+              </DropdownMenuItem>
               {/* Show Link/Unlink options only for non-Day notes */}
               {!isDayNote && (
                 <>
+                  <DropdownMenuSeparator className="lg:hidden" />
                   {isTradeNote ? (
                     <DropdownMenuItem onClick={handleUnlinkTrade}>
                       <Unlink className="h-4 w-4 mr-2" />
