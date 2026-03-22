@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useFilteredTrades } from '@/hooks/useFilteredTrades';
 import { useGlobalFilters } from '@/contexts/GlobalFiltersContext';
 import { calculateTradeMetrics } from '@/types/trade';
