@@ -251,7 +251,7 @@ export const TradeTimePerformanceChart = () => {
               fontSize={11}
               tickLine={false}
               axisLine={false}
-              width={60}
+              width={45}
             />
             <RechartsTooltip content={<CustomTooltip />} />
             <ReferenceLine 
