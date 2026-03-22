@@ -79,16 +79,16 @@ export const DayTradesTable = ({ trades }: DayTradesTableProps) => {
     <>
       <div className="border border-border rounded-lg overflow-hidden bg-card/50">
         <Table>
-          <TableHeader>
+          <TableHeader className="sticky top-0 z-10 bg-card">
             <TableRow className="hover:bg-transparent border-border">
-              <TableHead className="text-muted-foreground font-medium">Open Time</TableHead>
-              <TableHead className="text-muted-foreground font-medium">Ticker</TableHead>
-              <TableHead className="text-muted-foreground font-medium">Side</TableHead>
-              <TableHead className="text-muted-foreground font-medium">Net P&L</TableHead>
-              <TableHead className="text-muted-foreground font-medium">Net ROI</TableHead>
-              <TableHead className="text-muted-foreground font-medium">Realized R-Multiple</TableHead>
-              <TableHead className="text-muted-foreground font-medium">Strategy</TableHead>
-              <TableHead className="text-muted-foreground font-medium">Tags</TableHead>
+              <TableHead className="text-muted-foreground font-medium text-xs sm:text-sm whitespace-nowrap">Open Time</TableHead>
+              <TableHead className="text-muted-foreground font-medium text-xs sm:text-sm whitespace-nowrap">Ticker</TableHead>
+              <TableHead className="text-muted-foreground font-medium text-xs sm:text-sm whitespace-nowrap">Side</TableHead>
+              <TableHead className="text-muted-foreground font-medium text-xs sm:text-sm whitespace-nowrap">Net P&L</TableHead>
+              <TableHead className="text-muted-foreground font-medium text-xs sm:text-sm whitespace-nowrap">Net ROI</TableHead>
+              <TableHead className="text-muted-foreground font-medium text-xs sm:text-sm whitespace-nowrap">R-Multiple</TableHead>
+              <TableHead className="text-muted-foreground font-medium text-xs sm:text-sm whitespace-nowrap">Strategy</TableHead>
+              <TableHead className="text-muted-foreground font-medium text-xs sm:text-sm whitespace-nowrap">Tags</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
