@@ -354,8 +354,8 @@ export const MonthlyPerformanceCalendar = () => {
                             </div>
                           )}
                           {displaySettings.rMultiple && (
-                            <div className="text-[8px] md:text-[10px] text-muted-foreground hidden sm:block">
-                              {stats.rMultiple >= 0 ? '+' : ''}{stats.rMultiple.toFixed(2)}R
+                            <div className="text-[8px] md:text-[10px] text-muted-foreground">
+                              {stats.rMultiple >= 0 ? '+' : ''}{stats.rMultiple.toFixed(1)}R
                             </div>
                           )}
                         </div>
