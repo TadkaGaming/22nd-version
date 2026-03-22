@@ -1,10 +1,10 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { useFilteredTrades } from '@/hooks/useFilteredTrades';
 import { useGlobalFilters } from '@/contexts/GlobalFiltersContext';
 import { usePrivacyMode, PRIVACY_MASK } from '@/hooks/usePrivacyMode';
 import { calculateTradeMetrics, Trade } from '@/types/trade';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, addMonths, subMonths, isSameMonth, getDay, parseISO, startOfDay } from 'date-fns';
-import { ChevronLeft, ChevronRight, Settings } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ChevronDown, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -15,6 +15,15 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { motion } from 'framer-motion';
 import { DayDetailsModal } from '@/components/dayview/DayDetailsModal';
+import { cn } from '@/lib/utils';
+
+const MONTH_NAMES = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December'
+];
+const MONTH_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const currentYearConst = new Date().getFullYear();
+const YEARS = Array.from({ length: 21 }, (_, i) => currentYearConst - 10 + i);
 
 interface DayStats {
   pnl: number;
@@ -35,6 +44,75 @@ interface DisplaySettings {
   numTrades: boolean;
   winRate: boolean;
   rMultiple: boolean;
+}
+
+function MonthYearDropdowns({ month, onChange }: { month: Date; onChange: (d: Date) => void }) {
+  const [monthOpen, setMonthOpen] = useState(false);
+  const [yearOpen, setYearOpen] = useState(false);
+  const monthRef = useRef<HTMLDivElement>(null);
+  const yearRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (monthRef.current && !monthRef.current.contains(e.target as Node)) setMonthOpen(false);
+      if (yearRef.current && !yearRef.current.contains(e.target as Node)) setYearOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  return (
+    <div className="flex items-center gap-1">
+      <div ref={monthRef} className="relative">
+        <button
+          type="button"
+          onClick={() => { setMonthOpen(!monthOpen); setYearOpen(false); }}
+          className="flex items-center gap-0.5 text-sm md:text-base font-semibold hover:bg-accent rounded px-1.5 py-0.5 transition-colors border-b border-border"
+        >
+          {MONTH_SHORT[month.getMonth()]}
+          <ChevronDown className="h-3 w-3 opacity-60" />
+        </button>
+        {monthOpen && (
+          <div className="absolute top-full left-0 mt-1 bg-popover border border-border rounded-md shadow-md z-50 py-1 max-h-48 overflow-y-auto min-w-[80px]">
+            {MONTH_NAMES.map((name, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => { const d = new Date(month); d.setMonth(i); onChange(d); setMonthOpen(false); }}
+                className={cn("w-full text-left px-3 py-1.5 text-sm hover:bg-accent transition-colors", i === month.getMonth() && "bg-accent font-medium")}
+              >
+                {name}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+      <div ref={yearRef} className="relative">
+        <button
+          type="button"
+          onClick={() => { setYearOpen(!yearOpen); setMonthOpen(false); }}
+          className="flex items-center gap-0.5 text-sm md:text-base font-semibold hover:bg-accent rounded px-1.5 py-0.5 transition-colors border-b border-border"
+        >
+          {month.getFullYear()}
+          <ChevronDown className="h-3 w-3 opacity-60" />
+        </button>
+        {yearOpen && (
+          <div className="absolute top-full right-0 mt-1 bg-popover border border-border rounded-md shadow-md z-50 py-1 max-h-48 overflow-y-auto min-w-[70px]">
+            {YEARS.map((y) => (
+              <button
+                key={y}
+                type="button"
+                onClick={() => { const d = new Date(month); d.setFullYear(y); onChange(d); setYearOpen(false); }}
+                className={cn("w-full text-left px-3 py-1.5 text-sm hover:bg-accent transition-colors", y === month.getFullYear() && "bg-accent font-medium")}
+              >
+                {y}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }
 
 export const MonthlyPerformanceCalendar = () => {
@@ -222,15 +300,13 @@ export const MonthlyPerformanceCalendar = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4 md:mb-6">
         <div className="flex items-center gap-2 md:gap-3">
-          <Button variant="ghost" size="icon" onClick={handlePrevMonth} className="h-7 w-7 md:h-8 md:w-8">
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <h2 className="text-sm md:text-lg font-semibold min-w-[120px] md:min-w-[140px] text-center">
-            {format(currentMonth, 'MMMM yyyy')}
-          </h2>
-          <Button variant="ghost" size="icon" onClick={handleNextMonth} className="h-7 w-7 md:h-8 md:w-8">
-            <ChevronRight className="h-4 w-4" />
-          </Button>
+           <Button variant="ghost" size="icon" onClick={handlePrevMonth} className="h-7 w-7 md:h-8 md:w-8">
+             <ChevronLeft className="h-4 w-4" />
+           </Button>
+           <MonthYearDropdowns month={currentMonth} onChange={setCurrentMonth} />
+           <Button variant="ghost" size="icon" onClick={handleNextMonth} className="h-7 w-7 md:h-8 md:w-8">
+             <ChevronRight className="h-4 w-4" />
+           </Button>
           <Button variant="outline" size="sm" onClick={handleThisMonth} className="text-xs h-7">
             This month
           </Button>

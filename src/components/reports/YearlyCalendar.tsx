@@ -1,5 +1,5 @@
-import { useState, useMemo } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useState, useMemo, useRef, useEffect } from 'react';
+import { ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
 import { useFilteredTrades } from '@/hooks/useFilteredTrades';
 import { useGlobalFilters } from '@/contexts/GlobalFiltersContext';
 import { usePrivacyMode, PRIVACY_MASK } from '@/hooks/usePrivacyMode';
@@ -23,6 +23,49 @@ const MONTHS = [
 interface DayData {
   netPnl: number;
   tradeCount: number;
+}
+
+const currentYearConst = new Date().getFullYear();
+const YEAR_OPTIONS = Array.from({ length: 21 }, (_, i) => currentYearConst - 10 + i);
+
+function YearDropdown({ selectedYear, onChange }: { selectedYear: number; onChange: (y: number) => void }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="flex items-center gap-1 text-lg font-semibold text-foreground hover:bg-accent rounded px-2 py-0.5 transition-colors border-b border-border"
+      >
+        {selectedYear}
+        <ChevronDown className="h-3.5 w-3.5 opacity-60" />
+      </button>
+      {open && (
+        <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 bg-popover border border-border rounded-md shadow-md z-50 py-1 max-h-48 overflow-y-auto min-w-[80px]">
+          {YEAR_OPTIONS.map((y) => (
+            <button
+              key={y}
+              type="button"
+              onClick={() => { onChange(y); setOpen(false); }}
+              className={cn("w-full text-left px-3 py-1.5 text-sm hover:bg-accent transition-colors", y === selectedYear && "bg-accent font-medium")}
+            >
+              {y}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
 const YearlyCalendar = () => {
@@ -123,7 +166,7 @@ const YearlyCalendar = () => {
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
-          <h2 className="text-lg font-semibold text-foreground">{selectedYear}</h2>
+          <YearDropdown selectedYear={selectedYear} onChange={setSelectedYear} />
           <button
             onClick={handleNextYear}
             className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
