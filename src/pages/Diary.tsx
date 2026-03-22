@@ -102,18 +102,14 @@ const Diary = () => {
       >
         {activeMainTab === 'diary' ? (
           <div className="flex flex-col h-full overflow-hidden">
-            <div className="glass-card rounded-2xl overflow-hidden flex-shrink-0 grid grid-cols-[1fr_1fr] md:grid-cols-[200px_260px] lg:grid-cols-[220px_280px_1fr] lg:flex-1 lg:min-h-0 lg:rounded-2xl"
-              style={{ maxHeight: 'var(--diary-top-height)' }}
-            >
+            <div className="glass-card rounded-2xl overflow-hidden flex-shrink-0 grid grid-cols-[1fr_1fr] md:grid-cols-[200px_260px] lg:grid-cols-[220px_280px_1fr] lg:flex-1 lg:min-h-0">
               {/* Left Column - Folder Navigation */}
               <div className="overflow-hidden border-r border-border/50">
                 <DiaryFolderSidebar />
               </div>
               
               {/* Middle Column - Notes List */}
-              <div className="overflow-y-auto max-h-[calc(var(--note-item-h)*3)] md:max-h-[calc(var(--note-item-h)*6)] lg:max-h-none lg:h-full"
-                style={{ '--note-item-h': '5.5rem' } as React.CSSProperties}
-              >
+              <div className="overflow-y-auto max-h-[16.5rem] md:max-h-[33rem] lg:max-h-none lg:h-full">
                 <DiaryNotesList />
               </div>
               
