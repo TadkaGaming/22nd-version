@@ -115,7 +115,7 @@ function SingleMonthCalendar({ month, onMonthChange, selected, onSelect }: Singl
             <button
               type="button"
               onClick={() => { setYearDropdownOpen(!yearDropdownOpen); setMonthDropdownOpen(false); }}
-              className="flex items-center gap-0.5 text-sm font-medium hover:bg-accent rounded px-1.5 py-0.5 transition-colors"
+              className="flex items-center gap-0.5 text-sm font-medium hover:bg-accent rounded px-1.5 py-0.5 transition-colors border-b border-border"
             >
               {month.getFullYear()}
               <ChevronDown className="h-3 w-3 opacity-60" />
