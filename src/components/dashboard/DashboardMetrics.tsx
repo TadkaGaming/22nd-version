@@ -276,7 +276,13 @@ export const DashboardMetrics = ({ isEditMode }: DashboardMetricsProps) => {
           <div className={`grid ${gridColsClass} gap-3 auto-rows-fr`}>
             {allItems.map((item, i) => {
               const isLast = i === allItems.length - 1;
-              const spanClass = isLast ? `${needsMdSpan ? 'md:col-span-2' : ''} ${resetLgSpan && needsMdSpan ? 'lg:col-span-1' : ''} ${needsLgSpan ? 'lg:col-span-2' : ''}`.trim() : '';
+              const spanClass = isLast ? [
+                needsMobileSpan ? 'col-span-2' : '',
+                resetMdSpan ? 'md:col-span-1' : '',
+                needsMdSpan ? 'md:col-span-2' : '',
+                (resetLgSpan && (needsMobileSpan || needsMdSpan)) ? 'lg:col-span-1' : '',
+                needsLgSpan ? 'lg:col-span-2' : '',
+              ].filter(Boolean).join(' ') : '';
               if (item.type === 'add') {
                 return <div key="__add__" className={spanClass}><AddWidgetPlaceholder onClick={() => setIsMetricsLibraryOpen(true)} /></div>;
               }
