@@ -255,8 +255,10 @@ export const DashboardMetrics = ({ isEditMode }: DashboardMetricsProps) => {
   const lgClass = count <= 5 ? (lgColsMap[count] || 'lg:grid-cols-1') : 'lg:grid-cols-2';
   const gridColsClass = `grid-cols-1 ${mdClass} ${lgClass}`;
 
-  // For odd counts that exceed single-row capacity, last item spans full width
+  // For odd counts that exceed single-row capacity at a breakpoint, last item spans full width
+  // But reset at larger breakpoints where all fit in one row
   const needsMdSpan = count > 3 && count % 2 !== 0;
+  const resetLgSpan = count <= 5; // at lg all fit, so reset the md col-span
   const needsLgSpan = count > 5 && count % 2 !== 0;
 
   const allItems = [
@@ -271,7 +273,7 @@ export const DashboardMetrics = ({ isEditMode }: DashboardMetricsProps) => {
           <div className={`grid ${gridColsClass} gap-3 auto-rows-fr`}>
             {allItems.map((item, i) => {
               const isLast = i === allItems.length - 1;
-              const spanClass = isLast ? `${needsMdSpan ? 'md:col-span-2' : ''} ${needsLgSpan ? 'lg:col-span-2' : ''}`.trim() : '';
+              const spanClass = isLast ? `${needsMdSpan ? 'md:col-span-2' : ''} ${resetLgSpan && needsMdSpan ? 'lg:col-span-1' : ''} ${needsLgSpan ? 'lg:col-span-2' : ''}`.trim() : '';
               if (item.type === 'add') {
                 return <div key="__add__" className={spanClass}><AddWidgetPlaceholder onClick={() => setIsMetricsLibraryOpen(true)} /></div>;
               }
