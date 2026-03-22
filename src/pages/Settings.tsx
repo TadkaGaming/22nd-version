@@ -494,7 +494,7 @@ const Settings = () => {
       {activeSettingsTab === 'custom-tags' && (
         <div className="space-y-6">
           {/* Sub-tab Navigation */}
-          <div className="flex gap-2 p-1 bg-muted/30 rounded-lg w-fit">
+          <div className="flex gap-2 p-1 bg-muted/30 rounded-lg w-fit flex-wrap">
             <button
               onClick={() => setActiveTagsSubTab('categories')}
               className={cn(
