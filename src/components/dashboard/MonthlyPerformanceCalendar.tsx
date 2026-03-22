@@ -345,7 +345,7 @@ export const MonthlyPerformanceCalendar = () => {
                           )}
                           {displaySettings.numTrades && (
                             <div className="text-[8px] md:text-[10px] text-muted-foreground">
-                              {stats.trades}t
+                              {stats.trades} {stats.trades === 1 ? 'trade' : 'trades'}
                             </div>
                           )}
                           {displaySettings.winRate && (
