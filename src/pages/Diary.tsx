@@ -63,7 +63,7 @@ const Diary = () => {
   };
 
   return (
-    <div className="h-[calc(100vh-8rem)]">
+    <div className="h-[calc(100vh-8rem)] flex flex-col">
       {/* Sub-Navigation Menu */}
       <div className="flex items-center gap-1 border-b border-border pb-2 mb-4">
         {mainTabs.map((tab) => (
@@ -98,18 +98,24 @@ const Diary = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className={activeMainTab === 'diary' ? "h-[calc(100%-8rem)]" : ""}
+        className={activeMainTab === 'diary' ? "flex-1 min-h-0" : ""}
       >
         {activeMainTab === 'diary' ? (
-          <div className="glass-card rounded-2xl overflow-hidden h-full">
-            <div className="grid grid-cols-[220px_280px_1fr] h-full">
+          <div className="glass-card rounded-2xl overflow-hidden h-full flex flex-col">
+            <div className="grid grid-cols-[1fr_1fr] md:grid-cols-[200px_260px] lg:grid-cols-[220px_280px_1fr] max-h-[40vh] lg:max-h-none lg:h-full overflow-auto">
               {/* Left Column - Folder Navigation */}
               <DiaryFolderSidebar />
               
               {/* Middle Column - Notes List */}
               <DiaryNotesList />
               
-              {/* Right Column - Note Editor */}
+              {/* Right Column - Note Editor (hidden on mobile/tablet, shown below) */}
+              <div className="hidden lg:block h-full">
+                <DiaryNoteEditor />
+              </div>
+            </div>
+            {/* Editor below on mobile/tablet */}
+            <div className="lg:hidden flex-1 min-h-[300px] border-t border-border">
               <DiaryNoteEditor />
             </div>
           </div>
